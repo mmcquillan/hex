@@ -4,7 +4,7 @@ import (
 	"github.com/mmcquillan/jane/bambooapi"
 )
 
-func Build(user string, pass string, msg string) (results string) {
+func Build(url string, user string, pass string, msg string) (results string) {
 
 	key := "?"
 	switch msg {
@@ -18,7 +18,7 @@ func Build(user string, pass string, msg string) (results string) {
 		key = "SYN-SHR"
 	}
 	if key != "?" {
-		bambooapi.Queue("prysminc.atlassian.net", user, pass, key)
+		bambooapi.Queue(url, user, pass, key)
 		results = "Queued Build for " + msg
 	} else {
 		results = "Not sure what build that is, try: [ client | cloud | admin | html ]"

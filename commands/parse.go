@@ -31,9 +31,9 @@ func Parse(config *configs.Config, channel string, msg string) {
 	case "secrets":
 		r = Secrets(config)
 	case "build":
-		r = Build(config.BambooUser, config.BambooPass, msg)
+		r = Build(config.BambooUrl, config.BambooUser, config.BambooPass, msg)
 	case "deploy":
-		r = Deploy()
+		r = Deploy(config.BambooUrl)
 	case "catchphrase":
 		r = CatchPhrase()
 	case "rename":
@@ -51,9 +51,9 @@ func Parse(config *configs.Config, channel string, msg string) {
 	case "rules":
 		r = Rules()
 	case "env":
-		r = Env(config.BambooUser, config.BambooPass)
+		r = Env(config.BambooUrl, config.BambooUser, config.BambooPass)
 	case "environment":
-		r = Env(config.BambooUser, config.BambooPass)
+		r = Env(config.BambooUrl, config.BambooUser, config.BambooPass)
 	case "drop":
 		r = Drop(msg)
 	case "feelings":
