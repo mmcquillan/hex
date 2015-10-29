@@ -1,9 +1,9 @@
 package configs
 
 type Config struct {
-	SlackerName    string
-	SlackerEmoji   string
-	SlackerChannel string
+	JaneName       string
+	JaneEmoji      string
+	JaneChannel    string
 	SlackToken     string
 	BambooUser     string
 	BambooPass     string
