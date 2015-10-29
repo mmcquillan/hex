@@ -1,6 +1,8 @@
 package configs
 
 type Config struct {
+	LogFile        string
+	Debug          bool
 	JaneName       string
 	JaneEmoji      string
 	JaneChannel    string
