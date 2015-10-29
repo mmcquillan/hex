@@ -10,7 +10,7 @@ func Parse(config *configs.Config, channel string, msg string) {
 
 	// make sure they are talking to and not about us
 	tokmsg := strings.Split(strings.TrimSpace(msg), " ")
-	if strings.ToLower(tokmsg[0]) != strings.ToLower(config.SlackerName) {
+	if strings.ToLower(tokmsg[0]) != strings.ToLower(config.JaneName) {
 		return
 	}
 
@@ -78,7 +78,7 @@ func Help(config *configs.Config) (r string) {
 	}
 	r = "*Say things like:*\n"
 	for _, help := range helps {
-		r += "\t" + config.SlackerName + " " + help + "\n"
+		r += "\t" + config.JaneName + " " + help + "\n"
 	}
 	return r
 }
@@ -94,7 +94,7 @@ func Secrets(config *configs.Config) (r string) {
 	}
 	r = "*Quietly say things like:*\n"
 	for _, secret := range secrets {
-		r += "\t" + config.SlackerName + " " + secret + "\n"
+		r += "\t" + config.JaneName + " " + secret + "\n"
 	}
 	return r
 }
@@ -102,7 +102,7 @@ func Secrets(config *configs.Config) (r string) {
 func Talk(config *configs.Config, channel string, say string) {
 	api := slack.New(config.SlackToken)
 	params := slack.NewPostMessageParameters()
-	params.Username = config.SlackerName
-	params.IconEmoji = config.SlackerEmoji
+	params.Username = config.JaneName
+	params.IconEmoji = config.JaneEmoji
 	api.PostMessage(channel, say, params)
 }

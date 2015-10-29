@@ -48,8 +48,8 @@ func Listen(config *configs.Config) {
 func Talk(config *configs.Config, message Message) {
 	api := slack.New(config.SlackToken)
 	params := slack.NewPostMessageParameters()
-	params.Username = config.SlackerName
-	params.IconEmoji = config.SlackerEmoji
+	params.Username = config.JaneName
+	params.IconEmoji = config.JaneEmoji
 	color := ColorMe(message.Status)
 	attachment := slack.Attachment{
 		Title:     message.Title,

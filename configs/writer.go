@@ -21,9 +21,9 @@ func WriteDefaultConfig(location string) {
 	}()
 
 	var config Config
-	config.SlackerName = "slacker"
-	config.SlackerEmoji = ":game_die:"
-	config.SlackerChannel = "#general"
+	config.JaneName = "jane"
+	config.JaneEmoji = ":game_die:"
+	config.JaneChannel = "#general"
 	config.SlackToken = ""
 	config.BambooUser = ""
 	config.BambooPass = ""

@@ -15,8 +15,8 @@ import (
 var wg sync.WaitGroup
 
 func main() {
-	configFile := flag.String("config", "/etc/slacker.config", "Config file")
-	logFile := flag.String("log", "/var/log/slacker.log", "Log file")
+	configFile := flag.String("config", "/etc/jane.config", "Config file")
+	logFile := flag.String("log", "/var/log/jane.log", "Log file")
 	flag.Parse()
 	setLogs(*logFile)
 	config := loadConfig(*configFile)
@@ -33,7 +33,7 @@ func setLogs(logFile string) {
 		panic(err)
 	}
 	log.SetOutput(f)
-	log.Println("Starting the slacker bot")
+	log.Println("Starting the jane bot")
 }
 
 func loadConfig(configFile string) (config configs.Config) {
