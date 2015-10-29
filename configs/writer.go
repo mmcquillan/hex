@@ -25,6 +25,7 @@ func WriteDefaultConfig(location string) {
 	config.JaneEmoji = ":game_die:"
 	config.JaneChannel = "#general"
 	config.SlackToken = ""
+	config.BambooUrl = ""
 	config.BambooUser = ""
 	config.BambooPass = ""
 	config.BambooChannels = make(map[string]string)

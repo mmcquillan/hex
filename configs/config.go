@@ -5,6 +5,7 @@ type Config struct {
 	JaneEmoji      string
 	JaneChannel    string
 	SlackToken     string
+	BambooUrl      string
 	BambooUser     string
 	BambooPass     string
 	BambooChannels map[string]string

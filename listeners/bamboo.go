@@ -10,7 +10,7 @@ import (
 
 func Bamboo(config *configs.Config, lastMarker string) (nextMarker string, messages []Message) {
 	channels := config.BambooChannels
-	url := "https://" + config.BambooUser + ":" + config.BambooPass + "@prysminc.atlassian.net/builds/plugins/servlet/streams?local=true"
+	url := "https://" + config.BambooUser + ":" + config.BambooPass + "@" + config.BambooUrl + "/builds/plugins/servlet/streams?local=true"
 	feed, err := rss.Fetch(url)
 	if err != nil {
 		log.Println(err)
@@ -18,9 +18,9 @@ func Bamboo(config *configs.Config, lastMarker string) (nextMarker string, messa
 	for i := len(feed.Items) - 1; i >= 0; i-- {
 		item := feed.Items[i]
 		if item.Date.String() > lastMarker {
-			build := strings.Split(strings.Replace(item.Title, "<a href=\"https://prysminc.atlassian.net/builds/browse/", "", 1), "\"")[0]
-			link := "https://prysminc.atlassian.net/builds/browse/" + build
-			res := bambooapi.GetResult("prysminc.atlassian.net", config.BambooUser, config.BambooPass, build)
+			build := strings.Split(strings.Replace(item.Title, "<a href=\"https://"+config.BambooUrl+"/builds/browse/", "", 1), "\"")[0]
+			link := "https://" + config.BambooUrl + "/builds/browse/" + build
+			res := bambooapi.GetResult(config.BambooUrl, config.BambooUser, config.BambooPass, build)
 			for planmatch, channel := range channels {
 				if strings.Contains(res.Plan, planmatch) || planmatch == "*" {
 					m := Message{channel, "Bamboo Build " + res.State, res.Plan + " #" + res.Number + " - " + res.Responsible, link, res.State}

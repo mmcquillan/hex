@@ -4,9 +4,9 @@ import (
 	"github.com/mmcquillan/jane/bambooapi"
 )
 
-func Env(user string, pass string) (results string) {
+func Env(url string, user string, pass string) (results string) {
 	results = "*Current deploys...*\n"
-	d := bambooapi.DeployResults("prysminc.atlassian.net", user, pass)
+	d := bambooapi.DeployResults(url, user, pass)
 	for _, de := range d {
 		for _, e := range de.Environmentstatuses {
 			if e.Deploymentresult.ID > 0 {
