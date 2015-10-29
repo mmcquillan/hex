@@ -1,0 +1,9 @@
+-Allow jane to report back build # on newly queued build
+-Allow users to ask for status on build
+-Move the Bamboo url out to the config file
+-Add azure status
+-Add status.atlassian.com
+-Add hooks into sensu logging
+-Add hooks into New Relic logging
+-Add a check on commits with no Jira links
+-Keep stats of activity
