@@ -1,7 +1,7 @@
 package listeners
 
 import (
-	"bitbucket.org/prysm/devops-robot/configs"
+	"github.com/mmcquillan/jane/configs"
 	"github.com/nlopes/slack"
 	"strconv"
 	"time"

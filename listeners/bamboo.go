@@ -1,9 +1,9 @@
 package listeners
 
 import (
-	"bitbucket.org/prysm/devops-robot/bambooapi"
-	"bitbucket.org/prysm/devops-robot/configs"
 	"github.com/SlyMarbo/rss"
+	"github.com/mmcquillan/jane/bambooapi"
+	"github.com/mmcquillan/jane/configs"
 	"log"
 	"strings"
 )

@@ -1,11 +1,11 @@
 package main
 
 import (
-	"bitbucket.org/prysm/devops-robot/commands"
-	"bitbucket.org/prysm/devops-robot/configs"
-	"bitbucket.org/prysm/devops-robot/listeners"
 	"flag"
 	"fmt"
+	"github.com/mmcquillan/jane/commands"
+	"github.com/mmcquillan/jane/configs"
+	"github.com/mmcquillan/jane/listeners"
 	"github.com/nlopes/slack"
 	"log"
 	"os"

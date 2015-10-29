@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"bitbucket.org/prysm/devops-robot/bambooapi"
+	"github.com/mmcquillan/jane/bambooapi"
 )
 
 func Build(user string, pass string, msg string) (results string) {
