@@ -1,51 +1,22 @@
 package main
 
 import (
-	"flag"
-	"fmt"
 	"github.com/mmcquillan/jane/commands"
 	"github.com/mmcquillan/jane/configs"
 	"github.com/mmcquillan/jane/listeners"
 	"github.com/nlopes/slack"
-	"log"
-	"os"
 	"sync"
 )
 
 var wg sync.WaitGroup
 
 func main() {
-	configFile := flag.String("config", "/etc/jane.config", "Config file")
-	logFile := flag.String("log", "/var/log/jane.log", "Log file")
-	flag.Parse()
-	setLogs(*logFile)
-	config := loadConfig(*configFile)
+	config := configs.Load()
+	configs.Logging(&config)
 	wg.Add(2)
 	go commandLoop(&config)
 	go listenLoop(&config)
 	wg.Wait()
-}
-
-func setLogs(logFile string) {
-	f, err := os.OpenFile(logFile, os.O_RDWR|os.O_APPEND, 0660)
-	if err != nil {
-		fmt.Println("Cannot find log file at " + logFile)
-		panic(err)
-	}
-	log.SetOutput(f)
-	log.Println("Starting the jane bot")
-}
-
-func loadConfig(configFile string) (config configs.Config) {
-	if configs.CheckConfig(configFile) {
-		config = configs.ReadConfig(configFile)
-	} else {
-		configs.WriteDefaultConfig(configFile)
-		fmt.Println("Missing config file, creating...")
-		fmt.Println("Please configure " + configFile)
-		os.Exit(1)
-	}
-	return config
 }
 
 func commandLoop(config *configs.Config) {

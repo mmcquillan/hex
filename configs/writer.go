@@ -24,12 +24,6 @@ func WriteDefaultConfig(location string) {
 	config.JaneName = "jane"
 	config.JaneEmoji = ":game_die:"
 	config.JaneChannel = "#general"
-	config.SlackToken = ""
-	config.BambooUrl = ""
-	config.BambooUser = ""
-	config.BambooPass = ""
-	config.BambooChannels = make(map[string]string)
-	config.BambooChannels["*"] = "#general"
 
 	buf := new(bytes.Buffer)
 	if err := toml.NewEncoder(buf).Encode(config); err != nil {
