@@ -2,6 +2,7 @@ package configs
 
 type Config struct {
 	LogFile        string
+	Interactive    bool
 	Debug          bool
 	JaneName       string
 	JaneEmoji      string
