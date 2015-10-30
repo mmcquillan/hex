@@ -2,7 +2,7 @@ package commands
 
 import (
 	"github.com/mmcquillan/jane/configs"
-	"github.com/nlopes/slack"
+	"github.com/mmcquillan/jane/outputs"
 	"strings"
 )
 
@@ -61,7 +61,8 @@ func Parse(config *configs.Config, channel string, msg string) {
 	}
 
 	// feedback
-	Talk(config, channel, r)
+	message := outputs.Message{channel, r, "", "", ""}
+	outputs.Output(config, message)
 
 }
 
@@ -97,12 +98,4 @@ func Secrets(config *configs.Config) (r string) {
 		r += "\t" + config.JaneName + " " + secret + "\n"
 	}
 	return r
-}
-
-func Talk(config *configs.Config, channel string, say string) {
-	api := slack.New(config.SlackToken)
-	params := slack.NewPostMessageParameters()
-	params.Username = config.JaneName
-	params.IconEmoji = config.JaneEmoji
-	api.PostMessage(channel, say, params)
 }

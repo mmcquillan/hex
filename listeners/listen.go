@@ -2,24 +2,16 @@ package listeners
 
 import (
 	"github.com/mmcquillan/jane/configs"
-	"github.com/nlopes/slack"
+	"github.com/mmcquillan/jane/outputs"
 	"strconv"
 	"time"
 )
-
-type Message struct {
-	Destination string
-	Title       string
-	Description string
-	Link        string
-	Status      string
-}
 
 func Listen(config *configs.Config) {
 
 	// init
 	now := time.Now()
-	messages := make([]Message, 0)
+	messages := make([]outputs.Message, 0)
 	bambooMarker := now.UTC().String()
 	deployMarker := strconv.FormatInt(now.Unix(), 10) + "000"
 
@@ -29,13 +21,13 @@ func Listen(config *configs.Config) {
 		// bamboo
 		bambooMarker, messages = Bamboo(config, bambooMarker)
 		for _, m := range messages {
-			Talk(config, m)
+			outputs.Output(config, m)
 		}
 
 		// deploys
 		deployMarker, messages = Deploys(config, deployMarker)
 		for _, m := range messages {
-			Talk(config, m)
+			outputs.Output(config, m)
 		}
 
 		// wait
@@ -43,36 +35,4 @@ func Listen(config *configs.Config) {
 
 	}
 
-}
-
-func Talk(config *configs.Config, message Message) {
-	api := slack.New(config.SlackToken)
-	params := slack.NewPostMessageParameters()
-	params.Username = config.JaneName
-	params.IconEmoji = config.JaneEmoji
-	color := ColorMe(message.Status)
-	attachment := slack.Attachment{
-		Title:     message.Title,
-		TitleLink: message.Link,
-		Text:      message.Description,
-		Color:     color,
-	}
-	params.Attachments = []slack.Attachment{attachment}
-	api.PostMessage(message.Destination, "", params)
-}
-
-func ColorMe(status string) (color string) {
-	switch status {
-	case "Successful":
-		color = "good"
-	case "SUCCESS":
-		color = "good"
-	case "Failed":
-		color = "danger"
-	case "FAILED":
-		color = "danger"
-	default:
-		color = "#DDDDDD"
-	}
-	return color
 }

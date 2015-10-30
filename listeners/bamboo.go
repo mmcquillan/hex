@@ -4,11 +4,12 @@ import (
 	"github.com/SlyMarbo/rss"
 	"github.com/mmcquillan/jane/bambooapi"
 	"github.com/mmcquillan/jane/configs"
+	"github.com/mmcquillan/jane/outputs"
 	"log"
 	"strings"
 )
 
-func Bamboo(config *configs.Config, lastMarker string) (nextMarker string, messages []Message) {
+func Bamboo(config *configs.Config, lastMarker string) (nextMarker string, messages []outputs.Message) {
 	channels := config.BambooChannels
 	url := "https://" + config.BambooUser + ":" + config.BambooPass + "@" + config.BambooUrl + "/builds/plugins/servlet/streams?local=true"
 	feed, err := rss.Fetch(url)
@@ -23,7 +24,7 @@ func Bamboo(config *configs.Config, lastMarker string) (nextMarker string, messa
 			res := bambooapi.GetResult(config.BambooUrl, config.BambooUser, config.BambooPass, build)
 			for planmatch, channel := range channels {
 				if strings.Contains(res.Plan, planmatch) || planmatch == "*" {
-					m := Message{channel, "Bamboo Build " + res.State, res.Plan + " #" + res.Number + " - " + res.Responsible, link, res.State}
+					m := outputs.Message{channel, "Bamboo Build " + res.State, res.Plan + " #" + res.Number + " - " + res.Responsible, link, res.State}
 					messages = append(messages, m)
 				}
 			}
