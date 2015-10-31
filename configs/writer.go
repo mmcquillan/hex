@@ -1,8 +1,7 @@
 package configs
 
 import (
-	"bytes"
-	"github.com/BurntSushi/toml"
+	"encoding/json"
 	"log"
 	"os"
 )
@@ -21,16 +20,13 @@ func WriteDefaultConfig(location string) {
 	}()
 
 	var config Config
-	config.JaneName = "jane"
-	config.JaneEmoji = ":game_die:"
-	config.JaneChannel = "#general"
 
-	buf := new(bytes.Buffer)
-	if err := toml.NewEncoder(buf).Encode(config); err != nil {
+	b, err := json.Marshal(config)
+	if err != nil {
 		log.Println(err)
 	}
 
-	if _, err := fo.Write(buf.Bytes()); err != nil {
+	if _, err := fo.Write(b); err != nil {
 		log.Println(err)
 	}
 

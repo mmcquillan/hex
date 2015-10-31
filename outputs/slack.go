@@ -9,7 +9,7 @@ func Slack(config *configs.Config, message Message) {
 	api := slack.New(config.SlackToken)
 	msg := ""
 	params := slack.NewPostMessageParameters()
-	params.Username = config.JaneName
+	params.Username = config.Name
 	params.IconEmoji = config.JaneEmoji
 	if message.Description != "" {
 		color := ColorMe(message.Status)

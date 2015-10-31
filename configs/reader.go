@@ -1,16 +1,27 @@
 package configs
 
 import (
-	"github.com/BurntSushi/toml"
+	"encoding/json"
+	"io/ioutil"
 	"log"
 	"os"
 )
 
 func ReadConfig(location string) (config Config) {
 
-	if _, err := toml.DecodeFile(location, &config); err != nil {
+	file, err := ioutil.ReadFile(location)
+	if err != nil {
 		log.Println(err)
 	}
+	err = json.Unmarshal(file, &config)
+	if err != nil {
+		log.Println(err)
+	}
+
+	config.BambooChannels = make(map[string]string)
+	config.BambooChannels["*"] = "#devops"
+	config.BambooChannels["HTML"] = "#random"
+
 	return config
 
 }

@@ -10,7 +10,7 @@ func Parse(config *configs.Config, channel string, msg string) {
 
 	// make sure they are talking to and not about us
 	tokmsg := strings.Split(strings.TrimSpace(msg), " ")
-	if strings.ToLower(tokmsg[0]) != strings.ToLower(config.JaneName) {
+	if strings.ToLower(tokmsg[0]) != strings.ToLower(config.Name) {
 		return
 	}
 
@@ -79,7 +79,7 @@ func Help(config *configs.Config) (r string) {
 	}
 	r = "*Say things like:*\n"
 	for _, help := range helps {
-		r += "\t" + config.JaneName + " " + help + "\n"
+		r += "\t" + config.Name + " " + help + "\n"
 	}
 	return r
 }
@@ -95,7 +95,7 @@ func Secrets(config *configs.Config) (r string) {
 	}
 	r = "*Quietly say things like:*\n"
 	for _, secret := range secrets {
-		r += "\t" + config.JaneName + " " + secret + "\n"
+		r += "\t" + config.Name + " " + secret + "\n"
 	}
 	return r
 }

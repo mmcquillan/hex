@@ -6,7 +6,7 @@ import (
 )
 
 func CLI(config *configs.Config, message Message) {
-	fmt.Println(config.JaneName + ": " + message.Title)
+	fmt.Println(config.Name + ": " + message.Title)
 	if message.Description != "" {
 		fmt.Println(message.Description)
 	}

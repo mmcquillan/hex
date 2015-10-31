@@ -10,7 +10,7 @@ func Rename(config *configs.Config, msg string) (results string) {
 	if strings.Contains(name, " ") {
 		results = "Oops, can't do a name with a space."
 	} else {
-		config.JaneName = name
+		config.Name = name
 		results = "You may now call me '" + name + "'."
 	}
 	return results
