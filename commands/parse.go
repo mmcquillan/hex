@@ -49,6 +49,8 @@ func Parse(config *configs.Config, channel string, msg string) {
 		r = Env(config.BambooUrl, config.BambooUser, config.BambooPass)
 	case "environment":
 		r = Env(config.BambooUrl, config.BambooUser, config.BambooPass)
+	case "reload":
+		r = Reload(config)
 	default:
 		r = Response(config, cmd, msg)
 	}
@@ -80,11 +82,8 @@ func Help(config *configs.Config) (r string) {
 func Secrets(config *configs.Config) (r string) {
 	secrets := []string{
 		"secrets",
-		"jane",
-		"hal",
 		"rename <name>",
-		"drop <something>",
-		"feelings",
+		"reload",
 	}
 	r = "*Quietly say things like:*\n"
 	for _, secret := range secrets {
