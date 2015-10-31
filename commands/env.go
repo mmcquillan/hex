@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/mmcquillan/jane/bambooapi"
+	"github.com/mmcquillan/bambooapi"
 )
 
 func Env(url string, user string, pass string) (results string) {

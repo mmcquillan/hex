@@ -1,7 +1,7 @@
 package listeners
 
 import (
-	"github.com/mmcquillan/jane/bambooapi"
+	"github.com/mmcquillan/bambooapi"
 	"github.com/mmcquillan/jane/configs"
 	"github.com/mmcquillan/jane/outputs"
 	"strconv"
