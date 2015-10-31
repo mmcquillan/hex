@@ -24,7 +24,7 @@ func Parse(config *configs.Config, channel string, msg string) {
 	msg = strings.TrimSpace(msg)
 
 	// the big switch statement in the sky
-	r := "Sorry, no idea what that means."
+	var r string
 	switch cmd {
 	case "help":
 		r = Help(config)
@@ -34,30 +34,18 @@ func Parse(config *configs.Config, channel string, msg string) {
 		r = Build(config.BambooUrl, config.BambooUser, config.BambooPass, msg)
 	case "deploy":
 		r = Deploy(config.BambooUrl)
-	case "catchphrase":
-		r = CatchPhrase()
 	case "rename":
 		r = Rename(config, msg)
-	case "motivate":
-		r = Motivate(msg)
 	case "big":
 		r = Big(msg)
-	case "jane":
-		r = Jane()
-	case "hal":
-		r = Hal()
 	case "sensu":
 		r = Sensu()
-	case "rules":
-		r = Rules()
 	case "env":
 		r = Env(config.BambooUrl, config.BambooUser, config.BambooPass)
 	case "environment":
 		r = Env(config.BambooUrl, config.BambooUser, config.BambooPass)
-	case "drop":
-		r = Drop(msg)
-	case "feelings":
-		r = Feelings()
+	default:
+		r = Response(config, cmd, msg)
 	}
 
 	// feedback
