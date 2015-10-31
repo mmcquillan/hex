@@ -18,6 +18,11 @@ func Parse(config *configs.Config, channel string, msg string) {
 	msg = strings.Replace(msg, tokmsg[0], "", 1)
 	msg = strings.TrimSpace(msg)
 
+	// see if nothing is said
+	if msg == "" {
+		return
+	}
+
 	// pull off the first word as a command token
 	cmd := strings.ToLower(tokmsg[1])
 	msg = strings.Replace(msg, cmd, "", 1)
