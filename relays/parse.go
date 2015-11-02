@@ -1,12 +1,12 @@
-package commands
+package relays
 
 import (
+	"github.com/mmcquillan/jane/commands"
 	"github.com/mmcquillan/jane/configs"
-	"github.com/mmcquillan/jane/outputs"
 	"strings"
 )
 
-func Parse(config *configs.Config, channel string, msg string) {
+func Parse(config *configs.Config, relay configs.Relay, channel string, msg string) {
 
 	// make sure they are talking to and not about us
 	tokmsg := strings.Split(strings.TrimSpace(msg), " ")
@@ -36,28 +36,26 @@ func Parse(config *configs.Config, channel string, msg string) {
 	case "secrets":
 		r = Secrets(config)
 	case "build":
-		r = Build(config.BambooUrl, config.BambooUser, config.BambooPass, msg)
+		r = commands.Build(config.BambooUrl, config.BambooUser, config.BambooPass, msg)
 	case "deploy":
-		r = Deploy(config.BambooUrl)
-	case "rename":
-		r = Rename(config, msg)
+		r = commands.Deploy(config.BambooUrl)
 	case "big":
-		r = Big(msg)
+		r = commands.Big(msg)
 	case "sensu":
-		r = Sensu()
+		r = commands.Sensu()
 	case "env":
-		r = Env(config.BambooUrl, config.BambooUser, config.BambooPass)
+		r = commands.Env(config.BambooUrl, config.BambooUser, config.BambooPass)
 	case "environment":
-		r = Env(config.BambooUrl, config.BambooUser, config.BambooPass)
+		r = commands.Env(config.BambooUrl, config.BambooUser, config.BambooPass)
 	case "reload":
-		r = Reload(config)
+		r = commands.Reload(config)
 	default:
-		r = Response(config, cmd, msg)
+		r = commands.Response(config, cmd, msg)
 	}
 
 	// feedback
-	message := outputs.Message{channel, r, "", "", ""}
-	outputs.Output(config, message)
+	message := Message{channel, r, "", "", ""}
+	Output(config, relay, message)
 
 }
 
@@ -82,7 +80,6 @@ func Help(config *configs.Config) (r string) {
 func Secrets(config *configs.Config) (r string) {
 	secrets := []string{
 		"secrets",
-		"rename <name>",
 		"reload",
 	}
 	r = "*Quietly say things like:*\n"

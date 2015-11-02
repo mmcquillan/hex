@@ -4,7 +4,7 @@ import (
 	"github.com/SlyMarbo/rss"
 	"github.com/kennygrant/sanitize"
 	"github.com/mmcquillan/jane/configs"
-	"github.com/mmcquillan/jane/outputs"
+	"github.com/mmcquillan/jane/relays"
 	"html"
 	"log"
 	"strings"
@@ -17,12 +17,12 @@ func Rss(config *configs.Config, listener configs.Listener) {
 		feed, err := rss.Fetch(listener.Input)
 		if err != nil {
 			log.Println(err)
+			return
 		}
-		var messages []outputs.Message
+		var messages []relays.Message
 		for i := len(feed.Items) - 1; i >= 0; i-- {
 			if lastMarker == "" {
-				// TODO: Change the 3 to zero
-				lastMarker = feed.Items[3].Date.String()
+				lastMarker = feed.Items[2].Date.String()
 			}
 			item := feed.Items[i]
 			if item.Date.String() > lastMarker {
@@ -43,7 +43,7 @@ func Rss(config *configs.Config, listener configs.Listener) {
 						status = "FAIL"
 					}
 				}
-				m := outputs.Message{
+				m := relays.Message{
 					Destination: listener.Output,
 					Title:       listener.Name + " " + html.UnescapeString(sanitize.HTML(item.Title)),
 					Description: html.UnescapeString(sanitize.HTML(item.Content)),
@@ -57,7 +57,7 @@ func Rss(config *configs.Config, listener configs.Listener) {
 			}
 		}
 		for _, m := range messages {
-			outputs.Output(config, m)
+			relays.OutputAll(config, m)
 		}
 		time.Sleep(120 * time.Second)
 	}

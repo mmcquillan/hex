@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/mmcquillan/jane/configs"
-	"github.com/mmcquillan/jane/inputs"
 	"github.com/mmcquillan/jane/listeners"
+	"github.com/mmcquillan/jane/relays"
 	"sync"
 )
 
@@ -14,10 +14,24 @@ func main() {
 	configs.Flags(&config)
 	configs.Logging(&config)
 	wg.Add(3)
+	go runRelays(&config)
 	go runListener(&config)
-	go commandLoop(&config)
 	go listenLoop(&config)
 	wg.Wait()
+}
+
+func runRelays(config *configs.Config) {
+	defer wg.Done()
+	for _, relay := range config.Relays {
+		if relay.Active {
+			switch relay.Type {
+			case "cli":
+				go relays.CliIn(config, relay)
+			case "slack":
+				go relays.SlackIn(config, relay)
+			}
+		}
+	}
 }
 
 func runListener(config *configs.Config) {
@@ -26,15 +40,10 @@ func runListener(config *configs.Config) {
 		if listener.Active {
 			switch listener.Type {
 			case "rss":
-				listeners.Rss(config, listener)
+				go listeners.Rss(config, listener)
 			}
 		}
 	}
-}
-
-func commandLoop(config *configs.Config) {
-	defer wg.Done()
-	inputs.Input(config)
 }
 
 func listenLoop(config *configs.Config) {

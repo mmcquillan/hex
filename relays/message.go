@@ -1,4 +1,4 @@
-package outputs
+package relays
 
 type Message struct {
 	Destination string

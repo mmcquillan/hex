@@ -1,26 +1,31 @@
 package configs
 
 type Config struct {
-	Name        string
-	LogFile     string
-	Interactive bool
-	Debug       bool
+	Name    string
+	LogFile string
+	Debug   bool
 
 	// temp config start
-	JaneEmoji      string
-	JaneChannel    string
-	SlackToken     string
 	BambooUrl      string
 	BambooUser     string
 	BambooPass     string
 	BambooChannels map[string]string
 	// temp config end
 
+	Relays    []Relay
 	Listeners []Listener
 	Responses []struct {
 		In  string
 		Out string
 	}
+}
+
+type Relay struct {
+	Type     string
+	Name     string
+	Image    string
+	Resource string
+	Active   bool
 }
 
 type Listener struct {

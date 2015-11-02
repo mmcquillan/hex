@@ -3,13 +3,13 @@ package listeners
 import (
 	"github.com/mmcquillan/bambooapi"
 	"github.com/mmcquillan/jane/configs"
-	"github.com/mmcquillan/jane/outputs"
+	"github.com/mmcquillan/jane/relays"
 	"strconv"
 	"strings"
 	"time"
 )
 
-func Deploys(config *configs.Config, lastMarker string) (nextMarker string, messages []outputs.Message) {
+func Deploys(config *configs.Config, lastMarker string) (nextMarker string, messages []relays.Message) {
 	now := time.Now()
 	nextMarker = strconv.FormatInt(now.Unix(), 10) + "000"
 	channels := config.BambooChannels
@@ -20,7 +20,7 @@ func Deploys(config *configs.Config, lastMarker string) (nextMarker string, mess
 			if e.Deploymentresult.ID > 0 && buildTime > lastMarker {
 				for planmatch, channel := range channels {
 					if strings.Contains(e.Deploymentresult.Deploymentversion.Name, planmatch) || planmatch == "*" {
-						m := outputs.Message{
+						m := relays.Message{
 							channel,
 							"Bamboo Deploy " + e.Deploymentresult.Deploymentstate,
 							"Deployed " + e.Deploymentresult.Deploymentversion.Name + " to " + e.Environment.Name,

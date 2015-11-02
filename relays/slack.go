@@ -1,18 +1,36 @@
-package outputs
+package relays
 
 import (
 	"github.com/mmcquillan/jane/configs"
 	"github.com/nlopes/slack"
 )
 
-func Slack(config *configs.Config, message Message) {
-	api := slack.New(config.SlackToken)
+func SlackIn(config *configs.Config, relay configs.Relay) {
+	api := slack.New(relay.Resource)
+	api.SetDebug(false)
+	rtm := api.NewRTM()
+	go rtm.ManageConnection()
+	for {
+		select {
+		case msg := <-rtm.IncomingEvents:
+			switch ev := msg.Data.(type) {
+			case *slack.MessageEvent:
+				if ev.User != "" {
+					Parse(config, relay, ev.Channel, ev.Text)
+				}
+			}
+		}
+	}
+}
+
+func SlackOut(config *configs.Config, relay configs.Relay, message Message) {
+	api := slack.New(relay.Resource)
 	msg := ""
 	params := slack.NewPostMessageParameters()
-	params.Username = config.Name
-	params.IconEmoji = config.JaneEmoji
+	params.Username = relay.Name
+	params.IconEmoji = relay.Image
 	if message.Description != "" {
-		color := ColorMe(message.Status)
+		color := SlackColorMe(message.Status)
 		attachment := slack.Attachment{
 			Title:     message.Title,
 			TitleLink: message.Link,
@@ -26,7 +44,7 @@ func Slack(config *configs.Config, message Message) {
 	api.PostMessage(message.Destination, msg, params)
 }
 
-func ColorMe(status string) (color string) {
+func SlackColorMe(status string) (color string) {
 	switch status {
 	case "Successful":
 		color = "good"
