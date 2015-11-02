@@ -16,17 +16,20 @@ type Config struct {
 	BambooChannels map[string]string
 	// temp config end
 
-	Listeners []struct {
-		Type         string // rss,slack,
-		Input        string // the connection method
-		Output       string // slack,cli
-		Filter       string // string filter
-		SuccessMatch string // string to indicate success
-		FailureMatch string // string to indicate failure
-		Active       bool
-	}
+	Listeners []Listener
 	Responses []struct {
 		In  string
 		Out string
 	}
+}
+
+type Listener struct {
+	Type         string // rss,slack,
+	Name         string // a friendly name
+	Input        string // the connection method
+	Output       string // slack,cli
+	Filter       string // string filter
+	SuccessMatch string // string to indicate success
+	FailureMatch string // string to indicate failure
+	Active       bool
 }

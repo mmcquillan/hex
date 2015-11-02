@@ -36,6 +36,10 @@ func ColorMe(status string) (color string) {
 		color = "danger"
 	case "FAILED":
 		color = "danger"
+	case "FAIL":
+		color = "danger"
+	case "NONE":
+		color = "#DDDDDD"
 	default:
 		color = "#DDDDDD"
 	}

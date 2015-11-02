@@ -6,25 +6,10 @@ import (
 )
 
 func CLI(config *configs.Config, message Message) {
-	fmt.Println(config.Name + ": " + message.Title)
-	if message.Description != "" {
-		fmt.Println(message.Description)
-	}
+	fmt.Println("Name:   " + config.Name)
+	fmt.Println("Title:  " + message.Title)
+	fmt.Println("Desc:   " + message.Description)
+	fmt.Println("Link:   " + message.Link)
+	fmt.Println("Status: " + message.Status)
 	fmt.Println("")
-}
-
-func colorMe(status string) (color string) {
-	switch status {
-	case "Successful":
-		color = "good"
-	case "SUCCESS":
-		color = "good"
-	case "Failed":
-		color = "danger"
-	case "FAILED":
-		color = "danger"
-	default:
-		color = "#DDDDDD"
-	}
-	return color
 }

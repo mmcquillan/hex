@@ -13,10 +13,22 @@ func main() {
 	config := configs.Load()
 	configs.Flags(&config)
 	configs.Logging(&config)
-	wg.Add(2)
+	wg.Add(3)
 	go commandLoop(&config)
 	go listenLoop(&config)
 	wg.Wait()
+}
+
+func runListener(config *configs.Config) {
+	defer wg.Done()
+	for _, listener := range config.Listeners {
+		if listener.Active {
+			switch listener.Type {
+			case "rss":
+				listeners.Rss(config, listener)
+			}
+		}
+	}
 }
 
 func commandLoop(config *configs.Config) {
