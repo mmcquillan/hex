@@ -22,7 +22,7 @@ func Rss(config *configs.Config, listener configs.Listener) {
 		var messages []relays.Message
 		for i := len(feed.Items) - 1; i >= 0; i-- {
 			if lastMarker == "" {
-				lastMarker = feed.Items[2].Date.String()
+				lastMarker = feed.Items[0].Date.String()
 			}
 			item := feed.Items[i]
 			if item.Date.String() > lastMarker {
