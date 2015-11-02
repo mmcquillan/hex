@@ -22,7 +22,6 @@ type Config struct {
 
 type Relay struct {
 	Type     string
-	Name     string
 	Image    string
 	Resource string
 	Active   bool

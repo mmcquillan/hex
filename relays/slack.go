@@ -27,7 +27,7 @@ func SlackOut(config *configs.Config, relay configs.Relay, message Message) {
 	api := slack.New(relay.Resource)
 	msg := ""
 	params := slack.NewPostMessageParameters()
-	params.Username = relay.Name
+	params.Username = config.Name
 	params.IconEmoji = relay.Image
 	if message.Description != "" {
 		color := SlackColorMe(message.Status)

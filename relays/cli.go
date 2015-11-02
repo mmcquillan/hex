@@ -17,7 +17,8 @@ func CliIn(config *configs.Config, relay configs.Relay) {
 }
 
 func CliOut(config *configs.Config, relay configs.Relay, message Message) {
-	fmt.Println("Name:   " + relay.Name)
+	fmt.Println("Name:   " + config.Name)
+	fmt.Println("Image:  " + relay.Image)
 	fmt.Println("Title:  " + message.Title)
 	fmt.Println("Desc:   " + message.Description)
 	fmt.Println("Link:   " + message.Link)
