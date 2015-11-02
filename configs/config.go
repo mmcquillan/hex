@@ -31,7 +31,7 @@ type Listener struct {
 	Type         string // rss,slack,
 	Name         string // a friendly name
 	Resource     string // the connection method
-	Output       string // slack,cli
+	Relays       string // slack,cli
 	Filter       string // string filter
 	SuccessMatch string // string to indicate success
 	FailureMatch string // string to indicate failure

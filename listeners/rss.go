@@ -45,7 +45,7 @@ func Rss(config *configs.Config, listener configs.Listener) {
 					}
 				}
 				m := relays.Message{
-					Destination: listener.Output,
+					Destination: listener.Relays,
 					Title:       listener.Name + " " + html.UnescapeString(sanitize.HTML(item.Title)),
 					Description: html.UnescapeString(sanitize.HTML(item.Content)),
 					Link:        item.Link,
