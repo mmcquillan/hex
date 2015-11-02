@@ -14,6 +14,7 @@ func main() {
 	configs.Flags(&config)
 	configs.Logging(&config)
 	wg.Add(3)
+	go runListener(&config)
 	go commandLoop(&config)
 	go listenLoop(&config)
 	wg.Wait()
