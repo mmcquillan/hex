@@ -30,7 +30,7 @@ type Relay struct {
 type Listener struct {
 	Type         string // rss,slack,
 	Name         string // a friendly name
-	Input        string // the connection method
+	Resource     string // the connection method
 	Output       string // slack,cli
 	Filter       string // string filter
 	SuccessMatch string // string to indicate success

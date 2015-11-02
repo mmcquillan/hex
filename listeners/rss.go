@@ -12,9 +12,10 @@ import (
 )
 
 func Rss(config *configs.Config, listener configs.Listener) {
+	var displayOnStart = 0
 	lastMarker := ""
 	for {
-		feed, err := rss.Fetch(listener.Input)
+		feed, err := rss.Fetch(listener.Resource)
 		if err != nil {
 			log.Println(err)
 			return
@@ -22,7 +23,7 @@ func Rss(config *configs.Config, listener configs.Listener) {
 		var messages []relays.Message
 		for i := len(feed.Items) - 1; i >= 0; i-- {
 			if lastMarker == "" {
-				lastMarker = feed.Items[0].Date.String()
+				lastMarker = feed.Items[displayOnStart].Date.String()
 			}
 			item := feed.Items[i]
 			if item.Date.String() > lastMarker {
