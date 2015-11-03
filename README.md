@@ -35,6 +35,7 @@ Listeners are what Jane uses to pull in information and listen for commands. The
 `{"Type": "rss", "Name": "AWS EC2", "Resource": "http://status.aws.amazon.com/rss/ec2-us-east-1.rss", "Relays": "*", "Target": "#devops", "SuccessMatch": "", "FailureMatch": "", "Active": true }`
 
 ### Monitor Listener
+Note, this is currently setup to execute a nagios style monitoring script and interpret the results as the example shows below.
 `{"Type": "monitor", "Name": "Prod Elasticsearch", "Resource": "user:password@prod.server.com|/usr/lib/nagios/plugins/check_procs -C elasticsearch -c1:1", "Relays": "*", "Target": "#devops", "Active": true}`
 
 

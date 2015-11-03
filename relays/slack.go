@@ -31,14 +31,10 @@ func Slack(config *models.Config, relay models.Relay, message models.Message) {
 
 func SlackColorMe(status string) (color string) {
 	switch status {
-	case "Successful":
-		color = "good"
 	case "SUCCESS":
 		color = "good"
-	case "Failed":
-		color = "danger"
-	case "FAILED":
-		color = "danger"
+	case "WARN":
+		color = "warning"
 	case "FAIL":
 		color = "danger"
 	case "NONE":
