@@ -1,12 +1,16 @@
 # Jane
 
+Jane is a bot to pull information and conduct operational activities in your chatops scenario - even in a command line way. This bot is written in go and is made to be configuration driven. Contributions are welcome via pull requests. If you want to know why the name 'Jane' was chosen, talk to @kcwinner.
+
 
 
 ## Getting Started
 * This is developed using Go 1.5.1
-* Pull the project with `go get github.com/mmcquillan/jane`
+* Pull the project with `'go get github.com/mmcquillan/jane'
+* Compile with 'go install jane.go'
 * Use the sample.config for an example configuration file
 * Use the startup.conf as an upstart script to start/stop/restart on Linux systems
+* You can rename your bot by setting the top-level Name configuration setting
 
 
 
