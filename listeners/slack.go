@@ -38,16 +38,20 @@ func Slack(config *models.Config, listener models.Listener) {
 					}
 
 					if process {
-						m := models.Message{
-							Relays:      listener.Relays,
-							Target:      ev.Channel,
-							Request:     msg,
-							Title:       "",
-							Description: "",
-							Link:        "",
-							Status:      "",
+						for _, d := range listener.Destinations {
+							if strings.Contains(msg, d.Match) || d.Match == "*" {
+								m := models.Message{
+									Relays:      d.Relays,
+									Target:      ev.Channel,
+									Request:     msg,
+									Title:       "",
+									Description: "",
+									Link:        "",
+									Status:      "",
+								}
+								commands.Parse(config, m)
+							}
 						}
-						commands.Parse(config, m)
 					}
 				}
 			}

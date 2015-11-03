@@ -4,6 +4,7 @@ import (
 	"github.com/mmcquillan/jane/listeners"
 	"github.com/mmcquillan/jane/models"
 	"sync"
+	"time"
 )
 
 var wg sync.WaitGroup
@@ -31,6 +32,7 @@ func runListener(config *models.Config) {
 			case "monitor":
 				go listeners.Monitor(config, listener)
 			}
+			time.Sleep(1 * time.Second)
 		}
 	}
 }

@@ -4,9 +4,12 @@ type Listener struct {
 	Type         string
 	Name         string
 	Resource     string
-	Target       string
-	Relays       string
 	SuccessMatch string
 	FailureMatch string
 	Active       bool
+	Destinations []struct {
+		Match  string
+		Relays string
+		Target string
+	}
 }

@@ -44,16 +44,20 @@ func Rss(config *models.Config, listener models.Listener) {
 						status = "FAIL"
 					}
 				}
-				m := models.Message{
-					Relays:      listener.Relays,
-					Target:      listener.Target,
-					Request:     "",
-					Title:       listener.Name + " " + html.UnescapeString(sanitize.HTML(item.Title)),
-					Description: html.UnescapeString(sanitize.HTML(item.Content)),
-					Link:        item.Link,
-					Status:      status,
+				for _, d := range listener.Destinations {
+					if strings.Contains(item.Title, d.Match) || d.Match == "*" {
+						m := models.Message{
+							Relays:      d.Relays,
+							Target:      d.Target,
+							Request:     "",
+							Title:       listener.Name + " " + html.UnescapeString(sanitize.HTML(item.Title)),
+							Description: html.UnescapeString(sanitize.HTML(item.Content)),
+							Link:        item.Link,
+							Status:      status,
+						}
+						messages = append(messages, m)
+					}
 				}
-				messages = append(messages, m)
 				if i == 0 {
 					lastMarker = item.Date.String()
 				}

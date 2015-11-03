@@ -19,6 +19,11 @@ func Parse(config *models.Config, message models.Message) {
 			}
 		}
 
+		// if no match, just leave
+		if len(match) == 0 {
+			return
+		}
+
 		// if more than one match, pick a random one
 		var i = 0
 		if len(match) > 0 {

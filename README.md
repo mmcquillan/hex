@@ -26,17 +26,18 @@ The entire configuration of the site is done via a json config file. The configu
 Listeners are what Jane uses to pull in information and listen for commands. The Relays specify where the results from the input should be written to or * for all. The Target can specify a channel in the case of slack.
 
 ### Command Line listener
-`{"Type": "cli", "Name": "cli", "Relays": "cli", "Active": false}`
+`{"Type": "cli", "Name": "cli", "Active": false, "Destinations": [{"Match": "*", "Relays": "cli", "Target": ""}]}`
 
 ### Slack Listener
-`{"Type": "slack", "Name": "slack", "Resource": "xxxSlackTokenxxx", "Relays": "slack", "Active": true }`
+`{"Type": "slack", "Name": "slack", "Resource": "xxxSlackTokenxxx", "Active": true, "Destinations": [{"Match": "*", "Relays": "slack", "Target": ""}] }`
 
 ### RSS Listener
-`{"Type": "rss", "Name": "AWS EC2", "Resource": "http://status.aws.amazon.com/rss/ec2-us-east-1.rss", "Relays": "*", "Target": "#devops", "SuccessMatch": "", "FailureMatch": "", "Active": true }`
+`{"Type": "rss", "Name": "AWS EC2", "Resource": "http://status.aws.amazon.com/rss/ec2-us-east-1.rss", "SuccessMatch": "", "FailureMatch": "", "Active": true, "Destinations": [{"Match": "*", "Relays": "slack", "Target": "#devops"}] }`
 
 ### Monitor Listener
 Note, this is currently setup to execute a nagios style monitoring script and interpret the results as the example shows below.
-`{"Type": "monitor", "Name": "Prod Elasticsearch", "Resource": "user:password@prod.server.com|/usr/lib/nagios/plugins/check_procs -C elasticsearch -c1:1", "Relays": "*", "Target": "#devops", "Active": true}`
+
+`{"Type": "monitor", "Name": "Prod Elasticsearch", "Resource": "user:password@prod.server.com|/usr/lib/nagios/plugins/check_procs -C elasticsearch -c1:1", "Active": true, "Destinations": [{"Match": "*", "Relays": "slack", "Target": "#devops"},{"Match": "CRITICAL", "Relays": "slack", "Target": "@matt"}]}`
 
 
 
