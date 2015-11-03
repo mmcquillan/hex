@@ -6,7 +6,7 @@ Jane is a bot to pull information and conduct operational activities in your cha
 
 ## Getting Started
 * This is developed using Go 1.5.1
-* Pull the project with `'go get github.com/mmcquillan/jane'
+* Pull the project with 'go get github.com/mmcquillan/jane'
 * Compile with 'go install jane.go'
 * Use the sample.config for an example configuration file
 * Use the startup.conf as an upstart script to start/stop/restart on Linux systems
@@ -15,7 +15,7 @@ Jane is a bot to pull information and conduct operational activities in your cha
 
 
 ## Configuration
-The entire configuration of the site is done via a json configuraiton file. The configuration file is expected to be named 'jane.config' and will be looked for in this order:
+The entire configuration of the site is done via a json config file. The configuration file is expected to be named 'jane.config' and will be looked for in this order:
 * ./jane.config - the location of the jane binary
 * ~/jane.config - the home directory of the user
 * /etc/jane.config - the global config
@@ -59,7 +59,7 @@ Commands are what execute or respond to requests by listeners.
 ## Relays
 Relays are how information gets communicated out from Jane.
 
-### Skack Relay
+### Slack Relay
 `{"Type": "slack", "Image": ":speech_balloon:", "Resource": "xxxSlackTokenxxx", "Active": true}`
 
 ### Command Line Relay
