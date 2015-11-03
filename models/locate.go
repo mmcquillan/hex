@@ -1,4 +1,4 @@
-package configs
+package models
 
 import (
 	"github.com/kardianos/osext"

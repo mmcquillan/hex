@@ -1,34 +1,19 @@
 package relays
 
 import (
-	"github.com/mmcquillan/jane/configs"
+	"github.com/mmcquillan/jane/models"
 	"github.com/nlopes/slack"
 )
 
-func SlackIn(config *configs.Config, relay configs.Relay) {
-	api := slack.New(relay.Resource)
-	api.SetDebug(false)
-	rtm := api.NewRTM()
-	go rtm.ManageConnection()
-	for {
-		select {
-		case msg := <-rtm.IncomingEvents:
-			switch ev := msg.Data.(type) {
-			case *slack.MessageEvent:
-				if ev.User != "" {
-					Parse(config, relay, ev.Channel, ev.Text)
-				}
-			}
-		}
-	}
-}
-
-func SlackOut(config *configs.Config, relay configs.Relay, message Message) {
+func Slack(config *models.Config, relay models.Relay, message models.Message) {
 	api := slack.New(relay.Resource)
 	msg := ""
 	params := slack.NewPostMessageParameters()
 	params.Username = config.Name
 	params.IconEmoji = relay.Image
+	if message.Target == "" {
+		message.Target = "#general"
+	}
 	if message.Description != "" {
 		color := SlackColorMe(message.Status)
 		attachment := slack.Attachment{
@@ -41,7 +26,7 @@ func SlackOut(config *configs.Config, relay configs.Relay, message Message) {
 	} else {
 		msg = message.Title
 	}
-	api.PostMessage(message.Destination, msg, params)
+	api.PostMessage(message.Target, msg, params)
 }
 
 func SlackColorMe(status string) (color string) {

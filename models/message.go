@@ -1,7 +1,9 @@
-package relays
+package models
 
 type Message struct {
-	Destination string
+	Relays      string
+	Target      string
+	Request     string
 	Title       string
 	Description string
 	Link        string

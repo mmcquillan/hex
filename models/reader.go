@@ -1,4 +1,4 @@
-package configs
+package models
 
 import (
 	"encoding/json"
@@ -8,7 +8,6 @@ import (
 )
 
 func ReadConfig(location string) (config Config) {
-
 	file, err := ioutil.ReadFile(location)
 	if err != nil {
 		log.Println(err)
@@ -17,13 +16,7 @@ func ReadConfig(location string) (config Config) {
 	if err != nil {
 		log.Println(err)
 	}
-
-	config.BambooChannels = make(map[string]string)
-	config.BambooChannels["*"] = "#devops"
-	config.BambooChannels["HTML"] = "#random"
-
 	return config
-
 }
 
 func CheckConfig(location string) (exists bool) {

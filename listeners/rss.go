@@ -3,15 +3,15 @@ package listeners
 import (
 	"github.com/SlyMarbo/rss"
 	"github.com/kennygrant/sanitize"
-	"github.com/mmcquillan/jane/configs"
-	"github.com/mmcquillan/jane/relays"
+	"github.com/mmcquillan/jane/commands"
+	"github.com/mmcquillan/jane/models"
 	"html"
 	"log"
 	"strings"
 	"time"
 )
 
-func Rss(config *configs.Config, listener configs.Listener) {
+func Rss(config *models.Config, listener models.Listener) {
 	var displayOnStart = 0
 	lastMarker := ""
 	for {
@@ -20,7 +20,7 @@ func Rss(config *configs.Config, listener configs.Listener) {
 			log.Println(err)
 			return
 		}
-		var messages []relays.Message
+		var messages []models.Message
 		for i := len(feed.Items) - 1; i >= 0; i-- {
 			if lastMarker == "" {
 				lastMarker = feed.Items[displayOnStart].Date.String()
@@ -44,8 +44,10 @@ func Rss(config *configs.Config, listener configs.Listener) {
 						status = "FAIL"
 					}
 				}
-				m := relays.Message{
-					Destination: listener.Relays,
+				m := models.Message{
+					Relays:      listener.Relays,
+					Target:      listener.Target,
+					Request:     "",
 					Title:       listener.Name + " " + html.UnescapeString(sanitize.HTML(item.Title)),
 					Description: html.UnescapeString(sanitize.HTML(item.Content)),
 					Link:        item.Link,
@@ -58,7 +60,7 @@ func Rss(config *configs.Config, listener configs.Listener) {
 			}
 		}
 		for _, m := range messages {
-			relays.OutputAll(config, m)
+			commands.Parse(config, m)
 		}
 		time.Sleep(120 * time.Second)
 	}
