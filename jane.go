@@ -28,6 +28,8 @@ func runListener(config *models.Config) {
 				go listeners.Cli(config, listener)
 			case "rss":
 				go listeners.Rss(config, listener)
+			case "monitor":
+				go listeners.Monitor(config, listener)
 			}
 		}
 	}
