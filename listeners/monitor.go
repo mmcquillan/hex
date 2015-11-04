@@ -40,9 +40,12 @@ func Monitor(config *models.Config, listener models.Listener) {
 				defer session.Close()
 				var b bytes.Buffer
 				session.Stdout = &b
-				if err := session.Run(chk); err != nil {
-					log.Println(err)
-				}
+				session.Run(chk)
+				//err := ^^^
+				//if err != nil {
+				// leave for future debug logging
+				//log.Println(err)
+				//}
 				out = b.String()
 			}
 		}

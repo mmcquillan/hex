@@ -83,7 +83,7 @@ func checkConfig(location string) (exists bool) {
 		if err != nil {
 			log.Println(err)
 		}
-		var js map[string]interface{}
+		var js interface{}
 		exists = json.Unmarshal(file, &js) == nil
 		if !exists {
 			fmt.Println("Error - Config file does not appear to be valid json")
