@@ -12,6 +12,7 @@ import (
 )
 
 func Rss(config *models.Config, listener models.Listener) {
+	defer Recovery(config, listener)
 	var displayOnStart = 0
 	lastMarker := ""
 	for {

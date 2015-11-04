@@ -8,6 +8,7 @@ import (
 )
 
 func Slack(config *models.Config, listener models.Listener) {
+	defer Recovery(config, listener)
 	api := slack.New(listener.Resource)
 	api.SetDebug(false)
 	rtm := api.NewRTM()

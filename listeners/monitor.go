@@ -11,6 +11,7 @@ import (
 )
 
 func Monitor(config *models.Config, listener models.Listener) {
+	defer Recovery(config, listener)
 	var state = "OK"
 	user, pass, server, chk := monitorResource(listener.Resource)
 	clicon := &ssh.ClientConfig{

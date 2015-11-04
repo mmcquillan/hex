@@ -10,6 +10,7 @@ import (
 )
 
 func Cli(config *models.Config, listener models.Listener) {
+	defer Recovery(config, listener)
 	fmt.Println("Starting in cli mode...\n")
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
