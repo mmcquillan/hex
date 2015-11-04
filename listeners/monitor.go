@@ -22,21 +22,30 @@ func Monitor(config *models.Config, listener models.Listener) {
 	}
 	for {
 		var report = false
+		var out = ""
 		client, err := ssh.Dial("tcp", server+":22", clicon)
 		if err != nil {
 			log.Println(err)
 		}
-		session, err := client.NewSession()
-		if err != nil {
-			log.Println(err)
+		if client == nil {
+			out = "CRITICAL - Client cannot connect"
+		} else {
+			session, err := client.NewSession()
+			if err != nil {
+				log.Println(err)
+			}
+			if session == nil {
+				out = "CRITICAL - Session cannot connect"
+			} else {
+				defer session.Close()
+				var b bytes.Buffer
+				session.Stdout = &b
+				if err := session.Run(chk); err != nil {
+					log.Println(err)
+				}
+				out = b.String()
+			}
 		}
-		defer session.Close()
-		var b bytes.Buffer
-		session.Stdout = &b
-		if err := session.Run(chk); err != nil {
-			log.Println(err)
-		}
-		out := b.String()
 		var color = "NONE"
 		if strings.Contains(out, "OK") {
 			if state != "OK" {
