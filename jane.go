@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/mmcquillan/jane/listeners"
 	"github.com/mmcquillan/jane/models"
+	"github.com/yvasiyarov/gorelic"
 	"sync"
 	"time"
 )
@@ -13,6 +14,7 @@ func main() {
 	config := models.Load()
 	models.Flags(&config)
 	models.Logging(&config)
+	runProfiling(&config)
 	wg.Add(len(config.Listeners))
 	go runListener(&config)
 	wg.Wait()
@@ -34,5 +36,15 @@ func runListener(config *models.Config) {
 			}
 			time.Sleep(1 * time.Second)
 		}
+	}
+}
+
+func runProfiling(config *models.Config) {
+	if config.NewRelic != "" {
+		agent := gorelic.NewAgent()
+		agent.NewrelicLicense = config.NewRelic
+		agent.NewrelicName = config.Name
+		agent.Verbose = config.Debug
+		agent.Run()
 	}
 }

@@ -14,85 +14,91 @@ func Monitor(config *models.Config, listener models.Listener) {
 	defer Recovery(config, listener)
 	var state = "OK"
 	user, pass, server, chk := monitorResource(listener.Resource)
+	for {
+		state = callMonitor(state, user, pass, server, chk, config, listener)
+		time.Sleep(90 * time.Second)
+	}
+}
+
+func callMonitor(state string, user string, pass string, server string, chk string, config *models.Config, listener models.Listener) (newState string) {
+	var report = false
+	var out = ""
 	clicon := &ssh.ClientConfig{
 		User: user,
 		Auth: []ssh.AuthMethod{
 			ssh.Password(pass),
 		},
 	}
-	for {
-		var report = false
-		var out = ""
-		client, err := ssh.Dial("tcp", server+":22", clicon)
+	client, err := ssh.Dial("tcp", server+":22", clicon)
+	if err != nil {
+		log.Println(err)
+	}
+	if client == nil {
+		out = "CRITICAL - Client cannot connect"
+	} else {
+		session, err := client.NewSession()
 		if err != nil {
 			log.Println(err)
 		}
-		if client == nil {
-			out = "CRITICAL - Client cannot connect"
+		if session == nil {
+			out = "CRITICAL - Session cannot connect"
 		} else {
-			session, err := client.NewSession()
-			if err != nil {
-				log.Println(err)
-			}
-			if session == nil {
-				out = "CRITICAL - Session cannot connect"
-			} else {
-				defer session.Close()
-				var b bytes.Buffer
-				session.Stdout = &b
-				session.Run(chk)
-				//err := ^^^
-				//if err != nil {
-				// leave for future debug logging
-				//log.Println(err)
-				//}
-				out = b.String()
-			}
+			defer session.Close()
+			var b bytes.Buffer
+			session.Stdout = &b
+			session.Run(chk)
+			//err := ^^^
+			//if err != nil {
+			// leave for future debug logging
+			//log.Println(err)
+			//}
+			out = b.String()
 		}
-		var color = "NONE"
-		if strings.Contains(out, "OK") {
-			if state != "OK" {
-				report = true
-				state = "OK"
-				color = "SUCCESS"
-			}
-		} else if strings.Contains(out, "WARNING") {
-			if state != "WARNING" {
-				report = true
-				state = "WARNING"
-				color = "WARN"
-			}
-		} else if strings.Contains(out, "CRITICAL") {
-			if state != "CRITICAL" {
-				report = true
-				state = "CRITICAL"
-				color = "FAIL"
-			}
-		} else {
-			if state != "UNKNOWN" {
-				report = true
-				state = "UNKNOWN"
-				color = "NONE"
-			}
-		}
-		if report {
-			for _, d := range listener.Destinations {
-				if strings.Contains(out, d.Match) || d.Match == "*" {
-					m := models.Message{
-						Relays:      d.Relays,
-						Target:      d.Target,
-						Request:     "",
-						Title:       listener.Name,
-						Description: out,
-						Link:        "",
-						Status:      color,
-					}
-					commands.Parse(config, m)
-				}
-			}
-		}
-		time.Sleep(90 * time.Second)
 	}
+	var color = "NONE"
+	if strings.Contains(out, "OK") {
+		if state != "OK" {
+			report = true
+			state = "OK"
+			color = "SUCCESS"
+		}
+	} else if strings.Contains(out, "WARNING") {
+		if state != "WARNING" {
+			report = true
+			state = "WARNING"
+			color = "WARN"
+		}
+	} else if strings.Contains(out, "CRITICAL") {
+		if state != "CRITICAL" {
+			report = true
+			state = "CRITICAL"
+			color = "FAIL"
+		}
+	} else {
+		if state != "UNKNOWN" {
+			report = true
+			state = "UNKNOWN"
+			color = "NONE"
+		}
+	}
+	if report {
+		for _, d := range listener.Destinations {
+			if strings.Contains(out, d.Match) || d.Match == "*" {
+				m := models.Message{
+					Relays:      d.Relays,
+					Target:      d.Target,
+					Request:     "",
+					Title:       listener.Name,
+					Description: out,
+					Link:        "",
+					Status:      color,
+				}
+				commands.Parse(config, m)
+			}
+		}
+	}
+	newState = state
+	return newState
 }
 
 func monitorResource(resource string) (user string, pass string, server string, chk string) {
