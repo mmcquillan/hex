@@ -40,18 +40,13 @@ func callMonitor(state string, user string, pass string, server string, chk stri
 		if err != nil {
 			log.Println(err)
 		}
+		defer session.Close()
 		if session == nil {
 			out = "CRITICAL - Session cannot connect"
 		} else {
-			defer session.Close()
 			var b bytes.Buffer
 			session.Stdout = &b
 			session.Run(chk)
-			//err := ^^^
-			//if err != nil {
-			// leave for future debug logging
-			//log.Println(err)
-			//}
 			out = b.String()
 		}
 	}
