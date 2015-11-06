@@ -35,7 +35,7 @@ Listeners are what Jane uses to pull in information and listen for commands. The
     "Destinations": [
       {"Match": "*", "Relays": "slack", "Target": ""}
     ]
-  },`
+  }`
 
 ### RSS Listener
 `{"Type": "rss", "Name": "Bamboo Build", "Active": true,
@@ -45,9 +45,9 @@ Listeners are what Jane uses to pull in information and listen for commands. The
       {"Match": "*", "Relays": "slack", "Target": "#devops"},
       {"Match": "NextGen", "Relays": "slack", "Target": "#nextgen"}
     ]
-  },
+  }`
 
-  {"Type": "rss", "Name": "AWS EC2", "Active": true,
+ `{"Type": "rss", "Name": "AWS EC2", "Active": true,
     "Server": "http://status.aws.amazon.com/rss/ec2-us-east-1.rss",
     "Destinations": [
       {"Match": "*", "Relays": "slack", "Target": "#devops"}
