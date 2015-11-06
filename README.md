@@ -26,18 +26,50 @@ The entire configuration of the site is done via a json config file. The configu
 Listeners are what Jane uses to pull in information and listen for commands. The Relays specify where the results from the input should be written to or * for all. The Target can specify a channel in the case of slack.
 
 ### Command Line listener
-`{"Type": "cli", "Name": "cli", "Active": false, "Destinations": [{"Match": "*", "Relays": "cli", "Target": ""}]}`
+`{"Type": "cli", "Name": "cli", "Active": false,
+ "Destinations": [{"Match": "*", "Relays": "cli", "Target": ""}]}`
 
 ### Slack Listener
-`{"Type": "slack", "Name": "slack", "Resource": "xxxSlackTokenxxx", "Active": true, "Destinations": [{"Match": "*", "Relays": "slack", "Target": ""}] }`
+`{"Type": "slack", "Name": "slack", "Active": true,
+    "Key": "<SlackToken>",
+    "Destinations": [
+      {"Match": "*", "Relays": "slack", "Target": ""}
+    ]
+  },`
 
 ### RSS Listener
-`{"Type": "rss", "Name": "AWS EC2", "Resource": "http://status.aws.amazon.com/rss/ec2-us-east-1.rss", "SuccessMatch": "", "FailureMatch": "", "Active": true, "Destinations": [{"Match": "*", "Relays": "slack", "Target": "#devops"}] }`
+`{"Type": "rss", "Name": "Bamboo Build", "Active": true,
+    "Server": "https://BambooUser:BambooPass@somecompany.atlassian.net/builds/plugins/servlet/streams?local=true",
+    "SuccessMatch": "successful", "FailureMatch": "fail",
+    "Destinations": [
+      {"Match": "*", "Relays": "slack", "Target": "#devops"},
+      {"Match": "NextGen", "Relays": "slack", "Target": "#nextgen"}
+    ]
+  },
+
+  {"Type": "rss", "Name": "AWS EC2", "Active": true,
+    "Server": "http://status.aws.amazon.com/rss/ec2-us-east-1.rss",
+    "Destinations": [
+      {"Match": "*", "Relays": "slack", "Target": "#devops"}
+    ]
+  }`
 
 ### Monitor Listener
 Note, this is currently setup to execute a nagios style monitoring script and interpret the results as the example shows below.
 
-`{"Type": "monitor", "Name": "Prod Elasticsearch", "Resource": "user:password@prod.server.com|/usr/lib/nagios/plugins/check_procs -C elasticsearch -c1:1", "Active": true, "Destinations": [{"Match": "*", "Relays": "slack", "Target": "#devops"},{"Match": "CRITICAL", "Relays": "slack", "Target": "@matt"}]}`
+`{"Type": "monitor", "Name": "Elasticsearch Node", "Active": true,
+    "Server": "elasticsearch1.somecompany.com", "Login": "jane", "Pass": "abc123",
+    "SuccessMatch": "OK", "WarningMatch": "WARNING", "FailureMatch": "CRITICAL",
+    "Checks": [
+      {"Name": "Apt Check", "Check": "/usr/lib/nagios/plugins/check_apt"},
+      {"Name": "Disk Check", "Check": "/usr/lib/nagios/plugins/check_disk -w10% -c5% -A"},
+      {"Name": "Elasticsearch Check", "Check": "/usr/lib/nagios/plugins/check_procs -a elasticsearch -c1:1"}
+    ],
+    "Destinations": [
+      {"Match": "*", "Relays": "slack", "Target": "#devops"},
+      {"Match": "*", "Relays": "slack", "Target": "@matt"}
+    ]
+  }`
 
 
 
