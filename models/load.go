@@ -22,6 +22,18 @@ func Load() (config Config) {
 
 }
 
+func Reload(config *Config) (reloaded bool) {
+	configFile := locateConfig()
+	if checkConfig(configFile) {
+		newconfig := readConfig(configFile)
+		*config = newconfig
+		reloaded = true
+	} else {
+		reloaded = false
+	}
+	return reloaded
+}
+
 func locateConfig() (configFile string) {
 
 	// order of finding the config file

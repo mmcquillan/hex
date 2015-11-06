@@ -6,6 +6,10 @@ import (
 
 func Reload(command models.Command, config *models.Config) (results string) {
 	results = command.Output
-	*config = models.Load()
+	if models.Reload(config) {
+		results = command.Output
+	} else {
+		results = "Configuration is invalid, please check it."
+	}
 	return results
 }
