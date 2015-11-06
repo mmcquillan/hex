@@ -63,11 +63,11 @@ func fileExists(file string) bool {
 func readConfig(location string) (config Config) {
 	file, err := ioutil.ReadFile(location)
 	if err != nil {
-		log.Println(err)
+		log.Print(err)
 	}
 	err = json.Unmarshal(file, &config)
 	if err != nil {
-		log.Println(err)
+		log.Print(err)
 	}
 	return config
 }
@@ -81,7 +81,7 @@ func checkConfig(location string) (exists bool) {
 	if exists {
 		file, err := ioutil.ReadFile(location)
 		if err != nil {
-			log.Println(err)
+			log.Print(err)
 		}
 		var js interface{}
 		exists = json.Unmarshal(file, &js) == nil

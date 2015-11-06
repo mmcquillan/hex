@@ -17,7 +17,7 @@ func Exec(msg string, command models.Command) (results string) {
 	cmd.Stdout = &out
 	err := cmd.Run()
 	if err != nil {
-		log.Println(err)
+		log.Print(err)
 	}
 	results = strings.Replace(command.Output, "%stdout%", out.String(), -1)
 	return results

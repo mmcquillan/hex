@@ -4,14 +4,18 @@ import (
 	"github.com/mmcquillan/jane/commands"
 	"github.com/mmcquillan/jane/models"
 	"github.com/nlopes/slack"
+	"log"
 	"strings"
 )
 
 func Slack(config *models.Config, listener models.Listener) {
 	defer Recovery(config, listener)
 	api := slack.New(listener.Key)
-	api.SetDebug(false)
+	api.SetDebug(config.Debug)
 	rtm := api.NewRTM()
+	if config.Debug {
+		log.Print("Starting slack websocket api for " + listener.Name)
+	}
 	go rtm.ManageConnection()
 	for {
 		select {
@@ -20,6 +24,9 @@ func Slack(config *models.Config, listener models.Listener) {
 			case *slack.MessageEvent:
 				if ev.User != "" {
 
+					if config.Debug {
+						log.Print("Evaluating incoming slack message")
+					}
 					var process = true
 
 					// make sure they are talking to and not about us
@@ -39,6 +46,9 @@ func Slack(config *models.Config, listener models.Listener) {
 					}
 
 					if process {
+						if config.Debug {
+							log.Print("Processing incoming slack message")
+						}
 						for _, d := range listener.Destinations {
 							if strings.Contains(msg, d.Match) || d.Match == "*" {
 								m := models.Message{

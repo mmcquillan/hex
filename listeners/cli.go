@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/mmcquillan/jane/commands"
 	"github.com/mmcquillan/jane/models"
+	"log"
 	"os"
 	"strings"
 )
@@ -16,6 +17,9 @@ func Cli(config *models.Config, listener models.Listener) {
 	for scanner.Scan() {
 		for _, d := range listener.Destinations {
 			req := scanner.Text()
+			if config.Debug {
+				log.Print("Processing CLI")
+			}
 			if strings.Contains(req, d.Match) || d.Match == "*" {
 				m := models.Message{
 					Relays:      d.Relays,

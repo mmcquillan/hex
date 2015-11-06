@@ -14,6 +14,5 @@ func Logging(config *Config) {
 		panic(err)
 	}
 	log.SetOutput(f)
-	log.Println("Starting the jane bot...")
 
 }

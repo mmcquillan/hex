@@ -9,7 +9,7 @@ import (
 func Recovery(config *models.Config, listener models.Listener) {
 	msg := config.Name + " Panic - " + listener.Name + " " + listener.Type + " Listener"
 	if r := recover(); r != nil {
-		log.Println(msg, r)
+		log.Print(msg, r)
 	}
 	for _, d := range listener.Destinations {
 		m := models.Message{

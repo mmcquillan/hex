@@ -16,13 +16,13 @@ func Monitor(config *models.Config, listener models.Listener) {
 		state[chk.Name] = "OK"
 	}
 	for {
-		alerts := callMonitor(&state, listener)
+		alerts := callMonitor(&state, config, listener)
 		reportMonitor(alerts, &state, config, listener)
 		time.Sleep(60 * time.Second)
 	}
 }
 
-func callMonitor(state *map[string]string, listener models.Listener) (alerts []string) {
+func callMonitor(state *map[string]string, config *models.Config, listener models.Listener) (alerts []string) {
 	serverconn := true
 	clientconn := &ssh.ClientConfig{
 		User: listener.Login,
@@ -30,25 +30,43 @@ func callMonitor(state *map[string]string, listener models.Listener) (alerts []s
 			ssh.Password(listener.Pass),
 		},
 	}
+	if config.Debug {
+		log.Print("Starting client connection for " + listener.Server)
+	}
 	client, err := ssh.Dial("tcp", listener.Server+":22", clientconn)
 	if err != nil {
-		log.Println(err)
+		log.Print(err)
 	}
 	if client == nil {
 		serverconn = false
 	} else {
 		defer client.Close()
 		for _, chk := range listener.Checks {
+			if config.Debug {
+				log.Print("Starting session connection for " + listener.Server + " " + chk.Name + " check")
+			}
 			session, err := client.NewSession()
 			if err != nil {
-				log.Println(err)
+				log.Print(err)
 			}
 			if session == nil {
 				serverconn = false
 			} else {
-				b, _ := session.Output(chk.Check)
-				session.Close()
+				defer session.Close()
+				if config.Debug {
+					log.Print("Starting session call for " + listener.Server + " " + chk.Name + " check")
+				}
+				b, err := session.CombinedOutput(chk.Check)
+				if config.Debug {
+					log.Print("Ending session call for " + listener.Server + " " + chk.Name + " check")
+				}
+				if err != nil {
+					log.Print(err)
+				}
 				out := string(b[:])
+				if config.Debug {
+					log.Print("Session results for " + listener.Server + " " + chk.Name + ": " + out)
+				}
 				if (*state)[chk.Name] != out && !(strings.Contains(out, listener.SuccessMatch) && strings.Contains((*state)[chk.Name], listener.SuccessMatch)) {
 					alerts = append(alerts, chk.Name)
 					(*state)[chk.Name] = out
@@ -57,6 +75,9 @@ func callMonitor(state *map[string]string, listener models.Listener) (alerts []s
 		}
 	}
 	if !serverconn {
+		if config.Debug {
+			log.Print("Cannot connect to server " + listener.Server)
+		}
 		out := "CRITICAL - Cannot connect to server " + listener.Server
 		for _, chk := range listener.Checks {
 			if (*state)[chk.Name] != out {
@@ -69,6 +90,9 @@ func callMonitor(state *map[string]string, listener models.Listener) (alerts []s
 }
 
 func reportMonitor(alerts []string, state *map[string]string, config *models.Config, listener models.Listener) {
+	if config.Debug {
+		log.Print("Starting reporting on monitroing results for " + listener.Server)
+	}
 	for _, a := range alerts {
 		out := (*state)[a]
 		var color = "NONE"

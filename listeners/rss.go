@@ -22,12 +22,18 @@ func Rss(config *models.Config, listener models.Listener) {
 
 func callRss(lastMarker string, config *models.Config, listener models.Listener) (nextMarker string) {
 	var displayOnStart = 0
+	if config.Debug {
+		log.Print("Starting rss feed fetch for " + listener.Server)
+	}
 	feed, err := rss.Fetch(listener.Server)
 	if err != nil {
-		log.Println(err)
+		log.Print(err)
 		return
 	}
 	var messages []models.Message
+	if config.Debug {
+		log.Print("Feed count for " + listener.Server + ": " + string(len(feed.Items)))
+	}
 	for i := len(feed.Items) - 1; i >= 0; i-- {
 		if lastMarker == "" {
 			lastMarker = feed.Items[displayOnStart].Date.String()
@@ -82,5 +88,8 @@ func callRss(lastMarker string, config *models.Config, listener models.Listener)
 		commands.Parse(config, m)
 	}
 	nextMarker = lastMarker
+	if config.Debug {
+		log.Print("Next marker for " + listener.Server + ": " + nextMarker)
+	}
 	return nextMarker
 }
