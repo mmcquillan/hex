@@ -4,6 +4,8 @@ import (
 	"github.com/mmcquillan/jane/listeners"
 	"github.com/mmcquillan/jane/models"
 	"log"
+	"os"
+	"os/signal"
 	"sync"
 	"time"
 )
@@ -11,8 +13,16 @@ import (
 var wg sync.WaitGroup
 
 func main() {
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		for sig := range c {
+			log.Printf("Received signal %v", sig)
+			log.Print("Stopping jane bot...")
+			os.Exit(0)
+		}
+	}()
 	config := models.Load()
-	models.Flags(&config)
 	models.Logging(&config)
 	log.Print("---")
 	log.Print("Starting jane bot...")

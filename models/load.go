@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"github.com/kardianos/osext"
 	"github.com/mitchellh/go-homedir"
@@ -35,12 +36,12 @@ func Reload(config *Config) (reloaded bool) {
 }
 
 func locateConfig() (configFile string) {
-
-	// order of finding the config file
-	// 1. running path "./jane.config.json"
-	// 2. users home path "~/jane.config.json"
-	// 3. system etc "/etc/jane.config.json"
 	file := "jane.config.json"
+
+	zero := *configParam()
+	if fileExists(zero) {
+		return zero
+	}
 
 	first, _ := osext.ExecutableFolder()
 	first += "/" + file
@@ -61,6 +62,12 @@ func locateConfig() (configFile string) {
 
 	return file
 
+}
+
+func configParam() (configFile *string) {
+	configFile = flag.String("config", "", "Location of the config file")
+	flag.Parse()
+	return configFile
 }
 
 func fileExists(file string) bool {
