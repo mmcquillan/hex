@@ -22,7 +22,7 @@ func Rss(config *models.Config, listener models.Listener) {
 
 func callRss(lastMarker string, config *models.Config, listener models.Listener) (nextMarker string) {
 	var displayOnStart = 0
-	feed, err := rss.Fetch(listener.Resource)
+	feed, err := rss.Fetch(listener.Server)
 	if err != nil {
 		log.Println(err)
 		return
@@ -41,6 +41,14 @@ func callRss(lastMarker string, config *models.Config, listener models.Listener)
 				}
 				if strings.Contains(item.Content, listener.SuccessMatch) {
 					status = "SUCCESS"
+				}
+			}
+			if listener.WarningMatch != "" {
+				if strings.Contains(item.Title, listener.WarningMatch) {
+					status = "WARN"
+				}
+				if strings.Contains(item.Title, listener.WarningMatch) {
+					status = "WARN"
 				}
 			}
 			if listener.FailureMatch != "" {

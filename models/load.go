@@ -25,10 +25,10 @@ func Load() (config Config) {
 func locateConfig() (configFile string) {
 
 	// order of finding the config file
-	// 1. running path "./jane.config"
-	// 2. users home path "~/jane.config"
-	// 3. system etc "/etc/jane.config
-	file := "jane.config"
+	// 1. running path "./jane.config.json"
+	// 2. users home path "~/jane.config.json"
+	// 3. system etc "/etc/jane.config.json"
+	file := "jane.config.json"
 
 	first, _ := osext.ExecutableFolder()
 	first += "/" + file
