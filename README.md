@@ -13,13 +13,19 @@ Jane is a bot to pull information and conduct operational activities in your cha
 * You can rename your bot by setting the top-level Name configuration setting
 
 
+## Installation
+* Copy the compiled jane to /usr/bin/jane
+* Copy the startup.conf file to /etc/init/jane.conf
+* Make a configuration file and locate it at /etc/jane.config.json
+* Startup as "sudo service start jane"
+
 
 ## Configuration
 The entire configuration of the site is done via a json config file. The configuration file is expected to be named 'jane.config' and will be looked for in this order:
+* -config someconfig.json - Pass in a configuration file location as a command line parameter
 * ./jane.config - the location of the jane binary
 * ~/jane.config - the home directory of the user
 * /etc/jane.config - the global config
-
 
 
 ## Listeners
