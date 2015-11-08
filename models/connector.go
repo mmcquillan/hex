@@ -1,6 +1,6 @@
 package models
 
-type Listener struct {
+type Connector struct {
 	Type         string
 	Name         string
 	Active       bool

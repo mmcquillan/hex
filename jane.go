@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/mmcquillan/jane/listeners"
+	"github.com/mmcquillan/jane/connectors"
 	"github.com/mmcquillan/jane/models"
 	"log"
 	"os"
@@ -26,16 +26,16 @@ func main() {
 	models.Logging(&config)
 	log.Print("---")
 	log.Print("Starting jane bot...")
-	wg.Add(activeListeners(&config))
-	runListener(&config)
+	wg.Add(activeconnectors(&config))
+	runconnector(&config)
 	defer wg.Done()
 	wg.Wait()
 }
 
-func activeListeners(config *models.Config) (cnt int) {
+func activeconnectors(config *models.Config) (cnt int) {
 	cnt = 0
-	for _, listener := range config.Listeners {
-		if listener.Active {
+	for _, connector := range config.connectors {
+		if connector.Active {
 			cnt += 1
 		}
 	}
@@ -45,19 +45,19 @@ func activeListeners(config *models.Config) (cnt int) {
 	return cnt
 }
 
-func runListener(config *models.Config) {
-	for _, listener := range config.Listeners {
-		if listener.Active {
-			log.Print("Initializing " + listener.Name + " (" + listener.Type + ")")
-			switch listener.Type {
+func runconnector(config *models.Config) {
+	for _, connector := range config.connectors {
+		if connector.Active {
+			log.Print("Initializing " + connector.Name + " (" + connector.Type + ")")
+			switch connector.Type {
 			case "slack":
-				go listeners.Slack(config, listener)
+				go connectors.Slack(config, connector)
 			case "cli":
-				go listeners.Cli(config, listener)
+				go connectors.Cli(config, connector)
 			case "rss":
-				go listeners.Rss(config, listener)
+				go connectors.Rss(config, connector)
 			case "monitor":
-				go listeners.Monitor(config, listener)
+				go connectors.Monitor(config, connector)
 			}
 			time.Sleep(2 * time.Second)
 		}

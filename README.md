@@ -28,14 +28,14 @@ The entire configuration of the site is done via a json config file. The configu
 * /etc/jane.config - the global config
 
 
-## Listeners
-Listeners are what Jane uses to pull in information and listen for commands. The Relays specify where the results from the input should be written to or * for all. The Target can specify a channel in the case of slack.
+## Connectors
+Connectors are what Jane uses to pull in information and listen for commands. The Relays specify where the results from the input should be written to or * for all. The Target can specify a channel in the case of slack.
 
-### Command Line listener
+### Command Line Connector
 `{"Type": "cli", "Name": "cli", "Active": false,
  "Destinations": [{"Match": "*", "Relays": "cli", "Target": ""}]}`
 
-### Slack Listener
+### Slack Connector
 `{"Type": "slack", "Name": "slack", "Active": true,
     "Key": "<SlackToken>",
     "Destinations": [
@@ -43,7 +43,7 @@ Listeners are what Jane uses to pull in information and listen for commands. The
     ]
   }`
 
-### RSS Listener
+### RSS Connector
 `{"Type": "rss", "Name": "Bamboo Build", "Active": true,
     "Server": "https://BambooUser:BambooPass@somecompany.atlassian.net/builds/plugins/servlet/streams?local=true",
     "SuccessMatch": "successful", "FailureMatch": "fail",
@@ -60,7 +60,7 @@ Listeners are what Jane uses to pull in information and listen for commands. The
     ]
   }`
 
-### Monitor Listener
+### Monitor Connector
 Note, this is currently setup to execute a nagios style monitoring script and interpret the results as the example shows below.
 
 `{"Type": "monitor", "Name": "Elasticsearch Node", "Active": true,

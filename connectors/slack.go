@@ -1,4 +1,4 @@
-package listeners
+package connectors
 
 import (
 	"github.com/mmcquillan/jane/commands"
@@ -8,13 +8,13 @@ import (
 	"strings"
 )
 
-func Slack(config *models.Config, listener models.Listener) {
-	defer Recovery(config, listener)
-	api := slack.New(listener.Key)
+func Slack(config *models.Config, connector models.Connector) {
+	defer Recovery(config, connector)
+	api := slack.New(connector.Key)
 	api.SetDebug(config.Debug)
 	rtm := api.NewRTM()
 	if config.Debug {
-		log.Print("Starting slack websocket api for " + listener.Name)
+		log.Print("Starting slack websocket api for " + connector.Name)
 	}
 	go rtm.ManageConnection()
 	for {
@@ -49,7 +49,7 @@ func Slack(config *models.Config, listener models.Listener) {
 						if config.Debug {
 							log.Print("Processing incoming slack message")
 						}
-						for _, d := range listener.Destinations {
+						for _, d := range connector.Destinations {
 							if strings.Contains(msg, d.Match) || d.Match == "*" {
 								m := models.Message{
 									Relays:      d.Relays,

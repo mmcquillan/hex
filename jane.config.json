@@ -5,7 +5,7 @@
   "Relays": [
     {"Type": "slack", "Image": ":game_die:", "Resource": "<SlackToken>", "Active": true}
   ],
-  "Listeners": [
+  "Connectors": [
 
     {"Type": "slack", "Name": "slack", "Active": true,
       "Key": "<SlackToken>",

@@ -1,4 +1,4 @@
-package listeners
+package connectors
 
 import (
 	"bufio"
@@ -10,12 +10,12 @@ import (
 	"strings"
 )
 
-func Cli(config *models.Config, listener models.Listener) {
-	defer Recovery(config, listener)
+func Cli(config *models.Config, connector models.Connector) {
+	defer Recovery(config, connector)
 	fmt.Println("Starting in cli mode...\n")
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
-		for _, d := range listener.Destinations {
+		for _, d := range connector.Destinations {
 			req := scanner.Text()
 			if config.Debug {
 				log.Print("Processing CLI")

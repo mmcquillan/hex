@@ -1,4 +1,4 @@
-package listeners
+package connectors
 
 import (
 	"github.com/SlyMarbo/rss"
@@ -11,28 +11,28 @@ import (
 	"time"
 )
 
-func Rss(config *models.Config, listener models.Listener) {
-	defer Recovery(config, listener)
+func Rss(config *models.Config, connector models.Connector) {
+	defer Recovery(config, connector)
 	nextMarker := ""
 	for {
-		nextMarker = callRss(nextMarker, config, listener)
+		nextMarker = callRss(nextMarker, config, connector)
 		time.Sleep(120 * time.Second)
 	}
 }
 
-func callRss(lastMarker string, config *models.Config, listener models.Listener) (nextMarker string) {
+func callRss(lastMarker string, config *models.Config, connector models.Connector) (nextMarker string) {
 	var displayOnStart = 0
 	if config.Debug {
-		log.Print("Starting rss feed fetch for " + listener.Server)
+		log.Print("Starting rss feed fetch for " + connector.Server)
 	}
-	feed, err := rss.Fetch(listener.Server)
+	feed, err := rss.Fetch(connector.Server)
 	if err != nil {
 		log.Print(err)
 		return
 	}
 	var messages []models.Message
 	if config.Debug {
-		log.Print("Feed count for " + listener.Server + ": " + string(len(feed.Items)))
+		log.Print("Feed count for " + connector.Server + ": " + string(len(feed.Items)))
 	}
 	for i := len(feed.Items) - 1; i >= 0; i-- {
 		if lastMarker == "" {
@@ -41,37 +41,37 @@ func callRss(lastMarker string, config *models.Config, listener models.Listener)
 		item := feed.Items[i]
 		if item.Date.String() > lastMarker {
 			status := "NONE"
-			if listener.SuccessMatch != "" {
-				if strings.Contains(item.Title, listener.SuccessMatch) {
+			if connector.SuccessMatch != "" {
+				if strings.Contains(item.Title, connector.SuccessMatch) {
 					status = "SUCCESS"
 				}
-				if strings.Contains(item.Content, listener.SuccessMatch) {
+				if strings.Contains(item.Content, connector.SuccessMatch) {
 					status = "SUCCESS"
 				}
 			}
-			if listener.WarningMatch != "" {
-				if strings.Contains(item.Title, listener.WarningMatch) {
+			if connector.WarningMatch != "" {
+				if strings.Contains(item.Title, connector.WarningMatch) {
 					status = "WARN"
 				}
-				if strings.Contains(item.Title, listener.WarningMatch) {
+				if strings.Contains(item.Title, connector.WarningMatch) {
 					status = "WARN"
 				}
 			}
-			if listener.FailureMatch != "" {
-				if strings.Contains(item.Title, listener.FailureMatch) {
+			if connector.FailureMatch != "" {
+				if strings.Contains(item.Title, connector.FailureMatch) {
 					status = "FAIL"
 				}
-				if strings.Contains(item.Title, listener.FailureMatch) {
+				if strings.Contains(item.Title, connector.FailureMatch) {
 					status = "FAIL"
 				}
 			}
-			for _, d := range listener.Destinations {
+			for _, d := range connector.Destinations {
 				if strings.Contains(item.Title, d.Match) || d.Match == "*" {
 					m := models.Message{
 						Relays:      d.Relays,
 						Target:      d.Target,
 						Request:     "",
-						Title:       listener.Name + " " + html.UnescapeString(sanitize.HTML(item.Title)),
+						Title:       connector.Name + " " + html.UnescapeString(sanitize.HTML(item.Title)),
 						Description: html.UnescapeString(sanitize.HTML(item.Content)),
 						Link:        item.Link,
 						Status:      status,
@@ -89,7 +89,7 @@ func callRss(lastMarker string, config *models.Config, listener models.Listener)
 	}
 	nextMarker = lastMarker
 	if config.Debug {
-		log.Print("Next marker for " + listener.Server + ": " + nextMarker)
+		log.Print("Next marker for " + connector.Server + ": " + nextMarker)
 	}
 	return nextMarker
 }
