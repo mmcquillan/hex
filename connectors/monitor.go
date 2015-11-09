@@ -9,7 +9,11 @@ import (
 	"time"
 )
 
-func Monitor(config *models.Config, connector models.Connector) {
+type Monitor struct {
+	Connector models.Connector
+}
+
+func (x Monitor) Run(config *models.Config, connector models.Connector) {
 	defer Recovery(config, connector)
 	var state = make(map[string]string)
 	for _, chk := range connector.Checks {
@@ -105,11 +109,11 @@ func reportMonitor(alerts []string, state *map[string]string, config *models.Con
 		} else {
 			color = "NONE"
 		}
-		for _, d := range connector.Destinations {
-			if strings.Contains(out, d.Match) || d.Match == "*" {
+		for _, r := range connector.Routes {
+			if strings.Contains(out, r.Match) || r.Match == "*" {
 				m := models.Message{
-					Relays:      d.Relays,
-					Target:      d.Target,
+					Relays:      r.Relays,
+					Target:      r.Target,
 					Request:     "",
 					Title:       connector.Name + " " + a,
 					Description: out,

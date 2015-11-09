@@ -11,7 +11,11 @@ import (
 	"time"
 )
 
-func Rss(config *models.Config, connector models.Connector) {
+type Rss struct {
+	Connector models.Connector
+}
+
+func (x Rss) Run(config *models.Config, connector models.Connector) {
 	defer Recovery(config, connector)
 	nextMarker := ""
 	for {
@@ -65,11 +69,11 @@ func callRss(lastMarker string, config *models.Config, connector models.Connecto
 					status = "FAIL"
 				}
 			}
-			for _, d := range connector.Destinations {
-				if strings.Contains(item.Title, d.Match) || d.Match == "*" {
+			for _, r := range connector.Routes {
+				if strings.Contains(item.Title, r.Match) || r.Match == "*" {
 					m := models.Message{
-						Relays:      d.Relays,
-						Target:      d.Target,
+						Relays:      r.Relays,
+						Target:      r.Target,
 						Request:     "",
 						Title:       connector.Name + " " + html.UnescapeString(sanitize.HTML(item.Title)),
 						Description: html.UnescapeString(sanitize.HTML(item.Content)),

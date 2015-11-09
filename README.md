@@ -33,12 +33,12 @@ Connectors are what Jane uses to pull in information and listen for commands. Th
 
 ### Command Line Connector
 `{"Type": "cli", "Name": "cli", "Active": false,
- "Destinations": [{"Match": "*", "Relays": "cli", "Target": ""}]}`
+ "Routes": [{"Match": "*", "Relays": "cli", "Target": ""}]}`
 
 ### Slack Connector
 `{"Type": "slack", "Name": "slack", "Active": true,
     "Key": "<SlackToken>",
-    "Destinations": [
+    "Routes": [
       {"Match": "*", "Relays": "slack", "Target": ""}
     ]
   }`
@@ -47,7 +47,7 @@ Connectors are what Jane uses to pull in information and listen for commands. Th
 `{"Type": "rss", "Name": "Bamboo Build", "Active": true,
     "Server": "https://BambooUser:BambooPass@somecompany.atlassian.net/builds/plugins/servlet/streams?local=true",
     "SuccessMatch": "successful", "FailureMatch": "fail",
-    "Destinations": [
+    "Routes": [
       {"Match": "*", "Relays": "slack", "Target": "#devops"},
       {"Match": "NextGen", "Relays": "slack", "Target": "#nextgen"}
     ]
@@ -55,7 +55,7 @@ Connectors are what Jane uses to pull in information and listen for commands. Th
 
  `{"Type": "rss", "Name": "AWS EC2", "Active": true,
     "Server": "http://status.aws.amazon.com/rss/ec2-us-east-1.rss",
-    "Destinations": [
+    "Routes": [
       {"Match": "*", "Relays": "slack", "Target": "#devops"}
     ]
   }`
@@ -71,7 +71,7 @@ Note, this is currently setup to execute a nagios style monitoring script and in
       {"Name": "Disk Check", "Check": "/usr/lib/nagios/plugins/check_disk -w10% -c5% -A"},
       {"Name": "Elasticsearch Check", "Check": "/usr/lib/nagios/plugins/check_procs -a elasticsearch -c1:1"}
     ],
-    "Destinations": [
+    "Routes": [
       {"Match": "*", "Relays": "slack", "Target": "#devops"},
       {"Match": "*", "Relays": "slack", "Target": "@matt"}
     ]

@@ -26,15 +26,15 @@ func main() {
 	models.Logging(&config)
 	log.Print("---")
 	log.Print("Starting jane bot...")
-	wg.Add(activeconnectors(&config))
-	runconnector(&config)
+	wg.Add(activeConnectors(&config))
+	runConnector(&config)
 	defer wg.Done()
 	wg.Wait()
 }
 
-func activeconnectors(config *models.Config) (cnt int) {
+func activeConnectors(config *models.Config) (cnt int) {
 	cnt = 0
-	for _, connector := range config.connectors {
+	for _, connector := range config.Connectors {
 		if connector.Active {
 			cnt += 1
 		}
@@ -45,20 +45,12 @@ func activeconnectors(config *models.Config) (cnt int) {
 	return cnt
 }
 
-func runconnector(config *models.Config) {
-	for _, connector := range config.connectors {
+func runConnector(config *models.Config) {
+	for _, connector := range config.Connectors {
 		if connector.Active {
 			log.Print("Initializing " + connector.Name + " (" + connector.Type + ")")
-			switch connector.Type {
-			case "slack":
-				go connectors.Slack(config, connector)
-			case "cli":
-				go connectors.Cli(config, connector)
-			case "rss":
-				go connectors.Rss(config, connector)
-			case "monitor":
-				go connectors.Monitor(config, connector)
-			}
+			c := connectors.MakeConnector(connector.Type).(connectors.Connector)
+			go c.Run(config, connector)
 			time.Sleep(2 * time.Second)
 		}
 	}

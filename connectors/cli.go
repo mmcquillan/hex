@@ -10,20 +10,28 @@ import (
 	"strings"
 )
 
-func Cli(config *models.Config, connector models.Connector) {
+type Cli struct {
+}
+
+func (x Cli) Run(config *models.Config, connector models.Connector) {
 	defer Recovery(config, connector)
 	fmt.Println("Starting in cli mode...\n")
+	fmt.Print(config.Name + "> ")
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
-		for _, d := range connector.Destinations {
-			req := scanner.Text()
+		req := scanner.Text()
+		if req == "exit" {
+			log.Print("Exiting jane bot by command line")
+			os.Exit(0)
+		}
+		for _, r := range connector.Routes {
 			if config.Debug {
 				log.Print("Processing CLI")
 			}
-			if strings.Contains(req, d.Match) || d.Match == "*" {
+			if strings.Contains(req, r.Match) || r.Match == "*" {
 				m := models.Message{
-					Relays:      d.Relays,
-					Target:      d.Target,
+					Relays:      r.Relays,
+					Target:      r.Target,
 					Request:     req,
 					Title:       "",
 					Description: "",
@@ -33,5 +41,6 @@ func Cli(config *models.Config, connector models.Connector) {
 				commands.Parse(config, m)
 			}
 		}
+		fmt.Print("\n" + config.Name + "> ")
 	}
 }

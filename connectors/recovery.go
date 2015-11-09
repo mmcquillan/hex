@@ -11,10 +11,10 @@ func Recovery(config *models.Config, connector models.Connector) {
 	if r := recover(); r != nil {
 		log.Print(msg, r)
 	}
-	for _, d := range connector.Destinations {
+	for _, r := range connector.Routes {
 		m := models.Message{
-			Relays:      d.Relays,
-			Target:      d.Target,
+			Relays:      r.Relays,
+			Target:      r.Target,
 			Request:     "",
 			Title:       msg,
 			Description: "Check the log for more information and restart me to re-enable this connector.",

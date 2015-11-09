@@ -15,7 +15,7 @@ type Connector struct {
 		Name  string
 		Check string
 	}
-	Destinations []struct {
+	Routes []struct {
 		Match  string
 		Relays string
 		Target string

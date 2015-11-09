@@ -8,7 +8,11 @@ import (
 	"strings"
 )
 
-func Slack(config *models.Config, connector models.Connector) {
+type Slack struct {
+	Connector models.Connector
+}
+
+func (x Slack) Run(config *models.Config, connector models.Connector) {
 	defer Recovery(config, connector)
 	api := slack.New(connector.Key)
 	api.SetDebug(config.Debug)
@@ -49,10 +53,10 @@ func Slack(config *models.Config, connector models.Connector) {
 						if config.Debug {
 							log.Print("Processing incoming slack message")
 						}
-						for _, d := range connector.Destinations {
-							if strings.Contains(msg, d.Match) || d.Match == "*" {
+						for _, r := range connector.Routes {
+							if strings.Contains(msg, r.Match) || r.Match == "*" {
 								m := models.Message{
-									Relays:      d.Relays,
+									Relays:      r.Relays,
 									Target:      ev.Channel,
 									Request:     msg,
 									Title:       "",
