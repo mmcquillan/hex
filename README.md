@@ -29,34 +29,33 @@ The entire configuration of the site is done via a json config file. The configu
 
 
 ## Connectors
-Connectors are what Jane uses to pull in information and listen for commands. The Relays specify where the results from the input should be written to or * for all. The Target can specify a channel in the case of slack.
+Connectors are what Jane uses to pull in information, interpret them and issue out a response. The Routes specify where the results from the input should be written to or * for all. The Target can specify a channel in the case of slack. To add a new connector, Put them in the connectors folder and make an entry in connectors/list.go.
+
+For the connector configuration, when adding routes, you must specify the ID of the connector you want to route response to.
 
 ### Command Line Connector
-`{"Type": "cli", "Name": "cli", "Active": false,
- "Routes": [{"Match": "*", "Relays": "cli", "Target": ""}]}`
+`{"Type": "cli", "ID": "cli", "Active": false,
+ "Routes": [{"Match": "*", "Connectors": "cli", "Target": ""}]}`
 
 ### Slack Connector
-`{"Type": "slack", "Name": "slack", "Active": true,
-    "Key": "<SlackToken>",
-    "Routes": [
-      {"Match": "*", "Relays": "slack", "Target": ""}
-    ]
+`{"Type": "slack", "ID": "slack", "Active": true,
+    "Key": "<SlackToken>", "Image": ":game_die:"
   }`
 
 ### RSS Connector
-`{"Type": "rss", "Name": "Bamboo Build", "Active": true,
+`{"Type": "rss", "ID": "Bamboo Build", "Active": true,
     "Server": "https://BambooUser:BambooPass@somecompany.atlassian.net/builds/plugins/servlet/streams?local=true",
     "SuccessMatch": "successful", "FailureMatch": "fail",
     "Routes": [
-      {"Match": "*", "Relays": "slack", "Target": "#devops"},
-      {"Match": "NextGen", "Relays": "slack", "Target": "#nextgen"}
+      {"Match": "*", "Connectors": "slack", "Target": "#devops"},
+      {"Match": "NextGen", "Connectors": "slack", "Target": "#nextgen"}
     ]
   }`
 
- `{"Type": "rss", "Name": "AWS EC2", "Active": true,
+ `{"Type": "rss", "ID": "AWS EC2", "Active": true,
     "Server": "http://status.aws.amazon.com/rss/ec2-us-east-1.rss",
     "Routes": [
-      {"Match": "*", "Relays": "slack", "Target": "#devops"}
+      {"Match": "*", "Connectors": "slack", "Target": "#devops"}
     ]
   }`
 
@@ -72,8 +71,8 @@ Note, this is currently setup to execute a nagios style monitoring script and in
       {"Name": "Elasticsearch Check", "Check": "/usr/lib/nagios/plugins/check_procs -a elasticsearch -c1:1"}
     ],
     "Routes": [
-      {"Match": "*", "Relays": "slack", "Target": "#devops"},
-      {"Match": "*", "Relays": "slack", "Target": "@matt"}
+      {"Match": "*", "Connectors": "slack", "Target": "#devops"},
+      {"Match": "*", "Connectors": "slack", "Target": "@matt"}
     ]
   }`
 
@@ -94,14 +93,4 @@ Commands are what execute or respond to requests by listeners.
 ### Reload Command
 `{"Type": "reload", "Match": "reload", "Output": "Reloading command configuration"}`
 
-
-
-## Relays
-Relays are how information gets communicated out from Jane.
-
-### Slack Relay
-`{"Type": "slack", "Image": ":speech_balloon:", "Resource": "xxxSlackTokenxxx", "Active": true}`
-
-### Command Line Relay
-`{"Type": "cli", "Image": "", "Resource": "", "Active": false}`
 

@@ -24,6 +24,10 @@ func (x Rss) Run(config *models.Config, connector models.Connector) {
 	}
 }
 
+func (x Rss) Send(config *models.Config, message models.Message, target string) {
+	return
+}
+
 func callRss(lastMarker string, config *models.Config, connector models.Connector) (nextMarker string) {
 	var displayOnStart = 0
 	if config.Debug {
@@ -72,10 +76,9 @@ func callRss(lastMarker string, config *models.Config, connector models.Connecto
 			for _, r := range connector.Routes {
 				if strings.Contains(item.Title, r.Match) || r.Match == "*" {
 					m := models.Message{
-						Relays:      r.Relays,
-						Target:      r.Target,
+						Routes:      connector.Routes,
 						Request:     "",
-						Title:       connector.Name + " " + html.UnescapeString(sanitize.HTML(item.Title)),
+						Title:       connector.ID + " " + html.UnescapeString(sanitize.HTML(item.Title)),
 						Description: html.UnescapeString(sanitize.HTML(item.Content)),
 						Link:        item.Link,
 						Status:      status,
@@ -89,7 +92,8 @@ func callRss(lastMarker string, config *models.Config, connector models.Connecto
 		}
 	}
 	for _, m := range messages {
-		commands.Parse(config, m)
+		commands.Parse(config, &m)
+		Broadcast(config, m)
 	}
 	nextMarker = lastMarker
 	if config.Debug {

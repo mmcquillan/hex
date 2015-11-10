@@ -2,12 +2,13 @@ package models
 
 type Connector struct {
 	Type         string
-	Name         string
+	ID           string
 	Active       bool
 	Server       string
 	Login        string
 	Pass         string
 	Key          string
+	Image        string
 	SuccessMatch string
 	WarningMatch string
 	FailureMatch string
@@ -15,9 +16,5 @@ type Connector struct {
 		Name  string
 		Check string
 	}
-	Routes []struct {
-		Match  string
-		Relays string
-		Target string
-	}
+	Routes []Route
 }

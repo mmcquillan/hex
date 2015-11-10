@@ -18,7 +18,7 @@ func (x Slack) Run(config *models.Config, connector models.Connector) {
 	api.SetDebug(config.Debug)
 	rtm := api.NewRTM()
 	if config.Debug {
-		log.Print("Starting slack websocket api for " + connector.Name)
+		log.Print("Starting slack websocket api for " + connector.ID)
 	}
 	go rtm.ManageConnection()
 	for {
@@ -53,23 +53,72 @@ func (x Slack) Run(config *models.Config, connector models.Connector) {
 						if config.Debug {
 							log.Print("Processing incoming slack message")
 						}
-						for _, r := range connector.Routes {
-							if strings.Contains(msg, r.Match) || r.Match == "*" {
-								m := models.Message{
-									Relays:      r.Relays,
-									Target:      ev.Channel,
-									Request:     msg,
-									Title:       "",
-									Description: "",
-									Link:        "",
-									Status:      "",
-								}
-								commands.Parse(config, m)
-							}
+						var r []models.Route
+						r = append(r, models.Route{Match: "*", Connectors: connector.ID, Target: ev.Channel})
+						for _, cr := range connector.Routes {
+							r = append(r, cr)
 						}
+						m := models.Message{
+							Routes:      r,
+							Request:     msg,
+							Title:       "",
+							Description: "",
+							Link:        "",
+							Status:      "",
+						}
+						commands.Parse(config, &m)
+						Broadcast(config, m)
 					}
 				}
 			}
 		}
 	}
+}
+
+func (x Slack) Send(config *models.Config, message models.Message, target string) {
+	slackToken := ""
+	slackImage := ""
+	for _, c := range config.Connectors {
+		if c.Type == "slack" {
+			slackToken = c.Key
+			slackImage = c.Image
+		}
+	}
+	api := slack.New(slackToken)
+	msg := ""
+	params := slack.NewPostMessageParameters()
+	params.Username = config.Name
+	params.IconEmoji = slackImage
+	if target == "" {
+		target = "#general"
+	}
+	if message.Description != "" {
+		color := slackColorMe(message.Status)
+		attachment := slack.Attachment{
+			Title:     message.Title,
+			TitleLink: message.Link,
+			Text:      message.Description,
+			Color:     color,
+		}
+		params.Attachments = []slack.Attachment{attachment}
+	} else {
+		msg = message.Title
+	}
+	api.PostMessage(target, msg, params)
+}
+
+func slackColorMe(status string) (color string) {
+	switch status {
+	case "SUCCESS":
+		color = "good"
+	case "WARN":
+		color = "warning"
+	case "FAIL":
+		color = "danger"
+	case "NONE":
+		color = "#DDDDDD"
+	default:
+		color = "#DDDDDD"
+	}
+	return color
 }

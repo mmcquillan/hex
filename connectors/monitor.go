@@ -26,6 +26,10 @@ func (x Monitor) Run(config *models.Config, connector models.Connector) {
 	}
 }
 
+func (x Monitor) Send(config *models.Config, message models.Message, target string) {
+	return
+}
+
 func callMonitor(state *map[string]string, config *models.Config, connector models.Connector) (alerts []string) {
 	serverconn := true
 	clientconn := &ssh.ClientConfig{
@@ -109,19 +113,15 @@ func reportMonitor(alerts []string, state *map[string]string, config *models.Con
 		} else {
 			color = "NONE"
 		}
-		for _, r := range connector.Routes {
-			if strings.Contains(out, r.Match) || r.Match == "*" {
-				m := models.Message{
-					Relays:      r.Relays,
-					Target:      r.Target,
-					Request:     "",
-					Title:       connector.Name + " " + a,
-					Description: out,
-					Link:        "",
-					Status:      color,
-				}
-				commands.Parse(config, m)
-			}
+		m := models.Message{
+			Routes:      connector.Routes,
+			Request:     "",
+			Title:       connector.ID + " " + a,
+			Description: out,
+			Link:        "",
+			Status:      color,
 		}
+		commands.Parse(config, &m)
+		Broadcast(config, m)
 	}
 }

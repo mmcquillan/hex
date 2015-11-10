@@ -36,7 +36,7 @@ func Reload(config *Config) (reloaded bool) {
 }
 
 func locateConfig() (configFile string) {
-	file := "jane.config.json"
+	file := "jane.json"
 
 	zero := *configParam()
 	if fileExists(zero) {
