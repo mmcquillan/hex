@@ -2,12 +2,11 @@ package commands
 
 import (
 	"github.com/mmcquillan/jane/models"
-	"github.com/mmcquillan/jane/relays"
 	"math/rand"
 	"strings"
 )
 
-func Parse(config *models.Config, message models.Message) {
+func Parse(config *models.Config, message *models.Message) {
 
 	if message.Request != "" {
 
@@ -47,7 +46,5 @@ func Parse(config *models.Config, message models.Message) {
 		message.Title = r
 
 	}
-
-	relays.Output(config, message)
 
 }

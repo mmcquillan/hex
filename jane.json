@@ -2,42 +2,36 @@
   "Name": "jane",
   "LogFile": "/var/log/jane.log",
   "Debug": false,
-  "Relays": [
-    {"Type": "slack", "Image": ":game_die:", "Resource": "<SlackToken>", "Active": true}
-  ],
-  "Listeners": [
+  "Connectors": [
 
-    {"Type": "slack", "Name": "slack", "Active": true,
-      "Key": "<SlackToken>",
-      "Destinations": [
-        {"Match": "*", "Relays": "slack", "Target": ""}
-      ]
+    {"Type": "slack", "ID": "slack", "Active": true,
+      "Key": "<SlackToken>", "Image": ":game_die:"
     },
 
-    {"Type": "rss", "Name": "Bamboo Build", "Active": true,
+    {"Type": "rss", "ID": "Bamboo Build", "Active": true,
       "Server": "https://BambooUser:BambooPass@somecompany.atlassian.net/builds/plugins/servlet/streams?local=true",
       "SuccessMatch": "successful", "FailureMatch": "fail",
-      "Destinations": [
-        {"Match": "*", "Relays": "slack", "Target": "#devops"},
-        {"Match": "NextGen", "Relays": "slack", "Target": "#nextgen"}
+      "Routes": [
+        {"Match": "*", "Connectors": "slack", "Target": "#devops"},
+        {"Match": "NextGen", "Connectors": "slack", "Target": "#nextgen"}
       ]
     },
 
-    {"Type": "rss", "Name": "Atlassian Status", "Active": true,
+    {"Type": "rss", "ID": "Atlassian Status", "Active": true,
       "Server": "http://status.atlassian.com/history.rss",
-      "Destinations": [
-        {"Match": "*", "Relays": "slack", "Target": "#devops"}
+      "Routes": [
+        {"Match": "*", "Connectors": "slack", "Target": "#devops"}
       ]
     },
 
-    {"Type": "rss", "Name": "AWS EC2", "Active": true,
+    {"Type": "rss", "ID": "AWS EC2", "Active": true,
       "Server": "http://status.aws.amazon.com/rss/ec2-us-east-1.rss",
-      "Destinations": [
-        {"Match": "*", "Relays": "slack", "Target": "#devops"}
+      "Routes": [
+        {"Match": "*", "Connectors": "slack", "Target": "#devops"}
       ]
     },
 
-    {"Type": "monitor", "Name": "Elasticsearch Node", "Active": true,
+    {"Type": "monitor", "ID": "Elasticsearch Node", "Active": true,
       "Server": "elasticsearch1.somecompany.com", "Login": "jane", "Pass": "abc123",
       "SuccessMatch": "OK", "WarningMatch": "WARNING", "FailureMatch": "CRITICAL", 
       "Checks": [
@@ -45,9 +39,9 @@
         {"Name": "Disk Check", "Check": "/usr/lib/nagios/plugins/check_disk -w10% -c5% -A"},
         {"Name": "Elasticsearch Check", "Check": "/usr/lib/nagios/plugins/check_procs -a elasticsearch -c1:1"}
       ],
-      "Destinations": [
-        {"Match": "*", "Relays": "slack", "Target": "#devops"},
-        {"Match": "*", "Relays": "slack", "Target": "@matt"}
+      "Routes": [
+        {"Match": "*", "Connectors": "slack", "Target": "#devops"},
+        {"Match": "*", "Connectors": "slack", "Target": "@matt"}
       ]
     }
 

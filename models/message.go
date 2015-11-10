@@ -1,7 +1,7 @@
 package models
 
 type Message struct {
-	Relays      string
+	Routes      []Route
 	Target      string
 	Request     string
 	Title       string

@@ -1,13 +1,14 @@
 package models
 
-type Listener struct {
+type Connector struct {
 	Type         string
-	Name         string
+	ID           string
 	Active       bool
 	Server       string
 	Login        string
 	Pass         string
 	Key          string
+	Image        string
 	SuccessMatch string
 	WarningMatch string
 	FailureMatch string
@@ -15,9 +16,5 @@ type Listener struct {
 		Name  string
 		Check string
 	}
-	Destinations []struct {
-		Match  string
-		Relays string
-		Target string
-	}
+	Routes []Route
 }
