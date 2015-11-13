@@ -75,20 +75,12 @@ func (x Slack) Run(config *models.Config, connector models.Connector) {
 	}
 }
 
-func (x Slack) Send(config *models.Config, message models.Message, target string) {
-	slackToken := ""
-	slackImage := ""
-	for _, c := range config.Connectors {
-		if c.Type == "slack" {
-			slackToken = c.Key
-			slackImage = c.Image
-		}
-	}
-	api := slack.New(slackToken)
+func (x Slack) Send(config *models.Config, connector models.Connector, message models.Message, target string) {
+	api := slack.New(connector.Key)
 	msg := ""
 	params := slack.NewPostMessageParameters()
 	params.Username = config.Name
-	params.IconEmoji = slackImage
+	params.IconEmoji = connector.Image
 	if target == "" {
 		target = "#general"
 	}

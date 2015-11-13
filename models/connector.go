@@ -7,6 +7,7 @@ type Connector struct {
 	Server       string
 	Login        string
 	Pass         string
+	From         string
 	Key          string
 	Image        string
 	SuccessMatch string

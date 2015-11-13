@@ -26,7 +26,7 @@ func (x Monitor) Run(config *models.Config, connector models.Connector) {
 	}
 }
 
-func (x Monitor) Send(config *models.Config, message models.Message, target string) {
+func (x Monitor) Send(config *models.Config, connector models.Connector, message models.Message, target string) {
 	return
 }
 
@@ -68,7 +68,7 @@ func callMonitor(state *map[string]string, config *models.Config, connector mode
 				if config.Debug {
 					log.Print("Ending session call for " + connector.Server + " " + chk.Name + " check")
 				}
-				if err != nil {
+				if err != nil && config.Debug {
 					log.Print(err)
 				}
 				out := string(b[:])

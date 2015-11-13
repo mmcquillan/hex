@@ -38,6 +38,7 @@ For the connector configuration, when adding routes, you must specify the ID of 
  "Routes": [{"Match": "*", "Connectors": "cli", "Target": ""}]}`
 
 ### Slack Connector
+Note that the slack connector has a default route that will always route traffic from the source within slack back to itself, such that it can respond per channel and DM's. This cannot be turned off, but caution as DM's could be routed to places they should not, so best to leave this without routes.
 `{"Type": "slack", "ID": "slack", "Active": true,
     "Key": "<SlackToken>", "Image": ":game_die:"
   }`
@@ -59,10 +60,16 @@ For the connector configuration, when adding routes, you must specify the ID of 
     ]
   }`
 
+### Email Connector
+`{"Type": "email", "ID": "Email Server", "Active": true,
+    "Server": "mail.someserver.com", "Login": "jane", "Pass": "abc123",
+    "From": "jane@janecorp.com"
+ }`
+
 ### Monitor Connector
 Note, this is currently setup to execute a nagios style monitoring script and interpret the results as the example shows below.
 
-`{"Type": "monitor", "Name": "Elasticsearch Node", "Active": true,
+`{"Type": "monitor", "ID": "Elasticsearch Node", "Active": true,
     "Server": "elasticsearch1.somecompany.com", "Login": "jane", "Pass": "abc123",
     "SuccessMatch": "OK", "WarningMatch": "WARNING", "FailureMatch": "CRITICAL",
     "Checks": [

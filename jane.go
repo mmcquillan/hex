@@ -48,7 +48,7 @@ func activeConnectors(config *models.Config) (cnt int) {
 func runConnector(config *models.Config) {
 	for _, connector := range config.Connectors {
 		if connector.Active {
-			log.Print("Initializing " + connector.ID + " (" + connector.Type + ")")
+			log.Print("Initializing " + connector.ID + " (type: " + connector.Type + ")")
 			c := connectors.MakeConnector(connector.Type).(connectors.Connector)
 			go c.Run(config, connector)
 			time.Sleep(2 * time.Second)

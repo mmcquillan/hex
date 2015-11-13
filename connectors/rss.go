@@ -7,6 +7,7 @@ import (
 	"github.com/mmcquillan/jane/models"
 	"html"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -24,14 +25,14 @@ func (x Rss) Run(config *models.Config, connector models.Connector) {
 	}
 }
 
-func (x Rss) Send(config *models.Config, message models.Message, target string) {
+func (x Rss) Send(config *models.Config, connector models.Connector, message models.Message, target string) {
 	return
 }
 
 func callRss(lastMarker string, config *models.Config, connector models.Connector) (nextMarker string) {
 	var displayOnStart = 0
 	if config.Debug {
-		log.Print("Starting rss feed fetch for " + connector.Server)
+		log.Print("Starting rss feed fetch for " + connector.ID)
 	}
 	feed, err := rss.Fetch(connector.Server)
 	if err != nil {
@@ -40,9 +41,12 @@ func callRss(lastMarker string, config *models.Config, connector models.Connecto
 	}
 	var messages []models.Message
 	if config.Debug {
-		log.Print("Feed count for " + connector.Server + ": " + string(len(feed.Items)))
+		log.Print("Feed count for " + connector.ID + ": " + strconv.Itoa(len(feed.Items)))
 	}
 	for i := len(feed.Items) - 1; i >= 0; i-- {
+		if config.Debug {
+			log.Print("Feed " + connector.ID + " item #" + strconv.Itoa(i) + " marker " + feed.Items[i].Date.String())
+		}
 		if lastMarker == "" {
 			lastMarker = feed.Items[displayOnStart].Date.String()
 		}
@@ -73,19 +77,15 @@ func callRss(lastMarker string, config *models.Config, connector models.Connecto
 					status = "FAIL"
 				}
 			}
-			for _, r := range connector.Routes {
-				if strings.Contains(item.Title, r.Match) || r.Match == "*" {
-					m := models.Message{
-						Routes:      connector.Routes,
-						Request:     "",
-						Title:       connector.ID + " " + html.UnescapeString(sanitize.HTML(item.Title)),
-						Description: html.UnescapeString(sanitize.HTML(item.Content)),
-						Link:        item.Link,
-						Status:      status,
-					}
-					messages = append(messages, m)
-				}
+			m := models.Message{
+				Routes:      connector.Routes,
+				Request:     "",
+				Title:       connector.ID + " " + html.UnescapeString(sanitize.HTML(item.Title)),
+				Description: html.UnescapeString(sanitize.HTML(item.Content)),
+				Link:        item.Link,
+				Status:      status,
 			}
+			messages = append(messages, m)
 			if i == 0 {
 				lastMarker = item.Date.String()
 			}
@@ -97,7 +97,7 @@ func callRss(lastMarker string, config *models.Config, connector models.Connecto
 	}
 	nextMarker = lastMarker
 	if config.Debug {
-		log.Print("Next marker for " + connector.Server + ": " + nextMarker)
+		log.Print("Next marker for " + connector.ID + ": " + nextMarker)
 	}
 	return nextMarker
 }

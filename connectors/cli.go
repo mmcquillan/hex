@@ -37,7 +37,7 @@ func (x Cli) Run(config *models.Config, connector models.Connector) {
 	}
 }
 
-func (x Cli) Send(config *models.Config, message models.Message, target string) {
+func (x Cli) Send(config *models.Config, connector models.Connector, message models.Message, target string) {
 	fmt.Println("")
 	switch message.Status {
 	case "SUCCESS":
