@@ -60,6 +60,7 @@ func (x Slack) Run(config *models.Config, connector models.Connector) {
 						}
 						m := models.Message{
 							Routes:      r,
+							Source:      ev.User,
 							Request:     msg,
 							Title:       "",
 							Description: "",
