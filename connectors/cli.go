@@ -8,6 +8,7 @@ import (
 	"github.com/mmcquillan/jane/models"
 	"log"
 	"os"
+	"os/user"
 )
 
 type Cli struct {
@@ -15,6 +16,10 @@ type Cli struct {
 
 func (x Cli) Run(config *models.Config, connector models.Connector) {
 	defer Recovery(config, connector)
+	u, err := user.Current()
+	if err != nil {
+		log.Print(err)
+	}
 	fmt.Println("Starting in cli mode...\n")
 	fmt.Print(config.Name + "> ")
 	scanner := bufio.NewScanner(os.Stdin)
@@ -26,6 +31,7 @@ func (x Cli) Run(config *models.Config, connector models.Connector) {
 		}
 		m := models.Message{
 			Routes:      connector.Routes,
+			Source:      u.Username,
 			Request:     req,
 			Title:       "",
 			Description: "",

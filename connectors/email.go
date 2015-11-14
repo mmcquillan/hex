@@ -24,7 +24,7 @@ func (x Email) Send(config *models.Config, connector models.Connector, message m
 		msg := []byte("To: " + target + "\r\n" +
 			"Subject: " + message.Title + "\r\n" +
 			"\r\n" + message.Description + "\r\n\r\n" + message.Link + "\r\n")
-		err := smtp.SendMail(connector.Server+":25", auth, connector.From, to, msg)
+		err := smtp.SendMail(connector.Server, auth, connector.From, to, msg)
 		if err != nil {
 			log.Print(err)
 		}

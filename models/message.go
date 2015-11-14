@@ -2,7 +2,7 @@ package models
 
 type Message struct {
 	Routes      []Route
-	Target      string
+	Source      string
 	Request     string
 	Title       string
 	Description string
