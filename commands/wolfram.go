@@ -113,7 +113,7 @@ func ParseWolframAlphaQuery(query Query) string {
         continue
       }
       result += fmt.Sprintf("     %s\n", subpod.Plaintext)
-      result += fmt.Sprintf("     Image: %s\n\n", subpod.Image.Source)
+      // result += fmt.Sprintf("     Image: %s\n\n", subpod.Image.Source)
     }
   }
 
