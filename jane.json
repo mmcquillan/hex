@@ -33,7 +33,7 @@
 
     {"Type": "monitor", "ID": "Elasticsearch Node", "Active": true,
       "Server": "elasticsearch1.somecompany.com", "Login": "jane", "Pass": "abc123",
-      "SuccessMatch": "OK", "WarningMatch": "WARNING", "FailureMatch": "CRITICAL", 
+      "SuccessMatch": "OK", "WarningMatch": "WARNING", "FailureMatch": "CRITICAL",
       "Checks": [
         {"Name": "Apt Check", "Check": "/usr/lib/nagios/plugins/check_apt"},
         {"Name": "Disk Check", "Check": "/usr/lib/nagios/plugins/check_disk -w10% -c5% -A"},
@@ -81,5 +81,7 @@
     {"Type": "response", "Match": "jane", "Output": "\"It's the most charming thing about humans. You are all so sure that the lesser animals are bleeding with envy because they didn't have the good fortune to be born Homo sapiens.\""},
     {"Type": "response", "Match": "rules", "Output": "*The Three Laws of DevOps Robotics*\n\n1. A robot may not injure a production environment or, through inaction, allow a production environment to come to harm.\n\n2. A robot must obey the orders given it by a command line interface except where such orders would conflict with the First Law.\n\n3. A robot must protect its own production existence as long as such protection does not conflict with the First or Second Laws."},
     {"Type": "response", "Match": "motivate", "Output": "You can _do it_ %msg%!"},
+
+    {"Type": "wolfram", "Match": "wolf", "ApiKey": "insertKey"}
   ]
 }

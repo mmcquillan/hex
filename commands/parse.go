@@ -40,6 +40,8 @@ func Parse(config *models.Config, message *models.Message) {
 			r = Reload(match[i], config)
 		case "help":
 			r = Help(config)
+		case "wolfram":
+			r = Wolfram(message.Request, match[i])
 		}
 
 		// feedback

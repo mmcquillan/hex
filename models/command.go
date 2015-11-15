@@ -6,4 +6,5 @@ type Command struct {
 	Output string
 	Cmd    string
 	Args   string
+	ApiKey string
 }
