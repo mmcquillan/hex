@@ -34,7 +34,7 @@ Connectors are what Jane uses to pull in information, interpret them and issue o
 For the connector configuration, when adding routes, you must specify the ID of the connector you want to route response to.
 
 ### Command Line Connector
-`{"Type": "cli", "ID": "cli", "Active": false,
+`{"Type": "cli", "ID": "cli", "Active": true,
  "Routes": [{"Match": "*", "Connectors": "cli", "Target": ""}]}`
 
 ### Slack Connector
