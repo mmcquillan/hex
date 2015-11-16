@@ -1,12 +1,12 @@
 package commands
 
 import (
-  "strings"
   "fmt"
   "github.com/mmcquillan/jane/models"
   "net/http"
   "encoding/xml"
   "io/ioutil"
+  "net/url"
   "log"
 )
 
@@ -38,7 +38,8 @@ var returnTypes = "&format=image,plaintext"
 
 func Wolfram(msg string, command models.Command) (results string) {
   msg = strings.TrimSpace(strings.Replace(msg, command.Match, "", 1))
-  encodedRequest := strings.Replace(msg, " ", "%20", -1)
+  // encodedRequest := strings.Replace(msg, " ", "%20", -1)
+  encodedRequest := url.QueryEscape(msg)
   getRequest := baseQuery + command.ApiKey + input + encodedRequest + returnTypes
 
   resp, err := http.Get(getRequest)
