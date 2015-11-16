@@ -1,34 +1,35 @@
 package commands
 
 import (
-  "fmt"
-  "github.com/mmcquillan/jane/models"
-  "net/http"
-  "encoding/xml"
-  "io/ioutil"
-  "net/url"
-  "log"
+	"encoding/xml"
+	"fmt"
+	"github.com/mmcquillan/jane/models"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"net/url"
+	"strings"
 )
 
 type Query struct {
-  QueryResult string `xml:"success,attr"`
-  PodList []Pod `xml:"pod"`
-  Datatypes string `xml:"datatypes,attr"`
+	QueryResult string `xml:"success,attr"`
+	PodList     []Pod  `xml:"pod"`
+	Datatypes   string `xml:"datatypes,attr"`
 }
 
 type Pod struct {
-  Title string `xml:"title,attr"`
-  SubpodList []Subpod `xml:"subpod"`
+	Title      string   `xml:"title,attr"`
+	SubpodList []Subpod `xml:"subpod"`
 }
 
 type Subpod struct {
-  Title string `xml:"title,attr"`
-  Plaintext string `xml:"plaintext"`
-  Image Image `xml:"img"`
+	Title     string `xml:"title,attr"`
+	Plaintext string `xml:"plaintext"`
+	Image     Image  `xml:"img"`
 }
 
 type Image struct {
-  Source string `xml:"src,attr"`
+	Source string `xml:"src,attr"`
 }
 
 var errorResult = "Error processing request"
@@ -37,86 +38,86 @@ var input = "&input="
 var returnTypes = "&format=image,plaintext"
 
 func Wolfram(msg string, command models.Command) (results string) {
-  msg = strings.TrimSpace(strings.Replace(msg, command.Match, "", 1))
-  // encodedRequest := strings.Replace(msg, " ", "%20", -1)
-  encodedRequest := url.QueryEscape(msg)
-  getRequest := baseQuery + command.ApiKey + input + encodedRequest + returnTypes
+	msg = strings.TrimSpace(strings.Replace(msg, command.Match, "", 1))
+	// encodedRequest := strings.Replace(msg, " ", "%20", -1)
+	encodedRequest := url.QueryEscape(msg)
+	getRequest := baseQuery + command.ApiKey + input + encodedRequest + returnTypes
 
-  resp, err := http.Get(getRequest)
-  if err != nil {
-    log.Print(err)
-    return errorResult
-  }
+	resp, err := http.Get(getRequest)
+	if err != nil {
+		log.Print(err)
+		return errorResult
+	}
 
-  defer resp.Body.Close()
+	defer resp.Body.Close()
 
-  body, err := ioutil.ReadAll(resp.Body)
+	body, err := ioutil.ReadAll(resp.Body)
 
-  if err != nil {
-    log.Print(err)
-    return errorResult
-  }
+	if err != nil {
+		log.Print(err)
+		return errorResult
+	}
 
-  var query Query
-  err = xml.Unmarshal(body, &query)
-  if err != nil {
-    log.Print(err)
-    return errorResult
-  }
+	var query Query
+	err = xml.Unmarshal(body, &query)
+	if err != nil {
+		log.Print(err)
+		return errorResult
+	}
 
-  if query.QueryResult == "false" {
-    return "Failed to return a result"
-  }
+	if query.QueryResult == "false" {
+		return "Failed to return a result"
+	}
 
-  var result string
-  if query.Datatypes == "Math" {
-    result = ParseWolframAlphaMathQuery(query)
-  } else {
-    result = ParseWolframAlphaQuery(query)
-  }
+	var result string
+	if query.Datatypes == "Math" {
+		result = ParseWolframAlphaMathQuery(query)
+	} else {
+		result = ParseWolframAlphaQuery(query)
+	}
 
-  return result
+	return result
 }
 
 func ParseWolframAlphaMathQuery(query Query) string {
-  result := ""
+	result := ""
 
-  for _, pod := range query.PodList {
-    if len(pod.SubpodList) == 0 {
-      continue
-    }
-    if pod.Title != "Result" {
-      continue
-    }
-    for _, subpod := range pod.SubpodList {
-      if subpod.Plaintext == "{}" {
-        continue
-      }
-      result += fmt.Sprintf("     %s\n", subpod.Plaintext)
-    }
-  }
+	for _, pod := range query.PodList {
+		if len(pod.SubpodList) == 0 {
+			continue
+		}
+		if pod.Title != "Result" {
+			continue
+		}
+		for _, subpod := range pod.SubpodList {
+			if subpod.Plaintext == "{}" {
+				continue
+			}
+			result += fmt.Sprintf("     %s\n", subpod.Plaintext)
+		}
+	}
 
-  return result
+	return result
 }
 
 func ParseWolframAlphaQuery(query Query) string {
-  result := ""
+	result := ""
 
-  for _, pod := range query.PodList {
-    if len(pod.SubpodList) == 0 {
-      continue
-    }
-    if pod.Title == "Input interpretation" {
-      continue
-    }
-    for _, subpod := range pod.SubpodList {
-      if subpod.Plaintext == "{}" {
-        continue
-      }
-      result += fmt.Sprintf("     %s\n", subpod.Plaintext)
-      // result += fmt.Sprintf("     Image: %s\n\n", subpod.Image.Source)
-    }
-  }
+	for _, pod := range query.PodList {
+		if len(pod.SubpodList) == 0 {
+			continue
+		}
+		if pod.Title == "Input interpretation" {
+			continue
+		}
+		for _, subpod := range pod.SubpodList {
+			if subpod.Plaintext == "{}" {
+				continue
+			}
+			result += fmt.Sprintf("     %s\n", subpod.Plaintext)
+			// result += fmt.Sprintf("     Image: %s\n\n", subpod.Image.Source)
+		}
+	}
 
-  return result
+	return result
 }
