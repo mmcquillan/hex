@@ -43,6 +43,17 @@
         {"Match": "*", "Connectors": "slack", "Target": "#devops"},
         {"Match": "*", "Connectors": "slack", "Target": "@matt"}
       ]
+    },
+
+    {"Type": "website", "ID": "Website Monitor", "Active": true,
+      "Checks": [
+        {"Name": "Yahoo", "Check": "https://www.yahoo.com"},
+        {"Name": "Google", "Check": "https://google.com"}
+      ],
+      "Routes": [
+        {"Match": "*", "Connectors": "slack", "Target": "#devops"},
+        {"Match": "*", "Connectors": "slack", "Target": "@matt"}
+      ]
     }
 
   ],
