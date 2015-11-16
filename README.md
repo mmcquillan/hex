@@ -84,6 +84,19 @@ Note, this is currently setup to execute a nagios style monitoring script and in
   }`
 
 
+### Webserver Connector
+This will check if a given website returns a 200 status, else it will alert.
+
+`{"Type": "website", "ID": "Website Monitor", "Active": true,
+      "Checks": [
+        {"Name": "Google", "Check": "https://google.com"},
+        {"Name": "Yahoo", "Check": "http://www.yahoo.com"}
+      ],
+      "Routes": [
+        {"Match": "*", "Connectors": "*"}
+      ]
+    }`
+
 
 ## Commands
 Commands are what execute or respond to requests by listeners.

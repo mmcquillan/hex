@@ -13,6 +13,7 @@ func init() {
 	List["monitor"] = reflect.TypeOf(Monitor{})
 	List["slack"] = reflect.TypeOf(Slack{})
 	List["rss"] = reflect.TypeOf(Rss{})
+	List["website"] = reflect.TypeOf(Website{})
 }
 
 func MakeConnector(connType string) interface{} {
