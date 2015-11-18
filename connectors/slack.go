@@ -31,6 +31,7 @@ func (x Slack) Run(config *models.Config, connector models.Connector) {
 					if config.Debug {
 						log.Print("Evaluating incoming slack message")
 					}
+
 					var process = true
 
 					// make sure they are talking to and not about us
@@ -38,6 +39,28 @@ func (x Slack) Run(config *models.Config, connector models.Connector) {
 					tokmsg := strings.Split(strings.TrimSpace(msg), " ")
 					if strings.ToLower(tokmsg[0]) != strings.ToLower(config.Name) {
 						process = false
+
+						var jiraRegex = regexp.MustCompile(`(?i)(SYN|MED|STD)-[0-9]+`)
+						matches := synRegex.FindAllString(msg, -1)
+
+						if len(matches) > 0 {
+							var command models.Command
+
+							m := models.Message{
+								Routes:      r,
+								Source:      ev.User,
+								Request:     "jira " + matches[0],
+								Title:       "",
+								Description: "",
+								Link:        "",
+								Status:      "",
+							}
+
+							commands.Parse(config, &m)
+							Broadcast(config, m)
+
+							return
+						}
 					}
 
 					// remove me from the request and clean
