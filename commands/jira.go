@@ -80,6 +80,10 @@ func Jira(msg string, command models.Command) (string, string, string) {
   var ticket Ticket
   json.Unmarshal(body, &ticket)
 
+  if ticket.Fields.Status.Name == "" {
+    return "Ticket does not exist", "", ""
+  }
+
   link := baseUrl + "browse/" + issueNumber
 
   message := fmt.Sprintf("Status: %s\nAssignee: %s\nPriority: %s\nSummary: %s\n",

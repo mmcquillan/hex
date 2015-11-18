@@ -45,8 +45,13 @@ func Parse(config *models.Config, message *models.Message) {
 		case "jira":
 			var desc, link string
 			r, desc, link = Jira(message.Request, match[i])
-			message.Description = desc
-			message.Link = link
+
+			if desc != "" {
+				message.Description = desc
+			}
+			if link != "" {
+				message.Link = link
+			}
 		}
 
 		// feedback
