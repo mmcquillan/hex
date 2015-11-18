@@ -51,7 +51,7 @@ func Jira(msg string, command models.Command) string {
 
   }
 
-  baseUrl := "https://prysminc.atlassian.net/"
+  baseUrl := command.Args
   issueNumber := msg
 
   auth := command.ApiKey
