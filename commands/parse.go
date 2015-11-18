@@ -43,7 +43,15 @@ func Parse(config *models.Config, message *models.Message) {
 		case "wolfram":
 			r = Wolfram(message.Request, match[i])
 		case "jira":
-			r = Jira(message.Request, match[i])
+			var desc, link string
+			r, desc, link = Jira(message.Request, match[i])
+
+			if desc != "" {
+				message.Description = desc
+			}
+			if link != "" {
+				message.Link = link
+			}
 		}
 
 		// feedback

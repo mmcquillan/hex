@@ -45,7 +45,7 @@ type Priority struct {
   Name string `json:"name"`
 }
 
-func Jira(msg string, command models.Command) string {
+func Jira(msg string, command models.Command) (string, string, string) {
   msg = strings.TrimSpace(strings.Replace(msg, command.Match, "", 1))
   client := &http.Client {
 
@@ -80,11 +80,17 @@ func Jira(msg string, command models.Command) string {
   var ticket Ticket
   json.Unmarshal(body, &ticket)
 
+  if ticket.Fields.Status.Name == "" {
+    return "Ticket does not exist", "", ""
+  }
+
   link := baseUrl + "browse/" + issueNumber
 
-  return fmt.Sprintf("Status: %s\nAssignee: %s\nPriority: %s\nSummary: %s\nDescription: %s\n\n%s\n",
+  message := fmt.Sprintf("Status: %s\nAssignee: %s\nPriority: %s\nSummary: %s\n",
     ticket.Fields.Status.Name, ticket.Fields.Assignee.Name, ticket.Fields.Priority.Name,
-    ticket.Fields.Summary, ticket.Fields.Description, link)
+    ticket.Fields.Summary)
+
+  return message, ticket.Fields.Description, link
 }
 
 func EncodeB64(message string) string {
