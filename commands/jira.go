@@ -17,23 +17,9 @@ type Ticket struct {
 
 type Fields struct {
   Summary string `json:"summary"`
-  Assignee Assignee `json:"assignee"`
   Status Status `json:"status"`
   Description string `json:"description"`
-  Creator Creator `json:"creator"`
   Priority Priority `json:"priority"`
-}
-
-type Assignee struct {
-  Name string `json:"name"`
-}
-
-type Creator struct {
-  Name string `json:"name"`
-}
-
-type IssueType struct {
-  Name string `json:"name"`
 }
 
 type Status struct {
@@ -86,9 +72,8 @@ func Jira(msg string, command models.Command) (string, string, string) {
 
   link := baseUrl + "browse/" + issueNumber
 
-  message := fmt.Sprintf("Status: %s\nAssignee: %s\nPriority: %s\nSummary: %s\n",
-    ticket.Fields.Status.Name, ticket.Fields.Assignee.Name, ticket.Fields.Priority.Name,
-    ticket.Fields.Summary)
+  message := fmt.Sprintf("Status: %s\nPriority: %s\nSummary: %s\n",
+    ticket.Fields.Status.Name, ticket.Fields.Priority.Name, ticket.Fields.Summary)
 
   return message, ticket.Fields.Description, link
 }

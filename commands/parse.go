@@ -4,7 +4,10 @@ import (
 	"github.com/mmcquillan/jane/models"
 	"math/rand"
 	"strings"
+	"regexp"
 )
+
+var synRegex = regexp.MustCompile(`(?i)(SYN-)[0-9]+`)
 
 func Parse(config *models.Config, message *models.Message) {
 
@@ -20,6 +23,33 @@ func Parse(config *models.Config, message *models.Message) {
 
 		// if no match, just leave
 		if len(match) == 0 {
+
+			matches := synRegex.FindAllString(message.Request, -1)
+
+			var command models.Command
+
+			for _, c := range config.Commands {
+				if strings.HasPrefix(strings.ToLower("jira"), strings.ToLower(c.Match)) {
+					command = c
+				}
+			}
+
+			if len(matches) > 0 {
+				r, desc, link := Jira(matches[0], command)
+
+				if r != "" {
+					message.Title = r
+				}
+
+				if desc != "" {
+					message.Description = desc
+				}
+
+				if link != "" {
+					message.Link = link
+				}
+			}
+
 			return
 		}
 
