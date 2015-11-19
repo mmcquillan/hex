@@ -6,6 +6,7 @@ import (
 	"github.com/nlopes/slack"
 	"log"
 	"strings"
+	"regexp"
 )
 
 type Slack struct {
@@ -41,10 +42,9 @@ func (x Slack) Run(config *models.Config, connector models.Connector) {
 						process = false
 
 						var jiraRegex = regexp.MustCompile(`(?i)(SYN|MED|STD)-[0-9]+`)
-						matches := synRegex.FindAllString(msg, -1)
+						matches := jiraRegex.FindAllString(msg, -1)
 
 						if len(matches) > 0 {
-							var command models.Command
 
 							var r []models.Route
 							r = append(r, models.Route{Match: "*", Connectors: connector.ID, Target: ev.Channel})
