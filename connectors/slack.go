@@ -46,18 +46,26 @@ func (x Slack) Run(config *models.Config, connector models.Connector) {
 						if len(matches) > 0 {
 							var command models.Command
 
-							m := models.Message{
-								Routes:      r,
-								Source:      ev.User,
-								Request:     "jira " + matches[0],
-								Title:       "",
-								Description: "",
-								Link:        "",
-								Status:      "",
+							var r []models.Route
+							r = append(r, models.Route{Match: "*", Connectors: connector.ID, Target: ev.Channel})
+							for _, cr := range connector.Routes {
+								r = append(r, cr)
 							}
 
-							commands.Parse(config, &m)
-							Broadcast(config, m)
+							for _, match := range matches {
+								m := models.Message{
+									Routes:      r,
+									Source:      ev.User,
+									Request:     "jira " + match,
+									Title:       "",
+									Description: "",
+									Link:        "",
+									Status:      "",
+								}
+
+								commands.Parse(config, &m)
+								Broadcast(config, m)
+							}
 
 							return
 						}
