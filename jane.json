@@ -1,7 +1,6 @@
 {
   "Name": "jane",
   "LogFile": "/var/log/jane.log",
-  "Debug": false,
   "Connectors": [
 
     {"Type": "slack", "ID": "slack", "Active": true,

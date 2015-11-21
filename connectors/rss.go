@@ -16,7 +16,7 @@ type Rss struct {
 	Connector models.Connector
 }
 
-func (x Rss) Run(config *models.Config, connector models.Connector) {
+func (x Rss) Listen(config *models.Config, connector models.Connector) {
 	defer Recovery(config, connector)
 	nextMarker := ""
 	for {
@@ -25,13 +25,17 @@ func (x Rss) Run(config *models.Config, connector models.Connector) {
 	}
 }
 
-func (x Rss) Send(config *models.Config, connector models.Connector, message models.Message, target string) {
+func (x Rss) Command(config *models.Config, message *models.Message) {
+	return
+}
+
+func (x Rss) Publish(config *models.Config, connector models.Connector, message models.Message, target string) {
 	return
 }
 
 func callRss(lastMarker string, config *models.Config, connector models.Connector) (nextMarker string) {
 	var displayOnStart = 0
-	if config.Debug {
+	if connector.Debug {
 		log.Print("Starting rss feed fetch for " + connector.ID)
 	}
 	feed, err := rss.Fetch(connector.Server)
@@ -40,11 +44,11 @@ func callRss(lastMarker string, config *models.Config, connector models.Connecto
 		return
 	}
 	var messages []models.Message
-	if config.Debug {
+	if connector.Debug {
 		log.Print("Feed count for " + connector.ID + ": " + strconv.Itoa(len(feed.Items)))
 	}
 	for i := len(feed.Items) - 1; i >= 0; i-- {
-		if config.Debug {
+		if connector.Debug {
 			log.Print("Feed " + connector.ID + " item #" + strconv.Itoa(i) + " marker " + feed.Items[i].Date.String())
 		}
 		if lastMarker == "" {
@@ -96,7 +100,7 @@ func callRss(lastMarker string, config *models.Config, connector models.Connecto
 		Broadcast(config, m)
 	}
 	nextMarker = lastMarker
-	if config.Debug {
+	if connector.Debug {
 		log.Print("Next marker for " + connector.ID + ": " + nextMarker)
 	}
 	return nextMarker

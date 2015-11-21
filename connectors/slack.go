@@ -5,20 +5,20 @@ import (
 	"github.com/mmcquillan/jane/models"
 	"github.com/nlopes/slack"
 	"log"
-	"strings"
 	"regexp"
+	"strings"
 )
 
 type Slack struct {
 	Connector models.Connector
 }
 
-func (x Slack) Run(config *models.Config, connector models.Connector) {
+func (x Slack) Listen(config *models.Config, connector models.Connector) {
 	defer Recovery(config, connector)
 	api := slack.New(connector.Key)
-	api.SetDebug(config.Debug)
+	api.SetDebug(connector.Debug)
 	rtm := api.NewRTM()
-	if config.Debug {
+	if connector.Debug {
 		log.Print("Starting slack websocket api for " + connector.ID)
 	}
 	go rtm.ManageConnection()
@@ -29,7 +29,7 @@ func (x Slack) Run(config *models.Config, connector models.Connector) {
 			case *slack.MessageEvent:
 				if ev.User != "" {
 
-					if config.Debug {
+					if connector.Debug {
 						log.Print("Evaluating incoming slack message")
 					}
 
@@ -81,7 +81,7 @@ func (x Slack) Run(config *models.Config, connector models.Connector) {
 					}
 
 					if process {
-						if config.Debug {
+						if connector.Debug {
 							log.Print("Processing incoming slack message")
 						}
 						var r []models.Route
@@ -107,7 +107,11 @@ func (x Slack) Run(config *models.Config, connector models.Connector) {
 	}
 }
 
-func (x Slack) Send(config *models.Config, connector models.Connector, message models.Message, target string) {
+func (x Slack) Command(config *models.Config, message *models.Message) {
+	return
+}
+
+func (x Slack) Publish(config *models.Config, connector models.Connector, message models.Message, target string) {
 	api := slack.New(connector.Key)
 	msg := ""
 	params := slack.NewPostMessageParameters()

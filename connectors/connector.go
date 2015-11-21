@@ -5,6 +5,7 @@ import (
 )
 
 type Connector interface {
-	Run(config *models.Config, connector models.Connector)
-	Send(config *models.Config, connector models.Connector, message models.Message, target string)
+	Listen(config *models.Config, connector models.Connector)
+	Command(config *models.Config, message *models.Message)
+	Publish(config *models.Config, connector models.Connector, message models.Message, target string)
 }

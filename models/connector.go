@@ -18,4 +18,5 @@ type Connector struct {
 		Check string
 	}
 	Routes []Route
+	Debug  bool
 }

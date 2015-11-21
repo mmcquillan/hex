@@ -13,7 +13,7 @@ type Monitor struct {
 	Connector models.Connector
 }
 
-func (x Monitor) Run(config *models.Config, connector models.Connector) {
+func (x Monitor) Listen(config *models.Config, connector models.Connector) {
 	defer Recovery(config, connector)
 	var state = make(map[string]string)
 	for _, chk := range connector.Checks {
@@ -26,7 +26,11 @@ func (x Monitor) Run(config *models.Config, connector models.Connector) {
 	}
 }
 
-func (x Monitor) Send(config *models.Config, connector models.Connector, message models.Message, target string) {
+func (x Monitor) Command(config *models.Config, message *models.Message) {
+	return
+}
+
+func (x Monitor) Publish(config *models.Config, connector models.Connector, message models.Message, target string) {
 	return
 }
 
@@ -38,7 +42,7 @@ func callMonitor(state *map[string]string, config *models.Config, connector mode
 			ssh.Password(connector.Pass),
 		},
 	}
-	if config.Debug {
+	if connector.Debug {
 		log.Print("Starting client connection for " + connector.Server)
 	}
 	client, err := ssh.Dial("tcp", connector.Server+":22", clientconn)
@@ -50,7 +54,7 @@ func callMonitor(state *map[string]string, config *models.Config, connector mode
 	} else {
 		defer client.Close()
 		for _, chk := range connector.Checks {
-			if config.Debug {
+			if connector.Debug {
 				log.Print("Starting session connection for " + connector.Server + " " + chk.Name + " check")
 			}
 			session, err := client.NewSession()
@@ -61,18 +65,18 @@ func callMonitor(state *map[string]string, config *models.Config, connector mode
 				serverconn = false
 			} else {
 				defer session.Close()
-				if config.Debug {
+				if connector.Debug {
 					log.Print("Starting session call for " + connector.Server + " " + chk.Name + " check")
 				}
 				b, err := session.CombinedOutput(chk.Check)
-				if config.Debug {
+				if connector.Debug {
 					log.Print("Ending session call for " + connector.Server + " " + chk.Name + " check")
 				}
-				if err != nil && config.Debug {
+				if err != nil && connector.Debug {
 					log.Print(err)
 				}
 				out := string(b[:])
-				if config.Debug {
+				if connector.Debug {
 					log.Print("Session results for " + connector.Server + " " + chk.Name + ": " + out)
 				}
 				if (*state)[chk.Name] != out && !(strings.Contains(out, connector.SuccessMatch) && strings.Contains((*state)[chk.Name], connector.SuccessMatch)) {
@@ -83,7 +87,7 @@ func callMonitor(state *map[string]string, config *models.Config, connector mode
 		}
 	}
 	if !serverconn {
-		if config.Debug {
+		if connector.Debug {
 			log.Print("Cannot connect to server " + connector.Server)
 		}
 		out := "CRITICAL - Cannot connect to server " + connector.Server
@@ -98,7 +102,7 @@ func callMonitor(state *map[string]string, config *models.Config, connector mode
 }
 
 func reportMonitor(alerts []string, state *map[string]string, config *models.Config, connector models.Connector) {
-	if config.Debug {
+	if connector.Debug {
 		log.Print("Starting reporting on monitroing results for " + connector.Server)
 	}
 	for _, a := range alerts {
