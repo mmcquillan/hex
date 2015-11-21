@@ -12,13 +12,13 @@ func Broadcast(config *models.Config, message models.Message) {
 			for _, connector := range config.Connectors {
 				if connector.Active {
 					if sendToConnector(connector.ID, route.Connectors) {
-						if config.Debug {
+						if connector.Debug {
 							log.Print("Broadcasting to " + connector.ID + " (type:" + connector.Type + ") for route " + route.Connectors)
 							log.Printf("Message: %+v", message)
 							log.Print("")
 						}
 						c := MakeConnector(connector.Type).(Connector)
-						c.Send(config, connector, message, route.Target)
+						c.Publish(config, connector, message, route.Target)
 					}
 				}
 			}

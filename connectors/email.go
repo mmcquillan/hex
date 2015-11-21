@@ -10,12 +10,16 @@ type Email struct {
 	Connector models.Connector
 }
 
-func (x Email) Run(config *models.Config, connector models.Connector) {
+func (x Email) Listen(config *models.Config, connector models.Connector) {
 	defer Recovery(config, connector)
 	return
 }
 
-func (x Email) Send(config *models.Config, connector models.Connector, message models.Message, target string) {
+func (x Email) Command(config *models.Config, message *models.Message) {
+	return
+}
+
+func (x Email) Publish(config *models.Config, connector models.Connector, message models.Message, target string) {
 	if target == "" {
 		log.Print("No email provided to the email connector")
 	} else {

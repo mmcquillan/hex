@@ -39,9 +39,6 @@ func activeConnectors(config *models.Config) (cnt int) {
 			cnt += 1
 		}
 	}
-	if config.Debug {
-		log.Print("Active Listner count: " + string(cnt))
-	}
 	return cnt
 }
 
@@ -50,7 +47,7 @@ func runConnector(config *models.Config) {
 		if connector.Active {
 			log.Print("Initializing " + connector.ID + " (type: " + connector.Type + ")")
 			c := connectors.MakeConnector(connector.Type).(connectors.Connector)
-			go c.Run(config, connector)
+			go c.Listen(config, connector)
 			time.Sleep(2 * time.Second)
 		}
 	}

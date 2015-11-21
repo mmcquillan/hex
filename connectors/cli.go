@@ -14,7 +14,7 @@ import (
 type Cli struct {
 }
 
-func (x Cli) Run(config *models.Config, connector models.Connector) {
+func (x Cli) Listen(config *models.Config, connector models.Connector) {
 	defer Recovery(config, connector)
 	u, err := user.Current()
 	if err != nil {
@@ -28,6 +28,9 @@ func (x Cli) Run(config *models.Config, connector models.Connector) {
 		if req == "exit" {
 			log.Print("Exiting jane bot by command line")
 			os.Exit(0)
+		}
+		if connector.Debug {
+			log.Print("Logging msg: " + req)
 		}
 		m := models.Message{
 			Routes:      connector.Routes,
@@ -43,7 +46,11 @@ func (x Cli) Run(config *models.Config, connector models.Connector) {
 	}
 }
 
-func (x Cli) Send(config *models.Config, connector models.Connector, message models.Message, target string) {
+func (x Cli) Command(config *models.Config, message *models.Message) {
+	return
+}
+
+func (x Cli) Publish(config *models.Config, connector models.Connector, message models.Message, target string) {
 	fmt.Println("")
 	switch message.Status {
 	case "SUCCESS":
