@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/mmcquillan/jane/models"
+	"github.com/projectjane/jane/models"
 	"strings"
 )
 

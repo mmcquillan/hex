@@ -1,7 +1,7 @@
 package connectors
 
 import (
-	"github.com/mmcquillan/jane/models"
+	"github.com/projectjane/jane/models"
 	"log"
 	"strings"
 )

@@ -1,85 +1,83 @@
 package commands
 
 import (
-  "fmt"
-  "net/http"
-  "encoding/base64"
-  "encoding/json"
-  "io/ioutil"
-  "strings"
-  "github.com/mmcquillan/jane/models"
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
+	"github.com/projectjane/jane/models"
+	"io/ioutil"
+	"net/http"
+	"strings"
 )
 
 type Ticket struct {
-  Key string `json:"key"`
-  Fields Fields `json:"fields"`
+	Key    string `json:"key"`
+	Fields Fields `json:"fields"`
 }
 
 type Fields struct {
-  Summary string `json:"summary"`
-  Status Status `json:"status"`
-  Description string `json:"description"`
-  Priority Priority `json:"priority"`
+	Summary     string   `json:"summary"`
+	Status      Status   `json:"status"`
+	Description string   `json:"description"`
+	Priority    Priority `json:"priority"`
 }
 
 type Status struct {
-  Description string `json:"description"`
-  Name string `json:"name"`
+	Description string `json:"description"`
+	Name        string `json:"name"`
 }
 
 type Priority struct {
-  Name string `json:"name"`
+	Name string `json:"name"`
 }
 
 func Jira(msg string, command models.Command) (string, string, string) {
-  msg = strings.TrimSpace(strings.Replace(msg, command.Match, "", 1))
-  client := &http.Client {
+	msg = strings.TrimSpace(strings.Replace(msg, command.Match, "", 1))
+	client := &http.Client{}
 
-  }
+	baseUrl := command.Args
+	issueNumber := msg
 
-  baseUrl := command.Args
-  issueNumber := msg
+	auth := command.ApiKey
+	encodedAuth := EncodeB64(auth)
 
-  auth := command.ApiKey
-  encodedAuth := EncodeB64(auth)
+	req, err := http.NewRequest("GET", baseUrl+"rest/api/2/issue/"+issueNumber, nil)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("Authorization", "Basic "+encodedAuth)
+	}
 
-  req, err := http.NewRequest("GET", baseUrl + "rest/api/2/issue/" + issueNumber, nil)
-  if err != nil {
-    fmt.Println(err)
-  } else {
-    req.Header.Add("Content-Type", "application/json")
-    req.Header.Add("Authorization", "Basic " + encodedAuth)
-  }
+	response, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+	}
 
-  response, err := client.Do(req)
-  if err != nil {
-    fmt.Println(err)
-  }
+	defer response.Body.Close()
 
-  defer response.Body.Close()
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		fmt.Println(err)
+	}
 
-  body, err := ioutil.ReadAll(response.Body)
-  if err != nil {
-    fmt.Println(err)
-  }
+	var ticket Ticket
+	json.Unmarshal(body, &ticket)
 
-  var ticket Ticket
-  json.Unmarshal(body, &ticket)
+	if ticket.Fields.Status.Name == "" {
+		return "Ticket does not exist", "", ""
+	}
 
-  if ticket.Fields.Status.Name == "" {
-    return "Ticket does not exist", "", ""
-  }
+	link := baseUrl + "browse/" + issueNumber
 
-  link := baseUrl + "browse/" + issueNumber
+	message := fmt.Sprintf("Status: %s\nPriority: %s\nSummary: %s\n",
+		ticket.Fields.Status.Name, ticket.Fields.Priority.Name, ticket.Fields.Summary)
 
-  message := fmt.Sprintf("Status: %s\nPriority: %s\nSummary: %s\n",
-    ticket.Fields.Status.Name, ticket.Fields.Priority.Name, ticket.Fields.Summary)
-
-  return message, ticket.Fields.Description, link
+	return message, ticket.Fields.Description, link
 }
 
 func EncodeB64(message string) string {
-    base64Text := make([]byte, base64.StdEncoding.EncodedLen(len(message)))
-    base64.StdEncoding.Encode(base64Text, []byte(message))
-    return string(base64Text)
+	base64Text := make([]byte, base64.StdEncoding.EncodedLen(len(message)))
+	base64.StdEncoding.Encode(base64Text, []byte(message))
+	return string(base64Text)
 }

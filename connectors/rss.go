@@ -3,8 +3,8 @@ package connectors
 import (
 	"github.com/SlyMarbo/rss"
 	"github.com/kennygrant/sanitize"
-	"github.com/mmcquillan/jane/commands"
-	"github.com/mmcquillan/jane/models"
+	"github.com/projectjane/jane/commands"
+	"github.com/projectjane/jane/models"
 	"html"
 	"log"
 	"strconv"

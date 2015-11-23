@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/mmcquillan/jane/connectors"
-	"github.com/mmcquillan/jane/models"
+	"github.com/projectjane/jane/connectors"
+	"github.com/projectjane/jane/models"
 	"log"
 	"os"
 	"os/signal"

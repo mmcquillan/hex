@@ -1,8 +1,8 @@
 package connectors
 
 import (
-	"github.com/mmcquillan/jane/commands"
-	"github.com/mmcquillan/jane/models"
+	"github.com/projectjane/jane/commands"
+	"github.com/projectjane/jane/models"
 	"golang.org/x/crypto/ssh"
 	"log"
 	"strings"

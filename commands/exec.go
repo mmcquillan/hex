@@ -2,7 +2,7 @@ package commands
 
 import (
 	"bytes"
-	"github.com/mmcquillan/jane/models"
+	"github.com/projectjane/jane/models"
 	"log"
 	"os/exec"
 	"strings"

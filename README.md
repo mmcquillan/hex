@@ -6,7 +6,7 @@ Jane is a bot to pull information and conduct operational activities in your cha
 
 ## Getting Started
 * This is developed using Go 1.5.1
-* Pull the project with 'go get github.com/mmcquillan/jane'
+* Pull the project with 'go get github.com/projectjane/jane'
 * Compile with 'go install jane.go'
 * Use the sample.config for an example configuration file
 * Use the startup.conf as an upstart script to start/stop/restart on Linux systems

@@ -3,7 +3,7 @@ package commands
 import (
 	"encoding/xml"
 	"fmt"
-	"github.com/mmcquillan/jane/models"
+	"github.com/projectjane/jane/models"
 	"io/ioutil"
 	"log"
 	"net/http"

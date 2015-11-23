@@ -2,8 +2,8 @@ package connectors
 
 import (
 	"crypto/tls"
-	"github.com/mmcquillan/jane/commands"
-	"github.com/mmcquillan/jane/models"
+	"github.com/projectjane/jane/commands"
+	"github.com/projectjane/jane/models"
 	"log"
 	"net/http"
 	"strings"

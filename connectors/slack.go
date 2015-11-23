@@ -1,9 +1,9 @@
 package connectors
 
 import (
-	"github.com/mmcquillan/jane/commands"
-	"github.com/mmcquillan/jane/models"
 	"github.com/nlopes/slack"
+	"github.com/projectjane/jane/commands"
+	"github.com/projectjane/jane/models"
 	"log"
 	"regexp"
 	"strings"
