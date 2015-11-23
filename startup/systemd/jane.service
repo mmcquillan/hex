@@ -1,0 +1,15 @@
+[Unit]
+Description=jane
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker kill janed
+ExecStartPre=-/usr/bin/docker rm janed
+ExecStart=/usr/bin/docker run --name janed -v /var/devops/provision/docker/jane/jane.json:/etc/jane.json jane
+ExecStop=/usr/bin/docker stop janed
+
+[Install]
+WantedBy=multi-user.target
+
