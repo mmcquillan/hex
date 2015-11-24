@@ -21,7 +21,7 @@ func (x Cli) Listen(config *models.Config, connector models.Connector) {
 		log.Print(err)
 	}
 	fmt.Println("Starting in cli mode...\n")
-	fmt.Print(config.Name + "> ")
+	fmt.Print("jane> ")
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		req := scanner.Text()
@@ -65,5 +65,5 @@ func (x Cli) Publish(config *models.Config, connector models.Connector, message 
 	if message.Description != "" {
 		fmt.Println(message.Description)
 	}
-	fmt.Print("\n" + config.Name + "> ")
+	fmt.Print("\njane> ")
 }

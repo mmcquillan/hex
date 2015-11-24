@@ -38,7 +38,7 @@ func (x Slack) Listen(config *models.Config, connector models.Connector) {
 					// make sure they are talking to and not about us
 					var msg = ev.Text
 					tokmsg := strings.Split(strings.TrimSpace(msg), " ")
-					if strings.ToLower(tokmsg[0]) != strings.ToLower(config.Name) {
+					if strings.ToLower(tokmsg[0]) != "jane" {
 						process = false
 
 						var jiraRegex = regexp.MustCompile(`(?i)(SYN|MED|STD)-[0-9]+`)
@@ -115,7 +115,7 @@ func (x Slack) Publish(config *models.Config, connector models.Connector, messag
 	api := slack.New(connector.Key)
 	msg := ""
 	params := slack.NewPostMessageParameters()
-	params.Username = config.Name
+	params.Username = "jane"
 	params.IconEmoji = connector.Image
 	if target == "" {
 		target = "#general"
