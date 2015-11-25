@@ -5,7 +5,7 @@ import (
 )
 
 type Connector interface {
-	Listen(config *models.Config, connector models.Connector)
-	Command(config *models.Config, message *models.Message)
-	Publish(config *models.Config, connector models.Connector, message models.Message, target string)
+	Listen(commandMsgs chan<- models.Message, connector models.Connector)
+	Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector)
+	Publish(connector models.Connector, message models.Message, target string)
 }

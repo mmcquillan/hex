@@ -2,7 +2,6 @@ package connectors
 
 import (
 	"crypto/tls"
-	"github.com/projectjane/jane/commands"
 	"github.com/projectjane/jane/models"
 	"log"
 	"net/http"
@@ -14,28 +13,28 @@ type Website struct {
 	Connector models.Connector
 }
 
-func (x Website) Listen(config *models.Config, connector models.Connector) {
-	defer Recovery(config, connector)
+func (x Website) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+	defer Recovery(connector)
 	var state = make(map[string]string)
 	for _, chk := range connector.Checks {
 		state[chk.Name] = "OK"
 	}
 	for {
-		alerts := callWebsite(&state, config, connector)
-		reportWebsite(alerts, &state, config, connector)
+		alerts := callWebsite(&state, connector)
+		reportWebsite(alerts, &state, commandMsgs, connector)
 		time.Sleep(60 * time.Second)
 	}
 }
 
-func (x Website) Command(config *models.Config, message *models.Message) {
+func (x Website) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 
-func (x Website) Publish(config *models.Config, connector models.Connector, message models.Message, target string) {
+func (x Website) Publish(connector models.Connector, message models.Message, target string) {
 	return
 }
 
-func callWebsite(state *map[string]string, config *models.Config, connector models.Connector) (alerts []string) {
+func callWebsite(state *map[string]string, connector models.Connector) (alerts []string) {
 	for _, chk := range connector.Checks {
 		out := "OK"
 		if connector.Debug {
@@ -72,7 +71,7 @@ func callWebsite(state *map[string]string, config *models.Config, connector mode
 	return alerts
 }
 
-func reportWebsite(alerts []string, state *map[string]string, config *models.Config, connector models.Connector) {
+func reportWebsite(alerts []string, state *map[string]string, commandMsgs chan<- models.Message, connector models.Connector) {
 	if connector.Debug {
 		log.Print("Starting reporting on website results for " + connector.Server)
 	}
@@ -86,15 +85,12 @@ func reportWebsite(alerts []string, state *map[string]string, config *models.Con
 		} else {
 			color = "NONE"
 		}
-		m := models.Message{
-			Routes:      connector.Routes,
-			Request:     "",
-			Title:       connector.ID + " " + a,
-			Description: out,
-			Link:        "",
-			Status:      color,
-		}
-		commands.Parse(config, &m)
-		Broadcast(config, m)
+		var m models.Message
+		m.Routes = connector.Routes
+		m.In.Process = false
+		m.Out.Text = connector.ID + " " + a
+		m.Out.Detail = out
+		m.Out.Status = color
+		commandMsgs <- m
 	}
 }

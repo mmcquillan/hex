@@ -2,19 +2,16 @@ package connectors
 
 import (
 	"github.com/nlopes/slack"
-	"github.com/projectjane/jane/commands"
 	"github.com/projectjane/jane/models"
 	"log"
-	"regexp"
-	"strings"
 )
 
 type Slack struct {
 	Connector models.Connector
 }
 
-func (x Slack) Listen(config *models.Config, connector models.Connector) {
-	defer Recovery(config, connector)
+func (x Slack) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+	defer Recovery(connector)
 	api := slack.New(connector.Key)
 	api.SetDebug(connector.Debug)
 	rtm := api.NewRTM()
@@ -33,85 +30,31 @@ func (x Slack) Listen(config *models.Config, connector models.Connector) {
 						log.Print("Evaluating incoming slack message")
 					}
 
-					var process = true
-
-					// make sure they are talking to and not about us
-					var msg = ev.Text
-					tokmsg := strings.Split(strings.TrimSpace(msg), " ")
-					if strings.ToLower(tokmsg[0]) != "jane" {
-						process = false
-
-						var jiraRegex = regexp.MustCompile(`(?i)(SYN|MED|STD)-[0-9]+`)
-						matches := jiraRegex.FindAllString(msg, -1)
-
-						if len(matches) > 0 {
-
-							var r []models.Route
-							r = append(r, models.Route{Match: "*", Connectors: connector.ID, Target: ev.Channel})
-							for _, cr := range connector.Routes {
-								r = append(r, cr)
-							}
-
-							for _, match := range matches {
-								m := models.Message{
-									Routes:      r,
-									Source:      ev.User,
-									Request:     "jira " + match,
-									Title:       "",
-									Description: "",
-									Link:        "",
-									Status:      "",
-								}
-
-								commands.Parse(config, &m)
-								Broadcast(config, m)
-							}
-
-							return
-						}
+					var r []models.Route
+					r = append(r, models.Route{Match: "*", Connectors: connector.ID, Target: ev.Channel})
+					for _, cr := range connector.Routes {
+						r = append(r, cr)
 					}
 
-					// remove me from the request and clean
-					msg = strings.Replace(msg, tokmsg[0], "", 1)
-					msg = strings.TrimSpace(msg)
+					var m models.Message
+					m.Routes = r
+					m.In.Source = connector.ID
+					m.In.User = ev.User
+					m.In.Text = ev.Text
+					m.In.Process = true
+					commandMsgs <- m
 
-					// see if nothing is said
-					if msg == "" {
-						process = false
-					}
-
-					if process {
-						if connector.Debug {
-							log.Print("Processing incoming slack message")
-						}
-						var r []models.Route
-						r = append(r, models.Route{Match: "*", Connectors: connector.ID, Target: ev.Channel})
-						for _, cr := range connector.Routes {
-							r = append(r, cr)
-						}
-						m := models.Message{
-							Routes:      r,
-							Source:      ev.User,
-							Request:     msg,
-							Title:       "",
-							Description: "",
-							Link:        "",
-							Status:      "",
-						}
-						commands.Parse(config, &m)
-						Broadcast(config, m)
-					}
 				}
 			}
 		}
 	}
 }
 
-func (x Slack) Command(config *models.Config, message *models.Message) {
+func (x Slack) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 
-func (x Slack) Publish(config *models.Config, connector models.Connector, message models.Message, target string) {
+func (x Slack) Publish(connector models.Connector, message models.Message, target string) {
 	api := slack.New(connector.Key)
 	msg := ""
 	params := slack.NewPostMessageParameters()
@@ -120,17 +63,17 @@ func (x Slack) Publish(config *models.Config, connector models.Connector, messag
 	if target == "" {
 		target = "#general"
 	}
-	if message.Description != "" {
-		color := slackColorMe(message.Status)
+	if message.Out.Detail != "" {
+		color := slackColorMe(message.Out.Status)
 		attachment := slack.Attachment{
-			Title:     message.Title,
-			TitleLink: message.Link,
-			Text:      message.Description,
+			Title:     message.Out.Text,
+			TitleLink: message.Out.Link,
+			Text:      message.Out.Detail,
 			Color:     color,
 		}
 		params.Attachments = []slack.Attachment{attachment}
 	} else {
-		msg = message.Title
+		msg = message.Out.Text
 	}
 	api.PostMessage(target, msg, params)
 }

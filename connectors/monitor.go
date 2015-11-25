@@ -1,7 +1,6 @@
 package connectors
 
 import (
-	"github.com/projectjane/jane/commands"
 	"github.com/projectjane/jane/models"
 	"golang.org/x/crypto/ssh"
 	"log"
@@ -13,28 +12,28 @@ type Monitor struct {
 	Connector models.Connector
 }
 
-func (x Monitor) Listen(config *models.Config, connector models.Connector) {
-	defer Recovery(config, connector)
+func (x Monitor) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+	defer Recovery(connector)
 	var state = make(map[string]string)
 	for _, chk := range connector.Checks {
 		state[chk.Name] = "OK"
 	}
 	for {
-		alerts := callMonitor(&state, config, connector)
-		reportMonitor(alerts, &state, config, connector)
+		alerts := callMonitor(&state, connector)
+		reportMonitor(alerts, &state, commandMsgs, connector)
 		time.Sleep(60 * time.Second)
 	}
 }
 
-func (x Monitor) Command(config *models.Config, message *models.Message) {
+func (x Monitor) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 
-func (x Monitor) Publish(config *models.Config, connector models.Connector, message models.Message, target string) {
+func (x Monitor) Publish(connector models.Connector, message models.Message, target string) {
 	return
 }
 
-func callMonitor(state *map[string]string, config *models.Config, connector models.Connector) (alerts []string) {
+func callMonitor(state *map[string]string, connector models.Connector) (alerts []string) {
 	serverconn := true
 	clientconn := &ssh.ClientConfig{
 		User: connector.Login,
@@ -101,7 +100,7 @@ func callMonitor(state *map[string]string, config *models.Config, connector mode
 	return alerts
 }
 
-func reportMonitor(alerts []string, state *map[string]string, config *models.Config, connector models.Connector) {
+func reportMonitor(alerts []string, state *map[string]string, commandMsgs chan<- models.Message, connector models.Connector) {
 	if connector.Debug {
 		log.Print("Starting reporting on monitroing results for " + connector.Server)
 	}
@@ -117,15 +116,12 @@ func reportMonitor(alerts []string, state *map[string]string, config *models.Con
 		} else {
 			color = "NONE"
 		}
-		m := models.Message{
-			Routes:      connector.Routes,
-			Request:     "",
-			Title:       connector.ID + " " + a,
-			Description: out,
-			Link:        "",
-			Status:      color,
-		}
-		commands.Parse(config, &m)
-		Broadcast(config, m)
+		var m models.Message
+		m.Routes = connector.Routes
+		m.In.Process = false
+		m.Out.Text = connector.ID + " " + a
+		m.Out.Detail = out
+		m.Out.Status = color
+		commandMsgs <- m
 	}
 }

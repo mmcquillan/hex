@@ -8,7 +8,7 @@ import (
 
 func Broadcast(config *models.Config, message models.Message) {
 	for _, route := range message.Routes {
-		if strings.Contains(message.Title, route.Match) || route.Match == "*" {
+		if strings.Contains(message.Out.Text, route.Match) || route.Match == "*" {
 			for _, connector := range config.Connectors {
 				if connector.Active {
 					if sendToConnector(connector.ID, route.Connectors) {
@@ -18,7 +18,7 @@ func Broadcast(config *models.Config, message models.Message) {
 							log.Print("")
 						}
 						c := MakeConnector(connector.Type).(Connector)
-						c.Publish(config, connector, message, route.Target)
+						c.Publish(connector, message, route.Target)
 					}
 				}
 			}
