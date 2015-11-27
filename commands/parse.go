@@ -52,6 +52,8 @@ func Parse(config *models.Config, message *models.Message) {
 			if link != "" {
 				message.Link = link
 			}
+		case "imageme":
+			r = ImageMe(message.Request, match[i])
 		}
 
 		// feedback
