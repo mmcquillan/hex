@@ -53,7 +53,6 @@ func ImageMe(msg string, command models.Command) string {
   resp, err := client.Get(url)
   if err != nil {
     log.Print(err)
-    fmt.Println(err)
     return errorMessage
   }
   defer resp.Body.Close()
@@ -72,7 +71,6 @@ func ImageMe(msg string, command models.Command) string {
   err = json.Unmarshal(body, &result)
   if err != nil {
     log.Print(err)
-    fmt.Println(err)
     return errorMessage
   }
 
