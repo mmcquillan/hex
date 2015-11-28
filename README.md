@@ -28,6 +28,7 @@ Supported connectors:
 * cli - Command line interface
 * email - Email
 * exec - Execution of applications
+* imageme - Pull back images or animated gifs
 * jira - Atlassian Jira
 * monitor - Monitor of systems
 * slack - Slack chat

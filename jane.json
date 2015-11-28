@@ -63,6 +63,10 @@
       "Key": "<WOLFRAM API KEY>"
     },
 
+    {"Type": "imageme", "ID": "imageme", "Active": true,
+      "Key": "<GOOGLE API>", "Pass": "<GOOGLE CX ??? >"
+    },
+
     {"Type": "response", "ID": "Text Response", "Active": true, "Debug": true,
         "Commands": [
             {"Match": "jane", "Output": "\"But I have eyes,\" she said. \"And ears. I see everything in all the Hundred Worlds. I watch the sky through a thousand telescopes. I overhear a trillion conversations every day.\" She giggled a little. \"I'm the best gossip in the universe.\""},
