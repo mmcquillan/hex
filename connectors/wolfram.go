@@ -1,4 +1,4 @@
-package commands
+package connectors
 
 import (
 	"encoding/xml"
@@ -10,6 +10,25 @@ import (
 	"net/url"
 	"strings"
 )
+
+type Wolfram struct {
+}
+
+func (x Wolfram) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+	defer Recovery(connector)
+}
+
+func (x Wolfram) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+	if strings.Index(message.In.Text, "wolfram") == 0 {
+		msg := strings.TrimSpace(strings.Replace(message.In.Text, "wolfram", "", 1))
+		message.Out.Text = callWolfram(msg, connector.Key)
+		publishMsgs <- message
+	}
+}
+
+func (x Wolfram) Publish(connector models.Connector, message models.Message, target string) {
+	return
+}
 
 type Query struct {
 	QueryResult string `xml:"success,attr"`
@@ -37,11 +56,9 @@ var baseQuery = "http://api.wolframalpha.com/v2/query?appid="
 var input = "&input="
 var returnTypes = "&format=image,plaintext"
 
-func Wolfram(msg string, command models.Command) (results string) {
-	msg = strings.TrimSpace(strings.Replace(msg, command.Match, "", 1))
-	// encodedRequest := strings.Replace(msg, " ", "%20", -1)
+func callWolfram(msg string, api string) (results string) {
 	encodedRequest := url.QueryEscape(msg)
-	getRequest := baseQuery + command.ApiKey + input + encodedRequest + returnTypes
+	getRequest := baseQuery + api + input + encodedRequest + returnTypes
 
 	resp, err := http.Get(getRequest)
 	if err != nil {

@@ -42,11 +42,11 @@ func (x Cli) Listen(commandMsgs chan<- models.Message, connector models.Connecto
 }
 
 func (x Cli) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
-	return
+	fmt.Println("")
+	fmt.Print("\njane> ")
 }
 
 func (x Cli) Publish(connector models.Connector, message models.Message, target string) {
-	fmt.Println("")
 	switch message.Out.Status {
 	case "SUCCESS":
 		color.Set(color.FgGreen)
@@ -60,5 +60,4 @@ func (x Cli) Publish(connector models.Connector, message models.Message, target 
 	if message.Out.Detail != "" {
 		fmt.Println(message.Out.Detail)
 	}
-	fmt.Print("\njane> ")
 }

@@ -71,7 +71,7 @@ func runCommands(commandMsgs <-chan models.Message, publishMsgs chan<- models.Me
 			for _, connector := range config.Connectors {
 				if connector.Active {
 					c := connectors.MakeConnector(connector.Type).(connectors.Connector)
-					c.Command(m, publishMsgs, connector)
+					go c.Command(m, publishMsgs, connector)
 				}
 			}
 		} else {
