@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/fatih/color"
-	"github.com/projectjane/jane/commands"
 	"github.com/projectjane/jane/models"
 	"log"
 	"os"
@@ -14,14 +13,14 @@ import (
 type Cli struct {
 }
 
-func (x Cli) Listen(config *models.Config, connector models.Connector) {
-	defer Recovery(config, connector)
+func (x Cli) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+	defer Recovery(connector)
 	u, err := user.Current()
 	if err != nil {
 		log.Print(err)
 	}
 	fmt.Println("Starting in cli mode...\n")
-	fmt.Print(config.Name + "> ")
+	fmt.Print("jane> ")
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		req := scanner.Text()
@@ -30,29 +29,25 @@ func (x Cli) Listen(config *models.Config, connector models.Connector) {
 			os.Exit(0)
 		}
 		if connector.Debug {
-			log.Print("Logging msg: " + req)
+			log.Print("CLI Incoming message: " + req)
 		}
-		m := models.Message{
-			Routes:      connector.Routes,
-			Source:      u.Username,
-			Request:     req,
-			Title:       "",
-			Description: "",
-			Link:        "",
-			Status:      "",
-		}
-		commands.Parse(config, &m)
-		Broadcast(config, m)
+		var m models.Message
+		m.Routes = connector.Routes
+		m.In.Source = connector.ID
+		m.In.User = u.Username
+		m.In.Text = req
+		m.In.Process = true
+		commandMsgs <- m
 	}
 }
 
-func (x Cli) Command(config *models.Config, message *models.Message) {
-	return
+func (x Cli) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+	fmt.Println("")
+	fmt.Print("\njane> ")
 }
 
-func (x Cli) Publish(config *models.Config, connector models.Connector, message models.Message, target string) {
-	fmt.Println("")
-	switch message.Status {
+func (x Cli) Publish(connector models.Connector, message models.Message, target string) {
+	switch message.Out.Status {
 	case "SUCCESS":
 		color.Set(color.FgGreen)
 	case "WARN":
@@ -60,10 +55,9 @@ func (x Cli) Publish(config *models.Config, connector models.Connector, message 
 	case "FAIL":
 		color.Set(color.FgRed)
 	}
-	fmt.Println(message.Title)
+	fmt.Println(message.Out.Text)
 	color.Unset()
-	if message.Description != "" {
-		fmt.Println(message.Description)
+	if message.Out.Detail != "" {
+		fmt.Println(message.Out.Detail)
 	}
-	fmt.Print("\n" + config.Name + "> ")
 }

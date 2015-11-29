@@ -3,7 +3,6 @@ package connectors
 import (
 	"github.com/SlyMarbo/rss"
 	"github.com/kennygrant/sanitize"
-	"github.com/projectjane/jane/commands"
 	"github.com/projectjane/jane/models"
 	"html"
 	"log"
@@ -16,24 +15,24 @@ type Rss struct {
 	Connector models.Connector
 }
 
-func (x Rss) Listen(config *models.Config, connector models.Connector) {
-	defer Recovery(config, connector)
+func (x Rss) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+	defer Recovery(connector)
 	nextMarker := ""
 	for {
-		nextMarker = callRss(nextMarker, config, connector)
+		nextMarker = callRss(nextMarker, commandMsgs, connector)
 		time.Sleep(120 * time.Second)
 	}
 }
 
-func (x Rss) Command(config *models.Config, message *models.Message) {
+func (x Rss) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 
-func (x Rss) Publish(config *models.Config, connector models.Connector, message models.Message, target string) {
+func (x Rss) Publish(connector models.Connector, message models.Message, target string) {
 	return
 }
 
-func callRss(lastMarker string, config *models.Config, connector models.Connector) (nextMarker string) {
+func callRss(lastMarker string, commandMsgs chan<- models.Message, connector models.Connector) (nextMarker string) {
 	var displayOnStart = 0
 	if connector.Debug {
 		log.Print("Starting rss feed fetch for " + connector.ID)
@@ -43,7 +42,6 @@ func callRss(lastMarker string, config *models.Config, connector models.Connecto
 		log.Print(err)
 		return
 	}
-	var messages []models.Message
 	if connector.Debug {
 		log.Print("Feed count for " + connector.ID + ": " + strconv.Itoa(len(feed.Items)))
 	}
@@ -81,23 +79,18 @@ func callRss(lastMarker string, config *models.Config, connector models.Connecto
 					status = "FAIL"
 				}
 			}
-			m := models.Message{
-				Routes:      connector.Routes,
-				Request:     "",
-				Title:       connector.ID + " " + html.UnescapeString(sanitize.HTML(item.Title)),
-				Description: html.UnescapeString(sanitize.HTML(item.Content)),
-				Link:        item.Link,
-				Status:      status,
-			}
-			messages = append(messages, m)
+			var m models.Message
+			m.Routes = connector.Routes
+			m.In.Process = false
+			m.Out.Text = connector.ID + " " + html.UnescapeString(sanitize.HTML(item.Title))
+			m.Out.Detail = html.UnescapeString(sanitize.HTML(item.Content))
+			m.Out.Link = item.Link
+			m.Out.Status = status
+			commandMsgs <- m
 			if i == 0 {
 				lastMarker = item.Date.String()
 			}
 		}
-	}
-	for _, m := range messages {
-		commands.Parse(config, &m)
-		Broadcast(config, m)
 	}
 	nextMarker = lastMarker
 	if connector.Debug {

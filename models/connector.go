@@ -17,6 +17,12 @@ type Connector struct {
 		Name  string
 		Check string
 	}
+	Commands []struct {
+		Match  string
+		Output string
+		Cmd    string
+		Args   string
+	}
 	Routes []Route
 	Debug  bool
 }
