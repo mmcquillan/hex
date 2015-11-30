@@ -19,3 +19,7 @@ func (x Template) Command(message models.Message, publishMsgs chan<- models.Mess
 func (x Template) Publish(connector models.Connector, message models.Message, target string) {
 	return
 }
+
+func (x Template) Help(connector models.Connector) (help string) {
+	return
+}

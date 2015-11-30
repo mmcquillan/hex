@@ -37,6 +37,12 @@ func (x ImageMe) Publish(connector models.Connector, message models.Message, tar
 	return
 }
 
+func (x ImageMe) Help(connector models.Connector) (help string) {
+	help += "image me <image keywords> - pulls back an image url\n"
+	help += "animate me <image keywords> - pulls back an animated gif url\n"
+	return help
+}
+
 type SearchResult struct {
 	Items []Items `json:"items"`
 }

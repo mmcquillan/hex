@@ -33,3 +33,7 @@ func (x Email) Publish(connector models.Connector, message models.Message, targe
 		}
 	}
 }
+
+func (x Email) Help(connector models.Connector) (help string) {
+	return
+}

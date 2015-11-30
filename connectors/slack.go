@@ -78,6 +78,10 @@ func (x Slack) Publish(connector models.Connector, message models.Message, targe
 	api.PostMessage(target, msg, params)
 }
 
+func (x Slack) Help(connector models.Connector) (help string) {
+	return
+}
+
 func slackColorMe(status string) (color string) {
 	switch status {
 	case "SUCCESS":

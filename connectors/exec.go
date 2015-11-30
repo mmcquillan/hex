@@ -40,3 +40,14 @@ func (x Exec) Command(message models.Message, publishMsgs chan<- models.Message,
 func (x Exec) Publish(connector models.Connector, message models.Message, target string) {
 	return
 }
+
+func (x Exec) Help(connector models.Connector) (help string) {
+	for _, c := range connector.Commands {
+		if c.Help != "" {
+			help += c.Help + "\n"
+		} else {
+			help += c.Match + "\n"
+		}
+	}
+	return help
+}

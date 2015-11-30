@@ -34,6 +34,10 @@ func (x Website) Publish(connector models.Connector, message models.Message, tar
 	return
 }
 
+func (x Website) Help(connector models.Connector) (help string) {
+	return
+}
+
 func callWebsite(state *map[string]string, connector models.Connector) (alerts []string) {
 	for _, chk := range connector.Checks {
 		out := "OK"

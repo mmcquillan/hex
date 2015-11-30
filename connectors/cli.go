@@ -24,10 +24,6 @@ func (x Cli) Listen(commandMsgs chan<- models.Message, connector models.Connecto
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		req := scanner.Text()
-		if req == "exit" {
-			log.Print("Exiting jane bot by command line")
-			os.Exit(0)
-		}
 		if connector.Debug {
 			log.Print("CLI Incoming message: " + req)
 		}
@@ -42,6 +38,10 @@ func (x Cli) Listen(commandMsgs chan<- models.Message, connector models.Connecto
 }
 
 func (x Cli) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+	if message.In.Text == "exit" {
+		log.Print("Exiting jane by command line")
+		os.Exit(0)
+	}
 	fmt.Println("")
 	fmt.Print("\njane> ")
 }
@@ -60,4 +60,9 @@ func (x Cli) Publish(connector models.Connector, message models.Message, target 
 	if message.Out.Detail != "" {
 		fmt.Println(message.Out.Detail)
 	}
+}
+
+func (x Cli) Help(connector models.Connector) (help string) {
+	help = "exit - close and exit\n"
+	return help
 }
