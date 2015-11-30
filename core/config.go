@@ -1,4 +1,4 @@
-package models
+package core
 
 import (
 	"encoding/json"
@@ -6,12 +6,13 @@ import (
 	"fmt"
 	"github.com/kardianos/osext"
 	"github.com/mitchellh/go-homedir"
+	"github.com/projectjane/jane/models"
 	"io/ioutil"
 	"log"
 	"os"
 )
 
-func Load() (config Config) {
+func LoadConfig() (config models.Config) {
 
 	configFile := locateConfig()
 	if checkConfig(configFile) {
@@ -23,7 +24,7 @@ func Load() (config Config) {
 
 }
 
-func Reload(config *Config) (reloaded bool) {
+func Reload(config *models.Config) (reloaded bool) {
 	configFile := locateConfig()
 	if checkConfig(configFile) {
 		newconfig := readConfig(configFile)
@@ -39,24 +40,24 @@ func locateConfig() (configFile string) {
 	file := "jane.json"
 
 	zero := *configParam()
-	if fileExists(zero) {
+	if FileExists(zero) {
 		return zero
 	}
 
 	first, _ := osext.ExecutableFolder()
 	first += "/" + file
-	if fileExists(first) {
+	if FileExists(first) {
 		return first
 	}
 
 	second, _ := homedir.Dir()
 	second += "/" + file
-	if fileExists(second) {
+	if FileExists(second) {
 		return second
 	}
 
 	third := "/etc/" + file
-	if fileExists(third) {
+	if FileExists(third) {
 		return third
 	}
 
@@ -70,16 +71,7 @@ func configParam() (configFile *string) {
 	return configFile
 }
 
-func fileExists(file string) bool {
-	if _, err := os.Stat(file); err != nil {
-		if os.IsNotExist(err) {
-			return false
-		}
-	}
-	return true
-}
-
-func readConfig(location string) (config Config) {
+func readConfig(location string) (config models.Config) {
 	file, err := ioutil.ReadFile(location)
 	if err != nil {
 		log.Print(err)

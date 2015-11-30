@@ -27,8 +27,8 @@ func main() {
 	}()
 
 	// setup jane config
-	config := models.Load()
-	models.Logging(&config)
+	config := core.LoadConfig()
+	core.Logging(&config)
 	log.Print("---")
 	log.Print("Starting jane bot...")
 

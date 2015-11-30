@@ -1,13 +1,14 @@
-package models
+package core
 
 import (
 	"fmt"
+	"github.com/projectjane/jane/models"
 	"log"
 	"os"
 )
 
-func Logging(config *Config) {
-	if !fileExists(config.LogFile) {
+func Logging(config *models.Config) {
+	if !FileExists(config.LogFile) {
 		nf, err := os.Create(config.LogFile)
 		if err != nil {
 			fmt.Println("Error - Cannot create log file at " + config.LogFile)
