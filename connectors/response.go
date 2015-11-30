@@ -20,33 +20,17 @@ func (x Response) Command(message models.Message, publishMsgs chan<- models.Mess
 		log.Printf("%+v", message)
 	}
 	if message.In.Process {
-
-		// loop through and find command matches
-		var match []string
 		for _, c := range connector.Commands {
 			if strings.HasPrefix(strings.ToLower(message.In.Text), strings.ToLower(c.Match)) {
-				out := strings.Replace(c.Output, "%msg%", strings.TrimSpace(strings.Replace(message.In.Text, c.Match, "", 1)), -1)
-				match = append(match, out)
+				if len(c.Outputs) == 0 {
+					message.Out.Text = strings.Replace(c.Output, "%msg%", strings.TrimSpace(strings.Replace(message.In.Text, c.Match, "", 1)), -1)
+				} else {
+					i := rand.Intn(len(c.Outputs))
+					message.Out.Text = strings.Replace(c.Outputs[i], "%msg%", strings.TrimSpace(strings.Replace(message.In.Text, c.Match, "", 1)), -1)
+				}
+				publishMsgs <- message
 			}
 		}
-
-		// if no match, just leave
-		if len(match) == 0 {
-			return
-		}
-
-		// if more than one match, pick a random one
-		var i = 0
-		if len(match) > 0 {
-			i = rand.Intn(len(match))
-		}
-		if connector.Debug {
-			log.Print("Match: " + match[i])
-		}
-
-		message.Out.Text = match[i]
-		publishMsgs <- message
-
 	}
 }
 

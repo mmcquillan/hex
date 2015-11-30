@@ -18,11 +18,12 @@ type Connector struct {
 		Check string
 	}
 	Commands []struct {
-		Match  string
-		Output string
-		Cmd    string
-		Args   string
-		Help   string
+		Match   string
+		Output  string
+		Outputs []string
+		Cmd     string
+		Args    string
+		Help    string
 	}
 	Routes []Route
 	Debug  bool
