@@ -32,6 +32,10 @@ func (x Rss) Publish(connector models.Connector, message models.Message, target 
 	return
 }
 
+func (x Rss) Help(connector models.Connector) (help string) {
+	return
+}
+
 func callRss(lastMarker string, commandMsgs chan<- models.Message, connector models.Connector) (nextMarker string) {
 	var displayOnStart = 0
 	if connector.Debug {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/projectjane/jane/connectors"
+	"github.com/projectjane/jane/core"
 	"github.com/projectjane/jane/models"
 	"log"
 	"os"
@@ -69,6 +70,7 @@ func runCommands(commandMsgs <-chan models.Message, publishMsgs chan<- models.Me
 	for {
 		m := <-commandMsgs
 		if m.In.Process {
+			core.Commands(m, publishMsgs, config)
 			for _, connector := range config.Connectors {
 				if connector.Active {
 					c := connectors.MakeConnector(connector.Type).(connectors.Connector)

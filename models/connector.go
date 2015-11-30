@@ -22,6 +22,7 @@ type Connector struct {
 		Output string
 		Cmd    string
 		Args   string
+		Help   string
 	}
 	Routes []Route
 	Debug  bool

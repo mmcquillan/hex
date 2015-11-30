@@ -53,3 +53,14 @@ func (x Response) Command(message models.Message, publishMsgs chan<- models.Mess
 func (x Response) Publish(connector models.Connector, message models.Message, target string) {
 	return
 }
+
+func (x Response) Help(connector models.Connector) (help string) {
+	for _, c := range connector.Commands {
+		if c.Help != "" {
+			help += c.Help + "\n"
+		} else {
+			help += c.Match + "\n"
+		}
+	}
+	return help
+}

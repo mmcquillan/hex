@@ -30,6 +30,11 @@ func (x Wolfram) Publish(connector models.Connector, message models.Message, tar
 	return
 }
 
+func (x Wolfram) Help(connector models.Connector) (help string) {
+	help += "wolfram <query> - returns the wolfram alpha results from an api\n"
+	return help
+}
+
 type Query struct {
 	QueryResult string `xml:"success,attr"`
 	PodList     []Pod  `xml:"pod"`

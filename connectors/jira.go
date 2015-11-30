@@ -64,6 +64,11 @@ func (x Jira) Publish(connector models.Connector, message models.Message, target
 	return
 }
 
+func (x Jira) Help(connector models.Connector) (help string) {
+	help += "jira - mention a jira ticket and it'll be displayed\n"
+	return help
+}
+
 type Ticket struct {
 	Key    string `json:"key"`
 	Fields Fields `json:"fields"`

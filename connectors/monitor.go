@@ -33,6 +33,10 @@ func (x Monitor) Publish(connector models.Connector, message models.Message, tar
 	return
 }
 
+func (x Monitor) Help(connector models.Connector) (help string) {
+	return
+}
+
 func callMonitor(state *map[string]string, connector models.Connector) (alerts []string) {
 	serverconn := true
 	clientconn := &ssh.ClientConfig{
