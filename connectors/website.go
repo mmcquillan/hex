@@ -49,6 +49,7 @@ func callWebsite(state *map[string]string, connector models.Connector) (alerts [
 		}
 		client := &http.Client{Transport: tran}
 		res, err := client.Get(chk.Check)
+		defer res.Body.Close()
 		if err != nil {
 			if connector.Debug {
 				log.Print("Error call to " + chk.Check + " with " + err.Error())
