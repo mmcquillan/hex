@@ -37,7 +37,13 @@ func (x Monitor) Help(connector models.Connector) (help string) {
 	return
 }
 
-func callMonitor(state *map[string]string, connector models.Connector) (alerts []string) {
+type alert struct {
+	state string
+	check string
+	text  string
+}
+
+func callMonitor(state *map[string]string, connector models.Connector) (alerts []alert) {
 	serverconn := true
 	clientconn := &ssh.ClientConfig{
 		User: connector.Login,
@@ -82,9 +88,18 @@ func callMonitor(state *map[string]string, connector models.Connector) (alerts [
 				if connector.Debug {
 					log.Print("Session results for " + connector.Server + " " + chk.Name + ": " + out)
 				}
-				if (*state)[chk.Name] != out && !(strings.Contains(out, connector.SuccessMatch) && strings.Contains((*state)[chk.Name], connector.SuccessMatch)) {
-					alerts = append(alerts, chk.Name)
-					(*state)[chk.Name] = out
+				newState := "UNKNOWN"
+				if strings.Contains(out, connector.SuccessMatch) {
+					newState = connector.SuccessMatch
+				} else if strings.Contains(out, connector.WarningMatch) {
+					newState = connector.WarningMatch
+				} else if strings.Contains(out, connector.FailureMatch) {
+					newState = connector.FailureMatch
+				}
+				if (*state)[chk.Name] != newState {
+					a := alert{state: newState, check: chk.Name, text: out}
+					alerts = append(alerts, a)
+					(*state)[chk.Name] = newState
 				}
 			}
 		}
@@ -95,27 +110,27 @@ func callMonitor(state *map[string]string, connector models.Connector) (alerts [
 		}
 		out := "CRITICAL - Cannot connect to server " + connector.Server
 		for _, chk := range connector.Checks {
-			if (*state)[chk.Name] != out {
-				alerts = append(alerts, chk.Name)
-				(*state)[chk.Name] = out
+			if (*state)[chk.Name] != "CRITICAL" {
+				a := alert{state: "CRITICAL", check: chk.Name, text: out}
+				alerts = append(alerts, a)
+				(*state)[chk.Name] = "CRITICAL"
 			}
 		}
 	}
 	return alerts
 }
 
-func reportMonitor(alerts []string, state *map[string]string, commandMsgs chan<- models.Message, connector models.Connector) {
+func reportMonitor(alerts []alert, state *map[string]string, commandMsgs chan<- models.Message, connector models.Connector) {
 	if connector.Debug {
 		log.Print("Starting reporting on monitroing results for " + connector.Server)
 	}
 	for _, a := range alerts {
-		out := (*state)[a]
 		var color = "NONE"
-		if strings.Contains(out, connector.SuccessMatch) {
+		if a.state == connector.SuccessMatch {
 			color = "SUCCESS"
-		} else if strings.Contains(out, connector.WarningMatch) {
+		} else if a.state == connector.WarningMatch {
 			color = "WARN"
-		} else if strings.Contains(out, connector.FailureMatch) {
+		} else if a.state == connector.FailureMatch {
 			color = "FAIL"
 		} else {
 			color = "NONE"
@@ -123,8 +138,8 @@ func reportMonitor(alerts []string, state *map[string]string, commandMsgs chan<-
 		var m models.Message
 		m.Routes = connector.Routes
 		m.In.Process = false
-		m.Out.Text = connector.ID + " " + a
-		m.Out.Detail = out
+		m.Out.Text = connector.ID + " " + a.check
+		m.Out.Detail = a.text
 		m.Out.Status = color
 		commandMsgs <- m
 	}
