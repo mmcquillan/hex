@@ -38,10 +38,6 @@ func (x Cli) Listen(commandMsgs chan<- models.Message, connector models.Connecto
 }
 
 func (x Cli) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
-	if message.In.Text == "exit" {
-		log.Print("Exiting jane by command line")
-		os.Exit(0)
-	}
 	fmt.Println("")
 	fmt.Print("\njane> ")
 }
