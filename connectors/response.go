@@ -29,19 +29,19 @@ func (x Response) Command(message models.Message, publishMsgs chan<- models.Mess
 			eval := false
 			if ws && ws && strings.Contains(txt, m) {
 				eval = true
-			} else if ws && !we && strings.HasPrefix(txt, m) {
+			} else if ws && !we && strings.HasSuffix(txt, m) {
 				eval = true
-			} else if !ws && we && strings.HasSuffix(txt, m) {
+			} else if !ws && we && strings.HasPrefix(txt, m) {
 				eval = true
 			} else if txt == m {
 				eval = true
 			}
 			if eval {
 				if len(c.Outputs) == 0 {
-					message.Out.Text = strings.Replace(c.Output, "%msg%", strings.TrimSpace(strings.Replace(message.In.Text, c.Match, "", 1)), -1)
+					message.Out.Text = strings.Replace(c.Output, "%msg%", strings.TrimSpace(strings.Replace(message.In.Text, m, "", 1)), -1)
 				} else {
 					i := rand.Intn(len(c.Outputs))
-					message.Out.Text = strings.Replace(c.Outputs[i], "%msg%", strings.TrimSpace(strings.Replace(message.In.Text, c.Match, "", 1)), -1)
+					message.Out.Text = strings.Replace(c.Outputs[i], "%msg%", strings.TrimSpace(strings.Replace(message.In.Text, m, "", 1)), -1)
 				}
 				publishMsgs <- message
 			}
