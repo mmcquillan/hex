@@ -26,10 +26,11 @@ For the connector configuration, when adding routes, you must specify the ID of 
 
 Supported connectors:
 * cli - Command line interface
+* bamboo - Atlassian Bamboo integration
 * email - Email
 * exec - Execution of applications
 * imageme - Pull back images or animated gifs
-* jira - Atlassian Jira
+* jira - Atlassian Jira integration
 * monitor - Monitor of systems
 * slack - Slack chat
 * response - Text Responses

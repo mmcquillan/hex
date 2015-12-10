@@ -9,6 +9,7 @@ var List = make(map[string]reflect.Type)
 
 func init() {
 	List["cli"] = reflect.TypeOf(Cli{})
+	List["bamboo"] = reflect.TypeOf(Bamboo{})
 	List["email"] = reflect.TypeOf(Email{})
 	List["exec"] = reflect.TypeOf(Exec{})
 	List["imageme"] = reflect.TypeOf(ImageMe{})
