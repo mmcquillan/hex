@@ -8,6 +8,7 @@ import (
 var List = make(map[string]reflect.Type)
 
 func init() {
+	List["alias"] = reflect.TypeOf(Alias{})
 	List["cli"] = reflect.TypeOf(Cli{})
 	List["bamboo"] = reflect.TypeOf(Bamboo{})
 	List["email"] = reflect.TypeOf(Email{})
