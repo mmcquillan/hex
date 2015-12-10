@@ -21,5 +21,6 @@ func Logging(config *models.Config) {
 		panic(err)
 	}
 	log.SetOutput(f)
-
+	log.Print("---")
+	log.Print("Starting jane bot...")
 }
