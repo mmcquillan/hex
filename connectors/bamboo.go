@@ -85,7 +85,7 @@ func commandBuild(message models.Message, publishMsgs chan<- models.Message, con
 	} else {
 		message.Out.Text = "Queued build for " + queue.Plankey
 		message.Out.Detail = "Build #" + strconv.Itoa(queue.Buildnumber)
-		message.Out.Link = queue.Link.Href
+		message.Out.Link = "https://" + connector.Server + "/builds/browse/" + queue.Plankey + "-" + strconv.Itoa(queue.Buildnumber)
 	}
 	publishMsgs <- message
 }
