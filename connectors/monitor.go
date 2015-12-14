@@ -37,6 +37,10 @@ func (x Monitor) Help(connector models.Connector) (help string) {
 	return
 }
 
+var SuccessMatch = "OK"
+var WarningMatch = "WARNING"
+var FailureMatch = "CRITICAL"
+
 type alert struct {
 	state string
 	check string
@@ -89,12 +93,12 @@ func callMonitor(state *map[string]string, connector models.Connector) (alerts [
 					log.Print("Session results for " + connector.Server + " " + chk.Name + ": " + out)
 				}
 				newState := "UNKNOWN"
-				if strings.Contains(out, connector.SuccessMatch) {
-					newState = connector.SuccessMatch
-				} else if strings.Contains(out, connector.WarningMatch) {
-					newState = connector.WarningMatch
-				} else if strings.Contains(out, connector.FailureMatch) {
-					newState = connector.FailureMatch
+				if strings.Contains(out, SuccessMatch) {
+					newState = SuccessMatch
+				} else if strings.Contains(out, WarningMatch) {
+					newState = WarningMatch
+				} else if strings.Contains(out, FailureMatch) {
+					newState = FailureMatch
 				}
 				if (*state)[chk.Name] != newState {
 					a := alert{state: newState, check: chk.Name, text: out}
@@ -126,11 +130,11 @@ func reportMonitor(alerts []alert, state *map[string]string, commandMsgs chan<- 
 	}
 	for _, a := range alerts {
 		var color = "NONE"
-		if a.state == connector.SuccessMatch {
+		if a.state == SuccessMatch {
 			color = "SUCCESS"
-		} else if a.state == connector.WarningMatch {
+		} else if a.state == WarningMatch {
 			color = "WARN"
-		} else if a.state == connector.FailureMatch {
+		} else if a.state == FailureMatch {
 			color = "FAIL"
 		} else {
 			color = "NONE"

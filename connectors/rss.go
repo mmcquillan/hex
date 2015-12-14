@@ -7,7 +7,6 @@ import (
 	"html"
 	"log"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -58,38 +57,12 @@ func callRss(lastMarker string, commandMsgs chan<- models.Message, connector mod
 		}
 		item := feed.Items[i]
 		if item.Date.String() > lastMarker {
-			status := "NONE"
-			if connector.SuccessMatch != "" {
-				if strings.Contains(item.Title, connector.SuccessMatch) {
-					status = "SUCCESS"
-				}
-				if strings.Contains(item.Content, connector.SuccessMatch) {
-					status = "SUCCESS"
-				}
-			}
-			if connector.WarningMatch != "" {
-				if strings.Contains(item.Title, connector.WarningMatch) {
-					status = "WARN"
-				}
-				if strings.Contains(item.Title, connector.WarningMatch) {
-					status = "WARN"
-				}
-			}
-			if connector.FailureMatch != "" {
-				if strings.Contains(item.Title, connector.FailureMatch) {
-					status = "FAIL"
-				}
-				if strings.Contains(item.Title, connector.FailureMatch) {
-					status = "FAIL"
-				}
-			}
 			var m models.Message
 			m.Routes = connector.Routes
 			m.In.Process = false
 			m.Out.Text = connector.ID + " " + html.UnescapeString(sanitize.HTML(item.Title))
 			m.Out.Detail = html.UnescapeString(sanitize.HTML(item.Content))
 			m.Out.Link = item.Link
-			m.Out.Status = status
 			commandMsgs <- m
 			if i == 0 {
 				lastMarker = item.Date.String()

@@ -27,7 +27,6 @@
 
     {"Type": "monitor", "ID": "Elasticsearch Node", "Active": true,
       "Server": "elasticsearch1.somecompany.com", "Login": "jane", "Pass": "abc123",
-      "SuccessMatch": "OK", "WarningMatch": "WARNING", "FailureMatch": "CRITICAL",
       "Checks": [
         {"Name": "Apt Check", "Check": "/usr/lib/nagios/plugins/check_apt"},
         {"Name": "Disk Check", "Check": "/usr/lib/nagios/plugins/check_disk -w10% -c5% -A"},
