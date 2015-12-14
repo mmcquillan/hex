@@ -86,5 +86,12 @@
         ]
     }
 
+    {"Type": "ssh", "ID": "prod", "Active": true,
+      "Server": "prod.server.com", "Login": "jane", "Pass": "somepassword",
+        "Commands": [
+            {"Match": "jane prodlogs", "Output": "```%stdout%```", "Cmd": "tail", "Args": "-n20 /var/log/someserver.log"}
+        ]
+    }
+
   ]
 }

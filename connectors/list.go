@@ -18,6 +18,7 @@ func init() {
 	List["slack"] = reflect.TypeOf(Slack{})
 	List["response"] = reflect.TypeOf(Response{})
 	List["rss"] = reflect.TypeOf(Rss{})
+	List["ssh"] = reflect.TypeOf(Ssh{})
 	List["website"] = reflect.TypeOf(Website{})
 	List["wolfram"] = reflect.TypeOf(Wolfram{})
 }
