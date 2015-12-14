@@ -8,7 +8,8 @@ import (
 
 func main() {
 	core.CatchExit()
-	config := core.LoadConfig()
+	params := core.LoadParams()
+	config := core.LoadConfig(params)
 	core.Logging(&config)
 	commandMsgs := make(chan models.Message, 1)
 	publishMsgs := make(chan models.Message, 1)

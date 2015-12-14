@@ -2,7 +2,6 @@ package core
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"github.com/kardianos/osext"
 	"github.com/mitchellh/go-homedir"
@@ -12,34 +11,24 @@ import (
 	"os"
 )
 
-func LoadConfig() (config models.Config) {
-
-	configFile := locateConfig()
+func LoadConfig(params models.Params) (config models.Config) {
+	configFile := locateConfig(params)
 	if checkConfig(configFile) {
 		config = readConfig(configFile)
+		if params.Validate {
+			fmt.Println("SUCCESS - Config file is valid: " + configFile)
+			os.Exit(0)
+		}
 	} else {
 		os.Exit(1)
 	}
 	return config
-
 }
 
-func Reload(config *models.Config) (reloaded bool) {
-	configFile := locateConfig()
-	if checkConfig(configFile) {
-		newconfig := readConfig(configFile)
-		*config = newconfig
-		reloaded = true
-	} else {
-		reloaded = false
-	}
-	return reloaded
-}
-
-func locateConfig() (configFile string) {
+func locateConfig(params models.Params) (configFile string) {
 	file := "jane.json"
 
-	zero := *configParam()
+	zero := params.ConfigFile
 	if FileExists(zero) {
 		return zero
 	}
@@ -63,12 +52,6 @@ func locateConfig() (configFile string) {
 
 	return file
 
-}
-
-func configParam() (configFile *string) {
-	configFile = flag.String("config", "", "Location of the config file")
-	flag.Parse()
-	return configFile
 }
 
 func readConfig(location string) (config models.Config) {
