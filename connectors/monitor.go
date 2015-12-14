@@ -26,7 +26,17 @@ func (x Monitor) Listen(commandMsgs chan<- models.Message, connector models.Conn
 }
 
 func (x Monitor) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
-	return
+	if strings.HasPrefix(message.In.Text, "jane monitor") {
+		tokens := strings.Split(message.In.Text, " ")
+		if strings.Contains(strings.ToLower(connector.ID), strings.ToLower(tokens[2])) {
+			var state = make(map[string]string)
+			for _, chk := range connector.Checks {
+				state[chk.Name] = "X"
+			}
+			alerts := callMonitor(&state, connector)
+			reportMonitor(alerts, &state, publishMsgs, connector)
+		}
+	}
 }
 
 func (x Monitor) Publish(connector models.Connector, message models.Message, target string) {
@@ -34,7 +44,8 @@ func (x Monitor) Publish(connector models.Connector, message models.Message, tar
 }
 
 func (x Monitor) Help(connector models.Connector) (help string) {
-	return
+	help += "jane monitor <env name>\n"
+	return help
 }
 
 var SuccessMatch = "OK"
