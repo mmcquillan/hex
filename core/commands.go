@@ -12,6 +12,7 @@ func Commands(commandMsgs <-chan models.Message, publishMsgs chan<- models.Messa
 	for {
 		m := <-commandMsgs
 		if m.In.Process {
+			aliasCommands(&m, config)
 			staticCommands(m, publishMsgs, config)
 			for _, connector := range config.Connectors {
 				if connector.Active {
@@ -21,6 +22,14 @@ func Commands(commandMsgs <-chan models.Message, publishMsgs chan<- models.Messa
 			}
 		} else {
 			publishMsgs <- m
+		}
+	}
+}
+
+func aliasCommands(message *models.Message, config *models.Config) {
+	for _, alias := range config.Aliases {
+		if message.In.Text == alias.Match {
+			message.In.Text = alias.Output
 		}
 	}
 }
