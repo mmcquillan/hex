@@ -1,19 +1,14 @@
 {
   "Name": "jane",
   "LogFile": "/var/log/jane.log",
+  "Aliases": [
+    {"Match": "jane build app", "Output": "bamboo build KEY-PLAN"},
+    {"Match": "jane build db", "Output": "bamboo build KEY-DB"}
+  ],
   "Connectors": [
 
     {"Type": "slack", "ID": "slack", "Active": true,
       "Key": "<SlackToken>", "Image": ":game_die:"
-    },
-
-    {"Type": "rss", "ID": "Bamboo Build", "Active": true,
-      "Server": "https://BambooUser:BambooPass@somecompany.atlassian.net/builds/plugins/servlet/streams?local=true",
-      "SuccessMatch": "successful", "FailureMatch": "fail",
-      "Routes": [
-        {"Match": "*", "Connectors": "slack", "Target": "#devops"},
-        {"Match": "NextGen", "Connectors": "slack", "Target": "#nextgen"}
-      ]
     },
 
     {"Type": "rss", "ID": "Atlassian Status", "Active": true,
@@ -57,6 +52,13 @@
 
     {"Type": "jira", "ID": "jira", "Active": true, "Debug": true,
        "Server": "<URL>.atlassian.net", "Login": "<JIRA USER>", "Pass": "<JIRA PASS>"
+    },
+
+    {"Type": "bamboo", "ID": "bamboo", "Active": true, "Debug": true,
+       "Server": "<URL>.atlassian.net", "Login": "<JIRA USER>", "Pass": "<JIRA PASS>",
+       "Routes": [
+           {"Match": "*", "Connectors": "*", "Target": "#devops"}
+       ]
     },
 
     {"Type": "wolfram", "ID": "wolf", "Active": true, "Debug": true,
