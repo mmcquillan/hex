@@ -9,7 +9,6 @@ import (
 )
 
 type Monitor struct {
-	Connector models.Connector
 }
 
 func (x Monitor) Listen(commandMsgs chan<- models.Message, connector models.Connector) {

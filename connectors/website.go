@@ -10,7 +10,6 @@ import (
 )
 
 type Website struct {
-	Connector models.Connector
 }
 
 func (x Website) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
