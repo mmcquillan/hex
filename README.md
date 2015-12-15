@@ -25,15 +25,16 @@ Connectors are what Jane uses to pull in information, interpret them and issue o
 For the connector configuration, when adding routes, you must specify the ID of the connector you want to route response to.
 
 Supported connectors:
-* cli - Command line interface
 * bamboo - Atlassian Bamboo integration
+* cli - Command line interface
 * email - Email
 * exec - Execution of applications
 * imageme - Pull back images or animated gifs
 * jira - Atlassian Jira integration
 * monitor - Monitor of systems
-* slack - Slack chat
 * response - Text Responses
 * rss - RSS Feed
+* slack - Slack chat
+* ssh - Execute commands on remote systems
 * website - Monitor return code of websites
 * wolfram - Execute queries against Wolfram Alpha
