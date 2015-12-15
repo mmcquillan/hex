@@ -21,12 +21,12 @@ func (x ImageMe) Listen(commandMsgs chan<- models.Message, connector models.Conn
 }
 
 func (x ImageMe) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
-	if strings.Index(message.In.Text, "image me") == 0 {
+	if strings.HasPrefix(strings.ToLower(message.In.Text), "image me") {
 		msg := strings.TrimSpace(strings.Replace(message.In.Text, "image me", "", 1))
 		message.Out.Text = callImageMe(msg, connector.Key, connector.Pass, false)
 		publishMsgs <- message
 	}
-	if strings.Index(message.In.Text, "animate me") == 0 {
+	if strings.HasPrefix(strings.ToLower(message.In.Text), "animate me") {
 		msg := strings.TrimSpace(strings.Replace(message.In.Text, "animate me", "", 1))
 		message.Out.Text = callImageMe(msg, connector.Key, connector.Pass, true)
 		publishMsgs <- message
