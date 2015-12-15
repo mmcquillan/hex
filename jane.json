@@ -7,22 +7,23 @@
   ],
   "Connectors": [
 
-    {"Type": "slack", "ID": "slack", "Active": true,
-      "Key": "<SlackToken>", "Image": ":game_die:"
+    {"Type": "bamboo", "ID": "bamboo", "Active": true, "Debug": true,
+       "Server": "<URL>.atlassian.net", "Login": "<JIRA USER>", "Pass": "<JIRA PASS>",
+       "Routes": [
+           {"Match": "*", "Connectors": "*", "Target": "#devops"}
+       ]
     },
 
-    {"Type": "rss", "ID": "Atlassian Status", "Active": true,
-      "Server": "http://status.atlassian.com/history.rss",
-      "Routes": [
-        {"Match": "*", "Connectors": "slack", "Target": "#devops"}
-      ]
-    },
+    {"Type": "exec", "ID": "Exec", "Active": true,
+        "Commands": [
+            {"Match": "big", "Output": "```%stdout%```", "Cmd": "/usr/bin/figlet", "Args": "-w80 %msg%"},
+            {"Match": "log", "Output": "```%stdout% ```", "Cmd": "/usr/bin/tail", "Args": "-n8 /var/log/jane.log"},
+            {"Match": "cal", "Output": "```%stdout% ```", "Cmd": "/usr/bin/cal", "Args": "-h %msg%"}
+        ]
+    }
 
-    {"Type": "rss", "ID": "AWS EC2", "Active": true,
-      "Server": "http://status.aws.amazon.com/rss/ec2-us-east-1.rss",
-      "Routes": [
-        {"Match": "*", "Connectors": "slack", "Target": "#devops"}
-      ]
+    {"Type": "jira", "ID": "jira", "Active": true, "Debug": true,
+       "Server": "<URL>.atlassian.net", "Login": "<JIRA USER>", "Pass": "<JIRA PASS>"
     },
 
     {"Type": "monitor", "ID": "Elasticsearch Node", "Active": true,
@@ -38,6 +39,34 @@
       ]
     },
 
+    {"Type": "response", "ID": "Text Response", "Active": true, "Debug": true,
+        "Commands": [
+            {"Match": "jane", "Outputs": [
+                "\"But I have eyes,\" she said. \"And ears. I see everything in all the Hundred Worlds. I watch the sky through a thousand telescopes. I overhear a trillion conversations every day.\" She giggled a little. \"I'm the best gossip in the universe.\"",
+                "\"Twisted and perverse are the ways of the human mind,\" Jane intoned. \"Pinocchio was such a dolt to try to become a real boy. He was much better off with a wooden head.\"",
+                "\"It's the most charming thing about humans. You are all so sure that the lesser animals are bleeding with envy because they didn't have the good fortune to be born Homo sapiens.\""
+            ]}
+        ]
+    },
+
+    {"Type": "rss", "ID": "AWS EC2", "Active": true,
+      "Server": "http://status.aws.amazon.com/rss/ec2-us-east-1.rss",
+      "Routes": [
+        {"Match": "*", "Connectors": "slack", "Target": "#devops"}
+      ]
+    },
+
+    {"Type": "slack", "ID": "slack", "Active": true,
+      "Key": "<SlackToken>", "Image": ":game_die:"
+    },
+
+    {"Type": "ssh", "ID": "prod", "Active": true,
+      "Server": "prod.server.com", "Login": "jane", "Pass": "somepassword",
+        "Commands": [
+            {"Match": "jane prodlogs", "Output": "```%stdout%```", "Cmd": "tail", "Args": "-n20 /var/log/someserver.log"}
+        ]
+    },
+
     {"Type": "website", "ID": "Website Monitor", "Active": true,
       "Checks": [
         {"Name": "Yahoo", "Check": "https://www.yahoo.com"},
@@ -49,48 +78,8 @@
       ]
     },
 
-    {"Type": "jira", "ID": "jira", "Active": true, "Debug": true,
-       "Server": "<URL>.atlassian.net", "Login": "<JIRA USER>", "Pass": "<JIRA PASS>"
-    },
-
-    {"Type": "bamboo", "ID": "bamboo", "Active": true, "Debug": true,
-       "Server": "<URL>.atlassian.net", "Login": "<JIRA USER>", "Pass": "<JIRA PASS>",
-       "Routes": [
-           {"Match": "*", "Connectors": "*", "Target": "#devops"}
-       ]
-    },
-
     {"Type": "wolfram", "ID": "wolf", "Active": true, "Debug": true,
       "Key": "<WOLFRAM API KEY>"
-    },
-
-    {"Type": "imageme", "ID": "imageme", "Active": true,
-      "Key": "<GOOGLE API>", "Pass": "<GOOGLE CX ??? >"
-    },
-
-    {"Type": "response", "ID": "Text Response", "Active": true, "Debug": true,
-        "Commands": [
-            {"Match": "jane", "Outputs": [
-                "\"But I have eyes,\" she said. \"And ears. I see everything in all the Hundred Worlds. I watch the sky through a thousand telescopes. I overhear a trillion conversations every day.\" She giggled a little. \"I'm the best gossip in the universe.\"",
-                "\"Twisted and perverse are the ways of the human mind,\" Jane intoned. \"Pinocchio was such a dolt to try to become a real boy. He was much better off with a wooden head.\"",
-                "\"It's the most charming thing about humans. You are all so sure that the lesser animals are bleeding with envy because they didn't have the good fortune to be born Homo sapiens.\""
-            ]}
-        ]
-    },
-
-    {"Type": "exec", "ID": "Exec", "Active": true,
-        "Commands": [
-            {"Match": "big", "Output": "```%stdout%```", "Cmd": "/usr/bin/figlet", "Args": "-w80 %msg%"},
-            {"Match": "log", "Output": "```%stdout% ```", "Cmd": "/usr/bin/tail", "Args": "-n8 /var/log/jane.log"},
-            {"Match": "cal", "Output": "```%stdout% ```", "Cmd": "/usr/bin/cal", "Args": "-h %msg%"}
-        ]
-    }
-
-    {"Type": "ssh", "ID": "prod", "Active": true,
-      "Server": "prod.server.com", "Login": "jane", "Pass": "somepassword",
-        "Commands": [
-            {"Match": "jane prodlogs", "Output": "```%stdout%```", "Cmd": "tail", "Args": "-n20 /var/log/someserver.log"}
-        ]
     }
 
   ]

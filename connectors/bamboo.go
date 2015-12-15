@@ -61,8 +61,8 @@ func listenDeploys(lastMarker string, commandMsgs chan<- models.Message, connect
 				var m models.Message
 				m.Routes = connector.Routes
 				m.In.Process = false
-				m.Out.Text = "Bamboo Deploy " + e.Deploymentresult.Deploymentstate
-				m.Out.Detail = "Deployed " + e.Deploymentresult.Deploymentversion.Name + " to " + e.Environment.Name
+				m.Out.Text = "Bamboo Deploy " + e.Deploymentresult.Deploymentversion.Name + " to " + e.Environment.Name + " " + e.Deploymentresult.Deploymentstate
+				m.Out.Detail = html.UnescapeString(sanitize.HTML(e.Deploymentresult.Reasonsummary))
 				m.Out.Link = "https://" + connector.Server + "/builds/deploy/viewDeploymentResult.action?deploymentResultId=" + strconv.Itoa(e.Deploymentresult.ID)
 				if e.Deploymentresult.Deploymentstate == "SUCCESS" {
 					m.Out.Status = "SUCCESS"
@@ -95,10 +95,10 @@ func commandDeployStatus(message models.Message, publishMsgs chan<- models.Messa
 	d := bambooapi.DeployResults(connector.Server, connector.Login, connector.Pass)
 	for _, de := range d {
 		for _, e := range de.Environmentstatuses {
-			detail := "Deployed " + e.Deploymentresult.Deploymentversion.Name + " to " + e.Environment.Name
+			detail := e.Deploymentresult.Deploymentversion.Name + " to " + e.Environment.Name
 			if strings.Contains(strings.ToLower(detail), strings.ToLower(tokens[2])) {
-				message.Out.Text = "Bamboo Deploy " + e.Deploymentresult.Deploymentstate
-				message.Out.Detail = detail
+				message.Out.Text = "Bamboo Deploy " + detail + " " + e.Deploymentresult.Deploymentstate
+				message.Out.Detail = html.UnescapeString(sanitize.HTML(e.Deploymentresult.Reasonsummary))
 				message.Out.Link = "https://" + connector.Server + "/builds/deploy/viewDeploymentResult.action?deploymentResultId=" + strconv.Itoa(e.Deploymentresult.ID)
 				if e.Deploymentresult.Deploymentstate == "SUCCESS" {
 					message.Out.Status = "SUCCESS"

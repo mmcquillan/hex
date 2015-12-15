@@ -59,6 +59,5 @@ func (x Cli) Publish(connector models.Connector, message models.Message, target 
 }
 
 func (x Cli) Help(connector models.Connector) (help string) {
-	help = "exit - close and exit\n"
-	return help
+	return
 }
