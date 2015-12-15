@@ -19,7 +19,10 @@ func (x Monitor) Listen(commandMsgs chan<- models.Message, connector models.Conn
 	}
 	for {
 		alerts := callMonitor(&state, connector)
-		reportMonitor(alerts, &state, commandMsgs, connector)
+		var m models.Message
+		m.Routes = connector.Routes
+		m.In.Process = false
+		reportMonitor(m, alerts, &state, commandMsgs, connector)
 		time.Sleep(60 * time.Second)
 	}
 }
@@ -33,7 +36,7 @@ func (x Monitor) Command(message models.Message, publishMsgs chan<- models.Messa
 				state[chk.Name] = "X"
 			}
 			alerts := callMonitor(&state, connector)
-			reportMonitor(alerts, &state, publishMsgs, connector)
+			reportMonitor(message, alerts, &state, publishMsgs, connector)
 		}
 	}
 }
@@ -134,7 +137,7 @@ func callMonitor(state *map[string]string, connector models.Connector) (alerts [
 	return alerts
 }
 
-func reportMonitor(alerts []alert, state *map[string]string, commandMsgs chan<- models.Message, connector models.Connector) {
+func reportMonitor(message models.Message, alerts []alert, state *map[string]string, commandMsgs chan<- models.Message, connector models.Connector) {
 	if connector.Debug {
 		log.Print("Starting reporting on monitroing results for " + connector.Server)
 	}
@@ -149,12 +152,9 @@ func reportMonitor(alerts []alert, state *map[string]string, commandMsgs chan<- 
 		} else {
 			color = "NONE"
 		}
-		var m models.Message
-		m.Routes = connector.Routes
-		m.In.Process = false
-		m.Out.Text = connector.ID + " " + a.check
-		m.Out.Detail = a.text
-		m.Out.Status = color
-		commandMsgs <- m
+		message.Out.Text = connector.ID + " " + a.check
+		message.Out.Detail = a.text
+		message.Out.Status = color
+		commandMsgs <- message
 	}
 }
