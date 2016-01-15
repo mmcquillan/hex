@@ -16,7 +16,7 @@ func (x Website) Listen(commandMsgs chan<- models.Message, connector models.Conn
 	defer Recovery(connector)
 	var state = make(map[string]string)
 	for _, chk := range connector.Checks {
-		state[chk.Name] = "OK"
+		state[chk.Name] = "OK " + chk.Check
 	}
 	for {
 		alerts := callWebsite(&state, connector)
@@ -48,23 +48,23 @@ func callWebsite(state *map[string]string, connector models.Connector) (alerts [
 		}
 		client := &http.Client{Transport: tran}
 		res, err := client.Get(chk.Check)
-		defer res.Body.Close()
 		if err != nil {
 			if connector.Debug {
 				log.Print("Error call to " + chk.Check + " with " + err.Error())
 			}
 			out = "CRITICAL " + err.Error()
 		} else {
+			defer res.Body.Close()
 			if connector.Debug {
 				log.Print("Completed website call to " + chk.Check + " with " + res.Status)
 			}
 			if res.StatusCode == 200 {
-				out = "OK " + chk.Check + " " + res.Status
+				out = "OK " + chk.Check
 			} else {
 				out = "CRITICAL " + chk.Check + " " + res.Status
 			}
 		}
-		if (*state)[chk.Name] != out && (*state)[chk.Name] != "OK" {
+		if (*state)[chk.Name] != out {
 			if connector.Debug {
 				log.Print("Reporting alert for " + chk.Name)
 			}
