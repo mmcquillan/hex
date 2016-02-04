@@ -38,4 +38,7 @@ func staticCommands(message models.Message, publishMsgs chan<- models.Message, c
 	if strings.ToLower(strings.TrimSpace(message.In.Text)) == "jane help" {
 		Help(message, publishMsgs, config)
 	}
+	if strings.ToLower(strings.TrimSpace(message.In.Text)) == "jane whoami" {
+		WhoAmI(message, publishMsgs)
+	}
 }
