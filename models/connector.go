@@ -10,6 +10,7 @@ type Connector struct {
 	From   string
 	Key    string
 	Image  string
+	Users  string
 	Checks []struct {
 		Name  string
 		Check string

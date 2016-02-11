@@ -16,8 +16,21 @@ func Commands(commandMsgs <-chan models.Message, publishMsgs chan<- models.Messa
 			staticCommands(m, publishMsgs, config)
 			for _, connector := range config.Connectors {
 				if connector.Active {
-					c := connectors.MakeConnector(connector.Type).(connectors.Connector)
-					go c.Command(m, publishMsgs, connector)
+					canRun := false
+					if connector.Users == "" || connector.Users == "*" {
+						canRun = true
+					} else {
+						users := strings.Split(connector.Users, ",")
+						for _, u := range users {
+							if u == m.In.User {
+								canRun = true
+							}
+						}
+					}
+					if canRun {
+						c := connectors.MakeConnector(connector.Type).(connectors.Connector)
+						go c.Command(m, publishMsgs, connector)
+					}
 				}
 			}
 		} else {

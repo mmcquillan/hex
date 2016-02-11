@@ -15,8 +15,21 @@ func Help(message models.Message, publishMsgs chan<- models.Message, config *mod
 	}
 	for _, connector := range config.Connectors {
 		if connector.Active {
-			c := connectors.MakeConnector(connector.Type).(connectors.Connector)
-			help += c.Help(connector)
+			canRun := false
+			if connector.Users == "" || connector.Users == "*" {
+				canRun = true
+			} else {
+				users := strings.Split(connector.Users, ",")
+				for _, u := range users {
+					if u == message.In.User {
+						canRun = true
+					}
+				}
+			}
+			if canRun {
+				c := connectors.MakeConnector(connector.Type).(connectors.Connector)
+				help += c.Help(connector)
+			}
 		}
 	}
 	helps := strings.Split(help, "\n")
