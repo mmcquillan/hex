@@ -3,6 +3,7 @@ package connectors
 import (
 	"github.com/nlopes/slack"
 	"github.com/projectjane/jane/models"
+	"html"
 	"log"
 )
 
@@ -40,7 +41,7 @@ func (x Slack) Listen(commandMsgs chan<- models.Message, connector models.Connec
 					m.Routes = r
 					m.In.Source = connector.ID
 					m.In.User = ev.User
-					m.In.Text = ev.Text
+					m.In.Text = html.UnescapeString(ev.Text)
 					m.In.Process = true
 					commandMsgs <- m
 

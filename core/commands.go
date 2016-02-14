@@ -10,31 +10,34 @@ import (
 func Commands(commandMsgs <-chan models.Message, publishMsgs chan<- models.Message, config *models.Config) {
 	log.Print("Initializing Commands")
 	for {
-		m := <-commandMsgs
-		if m.In.Process {
-			aliasCommands(&m, config)
-			staticCommands(m, publishMsgs, config)
-			for _, connector := range config.Connectors {
-				if connector.Active {
-					canRun := false
-					if connector.Users == "" || connector.Users == "*" {
-						canRun = true
-					} else {
-						users := strings.Split(connector.Users, ",")
-						for _, u := range users {
-							if u == m.In.User {
-								canRun = true
+		message := <-commandMsgs
+		messages := splitCommands(message)
+		for _, m := range messages {
+			if m.In.Process {
+				aliasCommands(&m, config)
+				staticCommands(m, publishMsgs, config)
+				for _, connector := range config.Connectors {
+					if connector.Active {
+						canRun := false
+						if connector.Users == "" || connector.Users == "*" {
+							canRun = true
+						} else {
+							users := strings.Split(connector.Users, ",")
+							for _, u := range users {
+								if u == m.In.User {
+									canRun = true
+								}
 							}
 						}
-					}
-					if canRun {
-						c := connectors.MakeConnector(connector.Type).(connectors.Connector)
-						go c.Command(m, publishMsgs, connector)
+						if canRun {
+							c := connectors.MakeConnector(connector.Type).(connectors.Connector)
+							go c.Command(m, publishMsgs, connector)
+						}
 					}
 				}
+			} else {
+				publishMsgs <- m
 			}
-		} else {
-			publishMsgs <- m
 		}
 	}
 }
@@ -54,4 +57,18 @@ func staticCommands(message models.Message, publishMsgs chan<- models.Message, c
 	if strings.ToLower(strings.TrimSpace(message.In.Text)) == "jane whoami" {
 		WhoAmI(message, publishMsgs)
 	}
+}
+
+func splitCommands(message models.Message) (msgs []models.Message) {
+	if strings.Contains(message.In.Text, "&&") {
+		cmds := strings.Split(message.In.Text, "&&")
+		for _, cmd := range cmds {
+			var m = message
+			m.In.Text = strings.TrimSpace(cmd)
+			msgs = append(msgs, m)
+		}
+	} else {
+		msgs = append(msgs, message)
+	}
+	return msgs
 }
