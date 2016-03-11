@@ -27,7 +27,7 @@ func (x Email) Publish(connector models.Connector, message models.Message, targe
 		msg := []byte("To: " + target + "\r\n" +
 			"Subject: " + message.Out.Text + "\r\n" +
 			"\r\n" + message.Out.Detail + "\r\n\r\n" + message.Out.Link + "\r\n")
-		err := smtp.SendMail(connector.Server, auth, connector.From, to, msg)
+		err := smtp.SendMail(connector.Server+":"+connector.Port, auth, connector.From, to, msg)
 		if err != nil {
 			log.Print(err)
 		}

@@ -5,6 +5,7 @@ type Connector struct {
 	ID     string
 	Active bool
 	Server string
+	Port   string
 	Login  string
 	Pass   string
 	From   string
