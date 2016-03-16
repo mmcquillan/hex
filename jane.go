@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/projectjane/jane/core"
 	"github.com/projectjane/jane/models"
-	"github.com/projectjane/jane/api"
 	"sync"
 )
 
@@ -14,7 +13,6 @@ func main() {
 	core.Logging(&config)
 	commandMsgs := make(chan models.Message, 1)
 	publishMsgs := make(chan models.Message, 1)
-	api.StartRestServer(commandMsgs, publishMsgs)
 	var wg sync.WaitGroup
 	wg.Add(core.ActiveConnectors(&config))
 	wg.Add(3)

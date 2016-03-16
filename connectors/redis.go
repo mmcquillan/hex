@@ -3,11 +3,19 @@ package connectors
 import (
 	"log"
 	"strings"
+	"encoding/json"
 	"github.com/projectjane/jane/models"
   "gopkg.in/redis.v3"
 )
 
 type Redis struct {
+	Environments map[string][]Environment
+}
+
+type Environment struct {
+	Address string
+	Password string
+	DB int64
 }
 
 func (x Redis) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
@@ -16,8 +24,10 @@ func (x Redis) Listen(commandMsgs chan<- models.Message, connector models.Connec
 }
 
 func (x Redis) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
-	if strings.Contains(strings.ToLower(message.In.Text), "flushdb") {
-		status := FlushDb("", "", 0)
+	if strings.HasPrefix(strings.ToLower(message.In.Text), "flushdb") {
+		env := strings.TrimSpace(strings.Replace(message.In.Text, "flusbdb", "", 1))
+		environment := LookupEnvironment(env)
+		status := FlushDb(environment)
 		log.Println(status.String())
 		message.Out.Text = status.String()
 		publishMsgs <- message
@@ -29,20 +39,33 @@ func (x Redis) Publish(connector models.Connector, message models.Message, targe
 }
 
 func (x Redis) Help(connector models.Connector) (help string) {
-	return
+	help += "flushdb <environment> - pulls back an image url\n"
+	return help
 }
 
-func NewClient(addr, pass string, db int64) *redis.Client {
+func NewClient(environment Environment) *redis.Client {
   return redis.NewClient(&redis.Options{
-        Addr:     addr,
-        Password: pass,
-        DB:       db,  // use default DB
+        Addr:     environment.Address,
+        Password: environment.Password,
+        DB:       environment.DB,
   })
 }
 
-func FlushDb(addr, pass string, db int64) *redis.StatusCmd {
-	client := NewClient(addr, pass, db)
+func FlushDb(environment Environment) *redis.StatusCmd {
+	client := NewClient(environment)
   defer client.Close()
 
   return client.FlushDb()
+}
+
+func (redis Redis) LookupEnvironment(env string) Environment {
+	return redis.Environments[env]
+}
+
+func (x Redis) GetEnvironmentsFromConfig(config models.Config) {
+	var envs []Environment
+	err := json.Unmarshal([]byte(config), &envs)
+	if err != nil {
+		log.Println(err)
+	}
 }
