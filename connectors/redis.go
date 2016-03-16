@@ -3,13 +3,11 @@ package connectors
 import (
 	"log"
 	"strings"
-	"encoding/json"
 	"github.com/projectjane/jane/models"
   "gopkg.in/redis.v3"
 )
 
 type Redis struct {
-	Environments map[string][]Environment
 }
 
 type Environment struct {
@@ -25,8 +23,14 @@ func (x Redis) Listen(commandMsgs chan<- models.Message, connector models.Connec
 
 func (x Redis) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	if strings.HasPrefix(strings.ToLower(message.In.Text), "flushdb") {
-		env := strings.TrimSpace(strings.Replace(message.In.Text, "flusbdb", "", 1))
-		environment := LookupEnvironment(env)
+		// env := strings.TrimSpace(strings.Replace(message.In.Text, "flusbdb", "", 1))
+
+		environment := Environment {
+			Address: connector.Server,
+			Password: connector.Pass,
+			DB: 0,
+		}
+
 		status := FlushDb(environment)
 		log.Println(status.String())
 		message.Out.Text = status.String()
@@ -56,16 +60,4 @@ func FlushDb(environment Environment) *redis.StatusCmd {
   defer client.Close()
 
   return client.FlushDb()
-}
-
-func (redis Redis) LookupEnvironment(env string) Environment {
-	return redis.Environments[env]
-}
-
-func (x Redis) GetEnvironmentsFromConfig(config models.Config) {
-	var envs []Environment
-	err := json.Unmarshal([]byte(config), &envs)
-	if err != nil {
-		log.Println(err)
-	}
 }

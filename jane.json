@@ -80,7 +80,10 @@
 
     {"Type": "wolfram", "ID": "wolf", "Active": true, "Debug": true,
       "Key": "<WOLFRAM API KEY>"
-    }
+    },
 
+    {"Type": "redis", "ID": "localRedis", "Active": true,
+      "Server": "localhost:6379", "Pass": ""
+    }
   ]
 }
