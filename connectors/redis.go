@@ -1,47 +1,47 @@
 package connectors
 
 import (
-	"github.com/projectjane/jane/models"
 	"log"
+	"strings"
+	"github.com/projectjane/jane/models"
   "gopkg.in/redis.v3"
 )
 
 type Redis struct {
 }
 
-func (x Template) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+func (x Redis) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 	return
 }
 
-func (x Template) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func (x Redis) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	if strings.Contains(strings.ToLower(message.In.Text), "flushdb") {
-		status := FlushDb()
-		message.Out.Text = string(status
-		publishMsgs <- message)
+		status := FlushDb("", "", 0)
+		log.Println(status.String())
+		message.Out.Text = status.String()
+		publishMsgs <- message
 	}
+}
 
+func (x Redis) Publish(connector models.Connector, message models.Message, target string) {
 	return
 }
 
-func (x Template) Publish(connector models.Connector, message models.Message, target string) {
+func (x Redis) Help(connector models.Connector) (help string) {
 	return
 }
 
-func (x Template) Help(connector models.Connector) (help string) {
-	return
-}
-
-func NewClient(addr, pass string) *redis.Client {
+func NewClient(addr, pass string, db int64) *redis.Client {
   return redis.NewClient(&redis.Options{
         Addr:     addr,
         Password: pass,
-        DB:       0,  // use default DB
+        DB:       db,  // use default DB
   })
 }
 
-func FlushDb(addr, pass string) *redis.StatusCmd {
-	client := NewClient(addr, pass)
+func FlushDb(addr, pass string, db int64) *redis.StatusCmd {
+	client := NewClient(addr, pass, db)
   defer client.Close()
 
   return client.FlushDb()
