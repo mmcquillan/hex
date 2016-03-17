@@ -21,6 +21,7 @@ func init() {
 	List["ssh"] = reflect.TypeOf(Ssh{})
 	List["website"] = reflect.TypeOf(Website{})
 	List["wolfram"] = reflect.TypeOf(Wolfram{})
+	List["redis"] = reflect.TypeOf(Redis{})
 }
 
 func MakeConnector(connType string) interface{} {
