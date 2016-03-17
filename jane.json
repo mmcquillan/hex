@@ -82,8 +82,11 @@
       "Key": "<WOLFRAM API KEY>"
     },
 
-    {"Type": "redis", "ID": "localRedis", "Active": true,
-      "Server": "localhost:6379", "Pass": ""
+    {"Type": "redis", "ID": "devRedis", "Active": true,
+      "Server": "localhost:6379", "Pass": "",
+      "Commands": [
+        {"Match": "flushdb dev"}
+      ]
     }
   ]
 }
