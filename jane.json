@@ -85,7 +85,7 @@
     {"Type": "redis", "ID": "devRedis", "Active": true,
       "Server": "localhost:6379", "Pass": "",
       "Commands": [
-        {"Match": "flushdb dev"}
+        {"Match": "jane flushdb dev"}
       ]
     }
   ]

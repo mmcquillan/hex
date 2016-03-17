@@ -22,19 +22,22 @@ func (x Redis) Listen(commandMsgs chan<- models.Message, connector models.Connec
 }
 
 func (x Redis) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
-	if strings.HasPrefix(strings.ToLower(message.In.Text), "flushdb") {
-		// env := strings.TrimSpace(strings.Replace(message.In.Text, "flusbdb", "", 1))
+	if message.In.Process {
+		for _, c := range connector.Commands {
+			if strings.HasPrefix(strings.ToLower(message.In.Text), strings.ToLower(c.Match)) {
+				environment := Environment {
+					Address: connector.Server,
+					Password: connector.Pass,
+					DB: 0,
+				}
 
-		environment := Environment {
-			Address: connector.Server,
-			Password: connector.Pass,
-			DB: 0,
+				status := FlushDb(environment)
+				log.Println(status.String())
+				message.Out.Text = status.String()
+				publishMsgs <- message
+				return
+			}
 		}
-
-		status := FlushDb(environment)
-		log.Println(status.String())
-		message.Out.Text = status.String()
-		publishMsgs <- message
 	}
 }
 
@@ -43,7 +46,7 @@ func (x Redis) Publish(connector models.Connector, message models.Message, targe
 }
 
 func (x Redis) Help(connector models.Connector) (help string) {
-	help += "flushdb <environment> - pulls back an image url\n"
+	help += "jane flushdb <environment> - flushes the environments redis db\n"
 	return help
 }
 
