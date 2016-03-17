@@ -3,6 +3,7 @@ package connectors
 import (
 	"log"
 	"strings"
+	"fmt"
 	"github.com/projectjane/jane/models"
   "gopkg.in/redis.v3"
 )
@@ -33,7 +34,7 @@ func (x Redis) Command(message models.Message, publishMsgs chan<- models.Message
 
 				status := FlushDb(environment)
 				log.Println(status.String())
-				message.Out.Text = status.String()
+				message.Out.Text = fmt.Sprintf("Redis Server: %s\nStatus:%s", connector.Server, status.String())
 				publishMsgs <- message
 				return
 			}
