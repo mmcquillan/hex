@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/projectjane/jane/models"
+	"github.com/projectjane/jane/parse"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -21,14 +22,12 @@ func (x ImageMe) Listen(commandMsgs chan<- models.Message, connector models.Conn
 }
 
 func (x ImageMe) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
-	if strings.HasPrefix(strings.ToLower(message.In.Text), "image me") {
-		msg := strings.TrimSpace(strings.Replace(message.In.Text, "image me", "", 1))
-		message.Out.Text = callImageMe(msg, connector.Key, connector.Pass, false)
+	if match, tokens := parse.Match("image me*", message.In.Text); match {
+		message.Out.Text = callImageMe(strings.Join(tokens, " "), connector.Key, connector.Pass, false)
 		publishMsgs <- message
 	}
-	if strings.HasPrefix(strings.ToLower(message.In.Text), "animate me") {
-		msg := strings.TrimSpace(strings.Replace(message.In.Text, "animate me", "", 1))
-		message.Out.Text = callImageMe(msg, connector.Key, connector.Pass, true)
+	if match, tokens := parse.Match("animate me*", message.In.Text); match {
+		message.Out.Text = callImageMe(strings.Join(tokens, " "), connector.Key, connector.Pass, true)
 		publishMsgs <- message
 	}
 }

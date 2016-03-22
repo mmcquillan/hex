@@ -5,6 +5,7 @@ import (
 	"github.com/kennygrant/sanitize"
 	"github.com/mmcquillan/bambooapi"
 	"github.com/projectjane/jane/models"
+	"github.com/projectjane/jane/parse"
 	"html"
 	"log"
 	"strconv"
@@ -28,11 +29,11 @@ func (x Bamboo) Listen(commandMsgs chan<- models.Message, connector models.Conne
 }
 
 func (x Bamboo) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
-	if strings.HasPrefix(message.In.Text, "bamboo status") {
+	if match, _ := parse.Match("bamboo status*", message.In.Text); match {
 		commandDeployStatus(message, publishMsgs, connector)
 		commandBuildStatus(message, publishMsgs, connector)
 	}
-	if strings.HasPrefix(message.In.Text, "bamboo build") {
+	if match, _ := parse.Match("bamboo build*", message.In.Text); match {
 		commandBuild(message, publishMsgs, connector)
 	}
 }
@@ -61,7 +62,7 @@ func listenDeploys(lastMarker string, commandMsgs chan<- models.Message, connect
 				var m models.Message
 				m.Routes = connector.Routes
 				m.In.Process = false
-				m.Out.Text = "Bamboo Deploy " + e.Deploymentresult.Deploymentversion.Name + " to " + e.Environment.Name + " " + e.Deploymentresult.Deploymentstate
+				m.Out.Text = "Bamboo Deploy " + e.Deploymentresult.Deploymentversion.Planbranchname + " " + e.Deploymentresult.Deploymentversion.Name + " to " + e.Environment.Name + " " + e.Deploymentresult.Deploymentstate
 				m.Out.Detail = html.UnescapeString(sanitize.HTML(e.Deploymentresult.Reasonsummary))
 				m.Out.Link = "https://" + connector.Server + "/builds/deploy/viewDeploymentResult.action?deploymentResultId=" + strconv.Itoa(e.Deploymentresult.ID)
 				if e.Deploymentresult.Deploymentstate == "SUCCESS" {

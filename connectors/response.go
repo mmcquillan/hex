@@ -2,6 +2,7 @@ package connectors
 
 import (
 	"github.com/projectjane/jane/models"
+	"github.com/projectjane/jane/parse"
 	"log"
 	"math/rand"
 	"strings"
@@ -20,28 +21,13 @@ func (x Response) Command(message models.Message, publishMsgs chan<- models.Mess
 		log.Printf("%+v", message)
 	}
 	if message.In.Process {
-		txt := strings.ToLower(message.In.Text)
 		for _, c := range connector.Commands {
-			m := strings.ToLower(c.Match)
-			ws := strings.HasPrefix(m, "*")
-			we := strings.HasSuffix(m, "*")
-			m = strings.Replace(m, "*", "", -1)
-			eval := false
-			if ws && ws && strings.Contains(txt, m) {
-				eval = true
-			} else if ws && !we && strings.HasSuffix(txt, m) {
-				eval = true
-			} else if !ws && we && strings.HasPrefix(txt, m) {
-				eval = true
-			} else if txt == m {
-				eval = true
-			}
-			if eval {
+			if match, tokens := parse.Match(c.Match, message.In.Text); match {
 				if len(c.Outputs) == 0 {
-					message.Out.Text = strings.Replace(c.Output, "%msg%", strings.TrimSpace(strings.Replace(message.In.Text, m, "", 1)), -1)
+					message.Out.Text = strings.Replace(c.Output, "%msg%", strings.Join(tokens, " "), -1)
 				} else {
 					i := rand.Intn(len(c.Outputs))
-					message.Out.Text = strings.Replace(c.Outputs[i], "%msg%", strings.TrimSpace(strings.Replace(message.In.Text, m, "", 1)), -1)
+					message.Out.Text = strings.Replace(c.Outputs[i], "%msg%", strings.Join(tokens, " "), -1)
 				}
 				publishMsgs <- message
 			}

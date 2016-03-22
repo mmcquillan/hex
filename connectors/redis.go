@@ -1,20 +1,21 @@
 package connectors
 
 import (
-	"log"
-	"strings"
 	"fmt"
 	"github.com/projectjane/jane/models"
-  "gopkg.in/redis.v3"
+	"github.com/projectjane/jane/parse"
+	"gopkg.in/redis.v3"
+	"log"
+	"strings"
 )
 
 type Redis struct {
 }
 
 type Environment struct {
-	Address string
+	Address  string
 	Password string
-	DB int64
+	DB       int64
 }
 
 func (x Redis) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
@@ -25,11 +26,11 @@ func (x Redis) Listen(commandMsgs chan<- models.Message, connector models.Connec
 func (x Redis) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	if message.In.Process {
 		for _, c := range connector.Commands {
-			if strings.HasPrefix(strings.ToLower(message.In.Text), strings.ToLower(c.Match)) {
-				environment := Environment {
-					Address: connector.Server,
+			if match, _ := parse.Match(c.Match, message.In.Text); match {
+				environment := Environment{
+					Address:  connector.Server,
 					Password: connector.Pass,
-					DB: 0,
+					DB:       0,
 				}
 
 				status := FlushDb(environment)
@@ -52,16 +53,16 @@ func (x Redis) Help(connector models.Connector) (help string) {
 }
 
 func NewClient(environment Environment) *redis.Client {
-  return redis.NewClient(&redis.Options{
-        Addr:     environment.Address,
-        Password: environment.Password,
-        DB:       environment.DB,
-  })
+	return redis.NewClient(&redis.Options{
+		Addr:     environment.Address,
+		Password: environment.Password,
+		DB:       environment.DB,
+	})
 }
 
 func FlushDb(environment Environment) *redis.StatusCmd {
 	client := NewClient(environment)
-  defer client.Close()
+	defer client.Close()
 
-  return client.FlushDb()
+	return client.FlushDb()
 }

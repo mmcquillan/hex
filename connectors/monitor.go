@@ -2,6 +2,7 @@ package connectors
 
 import (
 	"github.com/projectjane/jane/models"
+	"github.com/projectjane/jane/parse"
 	"golang.org/x/crypto/ssh"
 	"log"
 	"strings"
@@ -28,9 +29,8 @@ func (x Monitor) Listen(commandMsgs chan<- models.Message, connector models.Conn
 }
 
 func (x Monitor) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
-	if strings.HasPrefix(message.In.Text, "jane monitor") {
-		tokens := strings.Split(message.In.Text, " ")
-		if strings.Contains(strings.ToLower(connector.ID), strings.ToLower(tokens[2])) {
+	if match, tokens := parse.Match("jane monitor*", message.In.Text); match {
+		if strings.Contains(strings.ToLower(connector.ID), strings.ToLower(tokens[0])) {
 			var state = make(map[string]string)
 			for _, chk := range connector.Checks {
 				state[chk.Name] = "X"

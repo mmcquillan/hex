@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/projectjane/jane/models"
+	"github.com/projectjane/jane/parse"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -19,9 +20,8 @@ func (x Wolfram) Listen(commandMsgs chan<- models.Message, connector models.Conn
 }
 
 func (x Wolfram) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
-	if strings.Index(message.In.Text, "wolfram") == 0 {
-		msg := strings.TrimSpace(strings.Replace(message.In.Text, "wolfram", "", 1))
-		message.Out.Text = callWolfram(msg, connector.Key)
+	if match, tokens := parse.Match("wolfram*", message.In.Text); match {
+		message.Out.Text = callWolfram(strings.Join(tokens, " "), connector.Key)
 		publishMsgs <- message
 	}
 }
