@@ -16,15 +16,13 @@ func (x Ssh) Listen(commandMsgs chan<- models.Message, connector models.Connecto
 }
 
 func (x Ssh) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
-	if message.In.Process {
-		for _, c := range connector.Commands {
-			if match, tokens := parse.Match(c.Match, message.In.Text); match {
-				msg = strings.Replace(strings.Join(tokens, " "), "\"", "", -1)
-				args := strings.Replace(c.Args, "%msg%", msg, -1)
-				out := callSsh(c.Cmd, args, connector)
-				message.Out.Text = strings.Replace(c.Output, "%stdout%", out, -1)
-				publishMsgs <- message
-			}
+	for _, c := range connector.Commands {
+		if match, tokens := parse.Match(c.Match, message.In.Text); match {
+			msg = strings.Replace(strings.Join(tokens, " "), "\"", "", -1)
+			args := strings.Replace(c.Args, "%msg%", msg, -1)
+			out := callSsh(c.Cmd, args, connector)
+			message.Out.Text = strings.Replace(c.Output, "%stdout%", out, -1)
+			publishMsgs <- message
 		}
 	}
 }

@@ -24,21 +24,19 @@ func (x Redis) Listen(commandMsgs chan<- models.Message, connector models.Connec
 }
 
 func (x Redis) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
-	if message.In.Process {
-		for _, c := range connector.Commands {
-			if match, _ := parse.Match(c.Match, message.In.Text); match {
-				environment := Environment{
-					Address:  connector.Server,
-					Password: connector.Pass,
-					DB:       0,
-				}
-
-				status := FlushDb(environment)
-				log.Println(status.String())
-				message.Out.Text = fmt.Sprintf("Redis Server: %s\nStatus:%s", connector.Server, status.String())
-				publishMsgs <- message
-				return
+	for _, c := range connector.Commands {
+		if match, _ := parse.Match(c.Match, message.In.Text); match {
+			environment := Environment{
+				Address:  connector.Server,
+				Password: connector.Pass,
+				DB:       0,
 			}
+
+			status := FlushDb(environment)
+			log.Println(status.String())
+			message.Out.Text = fmt.Sprintf("Redis Server: %s\nStatus:%s", connector.Server, status.String())
+			publishMsgs <- message
+			return
 		}
 	}
 }

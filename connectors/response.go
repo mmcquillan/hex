@@ -20,17 +20,15 @@ func (x Response) Command(message models.Message, publishMsgs chan<- models.Mess
 		log.Print("Incoming command message for " + connector.ID + " (" + connector.Type + ")")
 		log.Printf("%+v", message)
 	}
-	if message.In.Process {
-		for _, c := range connector.Commands {
-			if match, tokens := parse.Match(c.Match, message.In.Text); match {
-				if len(c.Outputs) == 0 {
-					message.Out.Text = strings.Replace(c.Output, "%msg%", strings.Join(tokens, " "), -1)
-				} else {
-					i := rand.Intn(len(c.Outputs))
-					message.Out.Text = strings.Replace(c.Outputs[i], "%msg%", strings.Join(tokens, " "), -1)
-				}
-				publishMsgs <- message
+	for _, c := range connector.Commands {
+		if match, tokens := parse.Match(c.Match, message.In.Text); match {
+			if len(c.Outputs) == 0 {
+				message.Out.Text = strings.Replace(c.Output, "%msg%", strings.Join(tokens, " "), -1)
+			} else {
+				i := rand.Intn(len(c.Outputs))
+				message.Out.Text = strings.Replace(c.Outputs[i], "%msg%", strings.Join(tokens, " "), -1)
 			}
+			publishMsgs <- message
 		}
 	}
 }
