@@ -6,7 +6,6 @@ import (
 	"github.com/projectjane/jane/parse"
 	"gopkg.in/redis.v3"
 	"log"
-	"strings"
 )
 
 type Redis struct {
