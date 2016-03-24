@@ -12,7 +12,8 @@ type Logging struct {
 
 func (x Logging) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
-	t, err := tail.TailFile(connector.File, tail.Config{Follow: true, Location: SeekInfo{Offset: 0, Whence: 2}})
+	seek := tail.SeekInfo{Offset: 0, Whence: 2}
+	t, err := tail.TailFile(connector.File, tail.Config{Follow: true, Location: &seek})
 	if err != nil {
 		log.Print(err)
 	}
