@@ -8,6 +8,7 @@ type Connector struct {
 	Port   string
 	Login  string
 	Pass   string
+	File   string
 	From   string
 	Key    string
 	Image  string

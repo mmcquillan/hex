@@ -14,6 +14,7 @@ func init() {
 	List["exec"] = reflect.TypeOf(Exec{})
 	List["imageme"] = reflect.TypeOf(ImageMe{})
 	List["jira"] = reflect.TypeOf(Jira{})
+	List["logging"] = reflect.TypeOf(Logging{})
 	List["monitor"] = reflect.TypeOf(Monitor{})
 	List["slack"] = reflect.TypeOf(Slack{})
 	List["response"] = reflect.TypeOf(Response{})
