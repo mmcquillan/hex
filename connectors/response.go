@@ -41,7 +41,8 @@ func (x Response) Help(connector models.Connector) (help string) {
 	for _, c := range connector.Commands {
 		if c.Help != "" {
 			help += c.Help + "\n"
-		} else {
+
+		} else if c.Help != "-" {
 			help += strings.Replace(c.Match, "*", "", -1) + "\n"
 		}
 	}
