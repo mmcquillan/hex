@@ -34,6 +34,14 @@ func Help(message models.Message, publishMsgs chan<- models.Message, config *mod
 	}
 	helps := strings.Split(help, "\n")
 	sort.Strings(helps)
-	message.Out.Detail = strings.Join(helps, "\n")
+	var lasthelp = ""
+	var newhelps = []string{}
+	for _, help := range helps {
+		if help != lasthelp && help != "-" {
+			newhelps = append(newhelps, help)
+		}
+		lasthelp = help
+	}
+	message.Out.Detail = strings.Join(newhelps, "\n")
 	publishMsgs <- message
 }
