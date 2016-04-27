@@ -1,86 +1,92 @@
 package connectors
 
 import (
-	"log"
-	"strings"
 	"fmt"
-  "net/http"
+	"log"
+	"net/http"
+	"strconv"
+	"strings"
+
 	"github.com/projectjane/jane/models"
 )
 
 type Webhook struct {
+	CommandMsgs chan<- models.Message
+	PublishMsgs chan<- models.Message
 }
 
+var webhook Webhook
+
 func webhookHandler(w http.ResponseWriter, r *http.Request) {
-  segs := strings.Split(r.URL.Path, "/")
-  if len(segs) < 2 {
-    w.WriteHeader(http.StatusNotFound)
-    fmt.Fprintf(w, "Route not found")
-    return
-  }
+	var segs []string
+	webhookString := r.URL.Path[9:]
+	segs = strings.Split(webhookString, "/")
+	log.Println(segs)
+	log.Println(len(segs))
+	if len(segs) < 2 {
 
-  // command := segs[2]
-  // provider := segs[3]
+		log.Println("About to split")
+		segs = strings.Split(webhookString, "+")
+		log.Println(segs)
+		log.Println(len(segs))
 
+		if len(segs) < 1 {
+			w.WriteHeader(http.StatusNotFound)
+			log.Println("Route not found")
+			fmt.Fprintf(w, "Route not found")
+			return
+		}
+	}
+
+	if segs[1] == "" {
+		w.WriteHeader(http.StatusNotFound)
+		log.Println("Empty webhook data")
+		fmt.Fprintf(w, "Empty webhook data")
+		return
+	}
+
+	command := strings.Join(segs[2:], " ")
+	log.Println(command)
+
+	w.WriteHeader(http.StatusOK)
+	// fmt.Fprintf(w, commands)
 }
 
 func (x Webhook) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
-  defer Recovery(connector)
+	defer Recovery(connector)
+
+	x.CommandMsgs = commandMsgs
+	webhook = x
+
 	if connector.Debug {
 		log.Println("Starting Webhook connector...")
 	}
 
+	port, _ := strconv.Atoi(connector.Port)
+
 	server := &http.Server{
-		Addr:    fmt.Sprintf(":%d", connector.Port),
+		Addr:    fmt.Sprintf(":%d", port),
 		Handler: nil,
 	}
 
-  http.HandleFunc("/webhook/", webhookHandler)
+	log.Println(server.Addr)
+
+	http.HandleFunc("/webhook/", webhookHandler)
 
 	err := server.ListenAndServe()
 	if err != nil {
 		panic(err)
 	}
-
-	// for {
-	// 	select {
-	// 	case msg := <-rtm.IncomingEvents:
-	// 		switch ev := msg.Data.(type) {
-	// 		case *slack.MessageEvent:
-	// 			if ev.User != "" {
-  //
-	// 				if connector.Debug {
-	// 					log.Print("Evaluating incoming slack message")
-	// 				}
-  //
-	// 				var r []models.Route
-	// 				r = append(r, models.Route{Match: "*", Connectors: connector.ID, Target: ev.Channel})
-	// 				for _, cr := range connector.Routes {
-	// 					r = append(r, cr)
-	// 				}
-  //
-	// 				var m models.Message
-	// 				m.Routes = r
-	// 				m.In.Source = connector.ID
-	// 				m.In.User = ev.User
-	// 				m.In.Text = html.UnescapeString(ev.Text)
-	// 				m.In.Process = true
-	// 				commandMsgs <- m
-  //
-	// 			}
-	// 		}
-	// 	}
-	// }
 }
 
 func (x Webhook) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	if message.In.Process {
 		for _, c := range connector.Commands {
 			if strings.HasPrefix(strings.ToLower(message.In.Text), strings.ToLower(c.Match)) {
-				environment := Environment {
-					Address: connector.Server,
+				environment := Environment{
+					Address:  connector.Server,
 					Password: connector.Pass,
-					DB: 0,
+					DB:       0,
 				}
 
 				status := FlushDb(environment)
@@ -98,6 +104,6 @@ func (x Webhook) Publish(connector models.Connector, message models.Message, tar
 }
 
 func (x Webhook) Help(connector models.Connector) (help string) {
-	help += "jane flushdb <environment> - flushes the environments redis db\n"
+	help += fmt.Sprintf("Webhooks enable at %s:%s/webhook/\n", connector.Server, connector.Port)
 	return help
 }
