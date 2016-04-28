@@ -2,6 +2,7 @@ package connectors
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -10,6 +11,7 @@ import (
 	"github.com/projectjane/jane/models"
 )
 
+// Webhook Struct for manipulating the webhook connector
 type Webhook struct {
 	CommandMsgs chan<- models.Message
 	Connector   models.Connector
@@ -23,15 +25,10 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 	// get everything passed /webhook/
 	webhookString := r.URL.Path[9:]
 
-	log.Println("About to split on plus")
 	segs = strings.Split(webhookString, "+")
 
-	log.Println(segs)
 	if len(segs) < 2 || segs[1] == "" {
-
-		log.Println("About to split on slash")
 		segs = strings.Split(webhookString, "/")
-		log.Println(segs)
 
 		if len(segs) < 1 {
 			w.WriteHeader(http.StatusNotFound)
@@ -48,6 +45,12 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Println(err)
+	}
+	defer r.Body.Close()
+
 	command := strings.Join(segs[0:], " ")
 	log.Println(command)
 
@@ -55,11 +58,13 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 	m.In.Source = webhook.Connector.ID
 	m.In.Text = command
 	m.In.Process = true
+	m.Out.Detail = string(body)
 	webhook.CommandMsgs <- m
 
 	w.WriteHeader(http.StatusOK)
 }
 
+// Listen Webhook listener
 func (x Webhook) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 
@@ -88,14 +93,22 @@ func (x Webhook) Listen(commandMsgs chan<- models.Message, connector models.Conn
 	}
 }
 
+// Command Webhook command parser
 func (x Webhook) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
-	log.Println("Processing command...")
-	log.Println(message.In.Text)
+	if connector.Debug {
+		log.Println("Processing command...")
+		log.Println(message.In.Text)
+	}
+
 	if message.In.Process {
 		for _, c := range connector.Commands {
 			if strings.HasPrefix(strings.ToLower(message.In.Text), strings.ToLower(c.Match)) {
 				msg := strings.TrimSpace(strings.Replace(message.In.Text, c.Match, "", 1))
-				log.Printf("Publishing... %s", msg)
+
+				if connector.Debug {
+					log.Printf("Publishing... %s", msg)
+				}
+
 				message.Out.Text = msg
 				publishMsgs <- message
 				return
@@ -104,10 +117,12 @@ func (x Webhook) Command(message models.Message, publishMsgs chan<- models.Messa
 	}
 }
 
+// Publish Webhook does not publish
 func (x Webhook) Publish(connector models.Connector, message models.Message, target string) {
 	return
 }
 
+// Help Webhook help information
 func (x Webhook) Help(connector models.Connector) (help string) {
 	help += fmt.Sprintf("Webhooks enable at %s:%s/webhook/\n", connector.Server, connector.Port)
 	return help
