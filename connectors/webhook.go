@@ -52,7 +52,6 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	command := strings.Join(segs[0:], " ")
-	log.Println(command)
 
 	var m models.Message
 	m.In.Source = webhook.Connector.ID

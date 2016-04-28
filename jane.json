@@ -87,6 +87,13 @@
       "Commands": [
         {"Match": "jane flushdb dev"}
       ]
+    },
+
+    {"Type": "webhook", "ID": "webhook", "Active": true,
+      "Server": "https://localhost", "Port": "8080",
+      "Commands": [
+        {"Match": "publish"}
+      ]
     }
   ]
 }
