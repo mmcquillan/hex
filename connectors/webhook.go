@@ -12,23 +12,26 @@ import (
 
 type Webhook struct {
 	CommandMsgs chan<- models.Message
-	PublishMsgs chan<- models.Message
+	Connector   models.Connector
 }
 
 var webhook Webhook
 
 func webhookHandler(w http.ResponseWriter, r *http.Request) {
 	var segs []string
-	webhookString := r.URL.Path[9:]
-	segs = strings.Split(webhookString, "/")
-	log.Println(segs)
-	log.Println(len(segs))
-	if len(segs) < 2 {
 
-		log.Println("About to split")
-		segs = strings.Split(webhookString, "+")
+	// get everything passed /webhook/
+	webhookString := r.URL.Path[9:]
+
+	log.Println("About to split on plus")
+	segs = strings.Split(webhookString, "+")
+
+	log.Println(segs)
+	if len(segs) < 2 || segs[1] == "" {
+
+		log.Println("About to split on slash")
+		segs = strings.Split(webhookString, "/")
 		log.Println(segs)
-		log.Println(len(segs))
 
 		if len(segs) < 1 {
 			w.WriteHeader(http.StatusNotFound)
@@ -38,24 +41,30 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if segs[1] == "" {
+	if segs[0] == "" {
 		w.WriteHeader(http.StatusNotFound)
 		log.Println("Empty webhook data")
 		fmt.Fprintf(w, "Empty webhook data")
 		return
 	}
 
-	command := strings.Join(segs[2:], " ")
+	command := strings.Join(segs[0:], " ")
 	log.Println(command)
 
+	var m models.Message
+	m.In.Source = webhook.Connector.ID
+	m.In.Text = command
+	m.In.Process = true
+	webhook.CommandMsgs <- m
+
 	w.WriteHeader(http.StatusOK)
-	// fmt.Fprintf(w, commands)
 }
 
 func (x Webhook) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 
 	x.CommandMsgs = commandMsgs
+	x.Connector = connector
 	webhook = x
 
 	if connector.Debug {
@@ -80,18 +89,14 @@ func (x Webhook) Listen(commandMsgs chan<- models.Message, connector models.Conn
 }
 
 func (x Webhook) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+	log.Println("Processing command...")
+	log.Println(message.In.Text)
 	if message.In.Process {
 		for _, c := range connector.Commands {
 			if strings.HasPrefix(strings.ToLower(message.In.Text), strings.ToLower(c.Match)) {
-				environment := Environment{
-					Address:  connector.Server,
-					Password: connector.Pass,
-					DB:       0,
-				}
-
-				status := FlushDb(environment)
-				log.Println(status.String())
-				message.Out.Text = fmt.Sprintf("Redis Server: %s\nStatus:%s", connector.Server, status.String())
+				msg := strings.TrimSpace(strings.Replace(message.In.Text, c.Match, "", 1))
+				log.Printf("Publishing... %s", msg)
+				message.Out.Text = msg
 				publishMsgs <- message
 				return
 			}
