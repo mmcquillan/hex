@@ -22,7 +22,7 @@ var webhook Webhook
 func webhookHandler(w http.ResponseWriter, r *http.Request) {
 	var segs []string
 
-	// get everything passed /webhook/
+	// get everything past /webhook/
 	webhookString := r.URL.Path[9:]
 
 	segs = strings.Split(webhookString, "+")
