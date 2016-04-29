@@ -60,7 +60,12 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 	m.Out.Detail = string(body)
 	webhook.CommandMsgs <- m
 
+	if webhook.Connector.Debug {
+		log.Printf("Command: %s", command)
+	}
+
 	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Request received."))
 }
 
 // Listen Webhook listener
@@ -123,6 +128,6 @@ func (x Webhook) Publish(connector models.Connector, message models.Message, tar
 
 // Help Webhook help information
 func (x Webhook) Help(connector models.Connector) (help string) {
-	help += fmt.Sprintf("Webhooks enable at %s:%s/webhook/\n", connector.Server, connector.Port)
+	help += fmt.Sprintf("Webhooks enabled at %s:%s/webhook/\n", connector.Server, connector.Port)
 	return help
 }
