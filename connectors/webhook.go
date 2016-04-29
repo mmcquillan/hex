@@ -87,7 +87,9 @@ func (x Webhook) Listen(commandMsgs chan<- models.Message, connector models.Conn
 		Handler: nil,
 	}
 
-	log.Println(server.Addr)
+	if connector.Debug {
+		log.Println(server.Addr)
+	}
 
 	http.HandleFunc("/webhook/", webhookHandler)
 
