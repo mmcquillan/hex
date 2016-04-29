@@ -115,7 +115,6 @@ func (x Webhook) Command(message models.Message, publishMsgs chan<- models.Messa
 
 				message.Out.Text = msg
 				publishMsgs <- message
-				return
 			}
 		}
 	}
