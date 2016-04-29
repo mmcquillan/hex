@@ -88,7 +88,7 @@ func (x Webhook) Listen(commandMsgs chan<- models.Message, connector models.Conn
 	}
 
 	if connector.Debug {
-		log.Println(server.Addr)
+		log.Printf("Server address: %s", server.Addr)
 	}
 
 	http.HandleFunc("/webhook/", webhookHandler)
@@ -101,18 +101,17 @@ func (x Webhook) Listen(commandMsgs chan<- models.Message, connector models.Conn
 
 // Command Webhook command parser
 func (x Webhook) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
-	if connector.Debug {
-		log.Println("Processing command...")
-		log.Println(message.In.Text)
-	}
+	if message.In.Process && connector.Type == "webhook" {
+		if connector.Debug {
+			log.Printf("Processing command: %s", message.In.Text)
+		}
 
-	if message.In.Process {
 		for _, c := range connector.Commands {
 			if strings.HasPrefix(strings.ToLower(message.In.Text), strings.ToLower(c.Match)) {
 				msg := strings.TrimSpace(strings.Replace(message.In.Text, c.Match, "", 1))
 
 				if connector.Debug {
-					log.Printf("Publishing... %s", msg)
+					log.Printf("Publishing: %s", msg)
 				}
 
 				message.Out.Text = msg
