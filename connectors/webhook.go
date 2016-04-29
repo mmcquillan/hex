@@ -19,66 +19,13 @@ type Webhook struct {
 
 var webhook Webhook
 
-func webhookHandler(w http.ResponseWriter, r *http.Request) {
-	var segs []string
-
-	// get everything past /webhook/
-	webhookString := r.URL.Path[9:]
-
-	segs = strings.Split(webhookString, "+")
-
-	if len(segs) < 2 || segs[1] == "" {
-		segs = strings.Split(webhookString, "/")
-
-		if len(segs) < 1 {
-			w.WriteHeader(http.StatusNotFound)
-			log.Println("Route not found")
-			fmt.Fprintf(w, "Route not found")
-			return
-		}
-	}
-
-	if segs[0] == "" {
-		w.WriteHeader(http.StatusNotFound)
-		log.Println("Empty webhook data")
-		fmt.Fprintf(w, "Empty webhook data")
-		return
-	}
-
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		log.Println(err)
-	}
-	defer r.Body.Close()
-
-	command := strings.Join(segs[0:], " ")
-
-	var m models.Message
-	m.In.Source = webhook.Connector.ID
-	m.In.Text = command
-	m.In.Process = true
-	m.Out.Detail = string(body)
-	webhook.CommandMsgs <- m
-
-	if webhook.Connector.Debug {
-		log.Printf("Command: %s", command)
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Request received."))
-}
-
 // Listen Webhook listener
 func (x Webhook) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 
-	x.CommandMsgs = commandMsgs
-	x.Connector = connector
 	webhook = x
-
-	if connector.Debug {
-		log.Println("Starting Webhook connector...")
-	}
+	webhook.CommandMsgs = commandMsgs
+	webhook.Connector = connector
 
 	port, _ := strconv.Atoi(connector.Port)
 
@@ -88,7 +35,7 @@ func (x Webhook) Listen(commandMsgs chan<- models.Message, connector models.Conn
 	}
 
 	if connector.Debug {
-		log.Printf("Server address: %s", server.Addr)
+		log.Printf("Starting Webhook connector at: %s", server.Addr)
 	}
 
 	http.HandleFunc("/webhook/", webhookHandler)
@@ -110,10 +57,6 @@ func (x Webhook) Command(message models.Message, publishMsgs chan<- models.Messa
 			if strings.HasPrefix(strings.ToLower(message.In.Text), strings.ToLower(c.Match)) {
 				msg := strings.TrimSpace(strings.Replace(message.In.Text, c.Match, "", 1))
 
-				if connector.Debug {
-					log.Printf("Publishing: %s", msg)
-				}
-
 				message.Out.Text = msg
 				publishMsgs <- message
 			}
@@ -130,4 +73,53 @@ func (x Webhook) Publish(connector models.Connector, message models.Message, tar
 func (x Webhook) Help(connector models.Connector) (help string) {
 	help += fmt.Sprintf("Webhooks enabled at %s:%s/webhook/\n", connector.Server, connector.Port)
 	return help
+}
+
+func webhookHandler(w http.ResponseWriter, r *http.Request) {
+	var segs []string
+
+	// get everything past /webhook/
+	webhookString := r.URL.Path[9:]
+
+	segs = strings.Split(webhookString, "+")
+
+	if len(segs) < 2 || segs[1] == "" {
+		segs = strings.Split(webhookString, "/")
+
+		if len(segs) < 1 {
+			w.WriteHeader(http.StatusNotFound)
+			log.Println("Route not found")
+			fmt.Fprintf(w, "Route not found")
+			return
+		}
+	}
+
+	if segs[0] == "" {
+		w.WriteHeader(http.StatusNotFound)
+		log.Println("Empty webhook command")
+		fmt.Fprintf(w, "Empty webhook command")
+		return
+	}
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Println(err)
+	}
+	defer r.Body.Close()
+
+	command := strings.Join(segs[0:], " ")
+
+	if webhook.Connector.Debug {
+		log.Printf("Command received: %s", command)
+	}
+
+	var m models.Message
+	m.In.Source = webhook.Connector.ID
+	m.In.Text = command
+	m.In.Process = true
+	m.Out.Detail = string(body)
+	webhook.CommandMsgs <- m
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Request received."))
 }
