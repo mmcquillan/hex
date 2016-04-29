@@ -114,6 +114,7 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var m models.Message
+	m.Routes = webhook.Connector.Routes
 	m.In.Source = webhook.Connector.ID
 	m.In.Text = command
 	m.In.Process = true
