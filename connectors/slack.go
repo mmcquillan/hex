@@ -1,10 +1,11 @@
 package connectors
 
 import (
-	"github.com/nlopes/slack"
-	"github.com/projectjane/jane/models"
 	"html"
 	"log"
+
+	"github.com/nlopes/slack"
+	"github.com/projectjane/jane/models"
 )
 
 type Slack struct {
@@ -76,6 +77,9 @@ func (x Slack) Publish(connector models.Connector, message models.Message, targe
 	} else {
 		msg = message.Out.Text
 	}
+
+	log.Printf("%s: %s - Target: %s", connector.ID, msg, target)
+
 	api.PostMessage(target, msg, params)
 }
 
