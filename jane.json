@@ -90,7 +90,10 @@
     },
 
     {"Type": "webhook", "ID": "webhook", "Active": true,
-      "Server": "https://localhost", "Port": "8080",
+      "Server": "http://localhost", "Port": "8080",
+      "Routes": [
+          {"Match": "*", "Connectors": "*", "Target": "#devops"}
+      ],
       "Commands": [
         {"Match": "publish"}
       ]
