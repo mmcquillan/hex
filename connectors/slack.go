@@ -1,10 +1,11 @@
 package connectors
 
 import (
-	"github.com/nlopes/slack"
-	"github.com/projectjane/jane/models"
 	"html"
 	"log"
+
+	"github.com/nlopes/slack"
+	"github.com/projectjane/jane/models"
 )
 
 type Slack struct {
