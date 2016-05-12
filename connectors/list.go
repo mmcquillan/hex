@@ -24,6 +24,7 @@ func init() {
 	List["wolfram"] = reflect.TypeOf(Wolfram{})
 	List["redis"] = reflect.TypeOf(Redis{})
 	List["webhook"] = reflect.TypeOf(Webhook{})
+	List["twilio"] = reflect.TypeOf(Twilio{})
 }
 
 func MakeConnector(connType string) interface{} {
