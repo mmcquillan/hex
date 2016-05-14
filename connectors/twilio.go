@@ -2,12 +2,20 @@ package connectors
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
 
 	"github.com/projectjane/jane/models"
 )
+
+type message struct {
+	To   string `json:"to"`
+	From string `json:"from"`
+	Body string `json:"body"`
+}
 
 // Twilio Struct for manipulating the webhook connector
 type Twilio struct {
@@ -31,27 +39,34 @@ func (x Twilio) Publish(connector models.Connector, message models.Message, targ
 	accountSid := connector.Key
 	authToken := connector.Pass
 	urlStr := "https://api.twilio.com/2010-04-01/Accounts/" + accountSid + "/Messages.json"
-	body := buildURL(target, message.Out.Text)
+	values := buildURL(target, connector.From, message.Out.Text)
 
-	req, _ := http.NewRequest("POST", urlStr, body)
+	req, _ := http.NewRequest("POST", urlStr, strings.NewReader(values.Encode()))
 	req.SetBasicAuth(accountSid, authToken)
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	client.Do(req)
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println(err)
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	log.Println(string(body))
 }
 
 // Help Twilio help information
 func (x Twilio) Help(connector models.Connector) (help string) {
-	help += fmt.Sprintf("Webhooks enabled at %s:%s/webhook/\n", connector.Server, connector.Port)
+	help += fmt.Sprintf("Twilioooo\n", connector.Server, connector.Port)
 	return help
 }
 
-func buildURL(toNumber, body string) *strings.Reader {
+func buildURL(toNumber, fromNumber, body string) url.Values {
 	values := url.Values{}
-	values.Set("TO", toNumber)
-	values.Set("FROM", "MY NUMBER")
+	values.Set("To", toNumber)
+	values.Set("From", fromNumber)
 	values.Set("Body", body)
-	rb := *strings.NewReader(values.Encode())
-	return &rb
+	return values
 }
