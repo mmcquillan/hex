@@ -11,22 +11,22 @@ import (
 	"github.com/projectjane/jane/models"
 )
 
-// Twilio Struct for manipulating the webhook connector
+// Twilio Empty struct
 type Twilio struct {
 }
 
-// Listen Twilio listener
+// Listen Twilio does not listen for anything right now
 func (x Twilio) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 	return
 }
 
-// Command Twilio command parser
+// Command Twilio does not process any commands right now
 func (x Twilio) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 
-// Publish Twilio publisher
+// Publish Twilio publisher to push messages via Twilio REST Api
 func (x Twilio) Publish(connector models.Connector, message models.Message, target string) {
 	client := &http.Client{}
 
