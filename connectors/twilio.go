@@ -11,12 +11,6 @@ import (
 	"github.com/projectjane/jane/models"
 )
 
-type message struct {
-	To   string `json:"to"`
-	From string `json:"from"`
-	Body string `json:"body"`
-}
-
 // Twilio Struct for manipulating the webhook connector
 type Twilio struct {
 }
