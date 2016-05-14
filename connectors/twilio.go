@@ -30,15 +30,10 @@ func (x Twilio) Command(message models.Message, publishMsgs chan<- models.Messag
 func (x Twilio) Publish(connector models.Connector, message models.Message, target string) {
 	client := &http.Client{}
 
-	accountSid := connector.Key
-	authToken := connector.Pass
-	urlStr := "https://api.twilio.com/2010-04-01/Accounts/" + accountSid + "/Messages.json"
-	values := buildURL(target, connector.From, message.Out.Text)
-
-	req, _ := http.NewRequest("POST", urlStr, strings.NewReader(values.Encode()))
-	req.SetBasicAuth(accountSid, authToken)
-	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req, err := buildRequest(target, message.Out.Text, connector)
+	if err != nil {
+		log.Println(err)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -48,9 +43,9 @@ func (x Twilio) Publish(connector models.Connector, message models.Message, targ
 
 	body, _ := ioutil.ReadAll(resp.Body)
 
-	if connector.Debug {
-		log.Println(string(body))
-	}
+	// if connector.Debug {
+	log.Println(string(body))
+	// }
 }
 
 // Help Twilio help information
@@ -59,10 +54,20 @@ func (x Twilio) Help(connector models.Connector) (help string) {
 	return help
 }
 
-func buildURL(toNumber, fromNumber, body string) url.Values {
+func buildRequest(toNumber, body string, connector models.Connector) (*http.Request, error) {
+	accountSid := connector.Key
+	authToken := connector.Pass
+	urlStr := "https://api.twilio.com/2010-04-01/Accounts/" + accountSid + "/Messages.json"
+
 	values := url.Values{}
 	values.Set("To", toNumber)
-	values.Set("From", fromNumber)
+	values.Set("From", connector.From)
 	values.Set("Body", body)
-	return values
+
+	req, err := http.NewRequest("POST", urlStr, strings.NewReader(values.Encode()))
+	req.SetBasicAuth(accountSid, authToken)
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	return req, err
 }
