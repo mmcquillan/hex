@@ -43,9 +43,9 @@ func (x Twilio) Publish(connector models.Connector, message models.Message, targ
 
 	body, _ := ioutil.ReadAll(resp.Body)
 
-	// if connector.Debug {
-	log.Println(string(body))
-	// }
+	if connector.Debug {
+		log.Println(string(body))
+	}
 }
 
 // Help Twilio help information
