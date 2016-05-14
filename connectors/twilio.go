@@ -55,7 +55,7 @@ func (x Twilio) Publish(connector models.Connector, message models.Message, targ
 
 // Help Twilio help information
 func (x Twilio) Help(connector models.Connector) (help string) {
-	help += fmt.Sprintf("Twilioooo\n", connector.Server, connector.Port)
+	help += fmt.Sprintf("Twilio messages sent from %s\n", connector.From)
 	return help
 }
 
