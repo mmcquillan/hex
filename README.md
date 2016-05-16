@@ -36,5 +36,7 @@ Supported connectors:
 * rss - RSS Feed
 * slack - Slack chat
 * ssh - Execute commands on remote systems
+* twilio - send SMS alerts
 * website - Monitor return code of websites
+* webhook - listen at http://.../webhook/ 
 * wolfram - Execute queries against Wolfram Alpha
