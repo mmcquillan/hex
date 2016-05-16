@@ -97,6 +97,12 @@
       "Commands": [
         {"Match": "publish"}
       ]
+    },
+
+    {"Type": "twilio", "ID": "twilio", "Active": true,
+      "Key": "API_KEY",
+      "Pass": "AUTH_TOKEN",
+      "From": "FROM_NUMBER"
     }
   ]
 }
