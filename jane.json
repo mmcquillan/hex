@@ -27,7 +27,7 @@
     },
 
     {"Type": "monitor", "ID": "Elasticsearch Node", "Active": true,
-      "Server": "elasticsearch1.somecompany.com", "Login": "jane", "Pass": "abc123",
+      "Server": "elasticsearch1.somecompany.com", "Port": "22", "Login": "jane", "Pass": "abc123",
       "Checks": [
         {"Name": "Apt Check", "Check": "/usr/lib/nagios/plugins/check_apt"},
         {"Name": "Disk Check", "Check": "/usr/lib/nagios/plugins/check_disk -w10% -c5% -A"},
@@ -61,7 +61,7 @@
     },
 
     {"Type": "ssh", "ID": "prod", "Active": true,
-      "Server": "prod.server.com", "Login": "jane", "Pass": "somepassword",
+      "Server": "prod.server.com", "Port": "22", "Login": "jane", "Pass": "somepassword",
         "Commands": [
             {"Match": "jane prodlogs", "Output": "```%stdout%```", "Cmd": "tail", "Args": "-n20 /var/log/someserver.log"}
         ]
