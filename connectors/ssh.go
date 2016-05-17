@@ -50,10 +50,14 @@ func callSsh(cmd string, args string, connector models.Connector) (out string) {
 			ssh.Password(connector.Pass),
 		},
 	}
-	if connector.Debug {
-		log.Print("Starting ssh connection for " + connector.Server)
+	port := "22"
+	if connector.Port != "" {
+		port = connector.Port
 	}
-	client, err := ssh.Dial("tcp", connector.Server+":22", clientconn)
+	if connector.Debug {
+		log.Print("Starting ssh connection for " + connector.Server + ":" + port)
+	}
+	client, err := ssh.Dial("tcp", connector.Server+":"+port, clientconn)
 	if err != nil {
 		log.Print(err)
 	}

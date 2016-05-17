@@ -68,10 +68,14 @@ func callMonitor(state *map[string]string, connector models.Connector) (alerts [
 			ssh.Password(connector.Pass),
 		},
 	}
-	if connector.Debug {
-		log.Print("Starting client connection for " + connector.Server)
+	port := "22"
+	if connector.Port != "" {
+		port = connector.Port
 	}
-	client, err := ssh.Dial("tcp", connector.Server+":22", clientconn)
+	if connector.Debug {
+		log.Print("Starting client connection for " + connector.Server + ":" + port)
+	}
+	client, err := ssh.Dial("tcp", connector.Server+":"+port, clientconn)
 	if err != nil {
 		log.Print(err)
 	}
