@@ -11,6 +11,7 @@ func Commands(commandMsgs <-chan models.Message, publishMsgs chan<- models.Messa
 	log.Print("Initializing Commands")
 	for {
 		message := <-commandMsgs
+		aliasCommands(&message, config)
 		messages := splitCommands(message)
 		for _, m := range messages {
 			if m.In.Process {
