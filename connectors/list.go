@@ -12,6 +12,7 @@ func init() {
 	List["bamboo"] = reflect.TypeOf(Bamboo{})
 	List["email"] = reflect.TypeOf(Email{})
 	List["exec"] = reflect.TypeOf(Exec{})
+	List["exec2"] = reflect.TypeOf(Exec2{})
 	List["imageme"] = reflect.TypeOf(ImageMe{})
 	List["jira"] = reflect.TypeOf(Jira{})
 	List["logging"] = reflect.TypeOf(Logging{})
