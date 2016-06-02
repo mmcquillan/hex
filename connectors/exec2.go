@@ -106,34 +106,20 @@ func callCmd(cmd string, args string, connector models.Connector) (out string) {
 	return out
 }
 
-func callLocal(c string, a string, connector models.Connector) (out string) {
+func callLocal(cmd string, args string, connector models.Connector) (out string) {
 	if connector.Debug {
-		log.Print("Executing " + c + " " + a)
+		log.Print("Executing: " + cmd + " " + args)
 	}
-	a = strings.TrimSpace(a)
-	args := strings.Split(a, " ")
 	var o bytes.Buffer
 	var e bytes.Buffer
-	if a == "" {
-		cmd := exec.Command(c)
-		cmd.Stdout = &o
-		cmd.Stderr = &e
-		err := cmd.Run()
-		if err != nil {
-			log.Print(c + " " + a)
-			log.Print(err)
-			log.Print(e.String())
-		}
-	} else {
-		cmd := exec.Command(c, args...)
-		cmd.Stdout = &o
-		cmd.Stderr = &e
-		err := cmd.Run()
-		if err != nil {
-			log.Print(c + " " + a)
-			log.Print(err)
-			log.Print(e.String())
-		}
+	c := exec.Command("sh", "-c", cmd+" "+args)
+	c.Stdout = &o
+	c.Stderr = &e
+	err := c.Run()
+	if err != nil {
+		log.Print(cmd + " " + args)
+		log.Print(err)
+		log.Print(e.String())
 	}
 	out = o.String()
 	if connector.Debug {
