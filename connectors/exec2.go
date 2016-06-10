@@ -107,18 +107,19 @@ func callCmd(cmd string, args string, connector models.Connector) (out string) {
 }
 
 func callLocal(cmd string, args string, connector models.Connector) (out string) {
-	excmd := cmd + " " + strings.Replace(args, "\"", "\\\"", -1)
+	//args = strings.Replace(args, "\"", "\\\"", -1)
+	ca := cmd + " " + args
 	if connector.Debug {
-		log.Print("Executing: " + excmd)
+		log.Print("Executing: " + cmd + " " + args)
 	}
 	var o bytes.Buffer
 	var e bytes.Buffer
-	c := exec.Command("sh", "-c", excmd)
+	c := exec.Command("/bin/sh", "-c", ca)
 	c.Stdout = &o
 	c.Stderr = &e
 	err := c.Run()
 	if err != nil {
-		log.Print(excmd)
+		log.Print(cmd + " " + args)
 		log.Print(err)
 		log.Print(e.String())
 	}
