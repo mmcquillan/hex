@@ -1,6 +1,7 @@
 package parse
 
 import (
+	"regexp"
 	"strings"
 )
 
@@ -8,12 +9,20 @@ func Match(pattern string, value string) (match bool, tokens []string) {
 	pattern = strings.ToLower(pattern)
 	ws := strings.HasPrefix(pattern, "*")
 	we := strings.HasSuffix(pattern, "*")
-	pattern = strings.Replace(pattern, "*", "", -1)
+	re := strings.HasPrefix(pattern, "/") && strings.HasSuffix(pattern, "/")
+	if re {
+		pattern = strings.Replace(pattern, "/", "", -1)
+	} else {
+		pattern = strings.Replace(pattern, "*", "", -1)
+	}
 	value = strings.TrimSpace(value)
 	tokens = strings.Split(strings.TrimSpace(strings.Replace(value, pattern, "", 1)), " ")
 	value = strings.ToLower(value)
 	match = false
-	if ws && ws && strings.Contains(value, pattern) {
+	if re {
+		regx := regexp.MustCompile(pattern)
+		match = regx.MatchString(value)
+	} else if ws && we && strings.Contains(value, pattern) {
 		match = true
 	} else if ws && !we && strings.HasSuffix(value, pattern) {
 		match = true
