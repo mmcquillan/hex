@@ -22,7 +22,7 @@ func Match(pattern string, value string) (match bool, tokens []string) {
 	if re {
 		regx := regexp.MustCompile(pattern)
 		match = regx.MatchString(value)
-	} else if ws && ws && strings.Contains(value, pattern) {
+	} else if ws && we && strings.Contains(value, pattern) {
 		match = true
 	} else if ws && !we && strings.HasSuffix(value, pattern) {
 		match = true
