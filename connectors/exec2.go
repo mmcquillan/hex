@@ -107,7 +107,6 @@ func callCmd(cmd string, args string, connector models.Connector) (out string) {
 }
 
 func callLocal(cmd string, args string, connector models.Connector) (out string) {
-	//args = strings.Replace(args, "\"", "\\\"", -1)
 	ca := cmd + " " + args
 	if connector.Debug {
 		log.Print("Executing: " + cmd + " " + args)
