@@ -71,13 +71,19 @@ func (x Exec2) Help(connector models.Connector) (help string) {
 func check(commandMsgs chan<- models.Message, command models.Command, connector models.Connector) {
 	var state = command.Green
 	var interval = 1
+	var remind = 0
 	if command.Interval > 0 {
 		interval = command.Interval
 	}
+	if command.Remind > 0 {
+		remind = command.Remind
+	}
+	var counter = 0
 	for {
 		var color = "NONE"
 		var match = false
 		var newstate = ""
+		counter += 1
 		out := callCmd(command.Cmd, command.Args, connector)
 		if match, _ = parse.Match(command.Green, out); match {
 			newstate = command.Green
@@ -91,7 +97,7 @@ func check(commandMsgs chan<- models.Message, command models.Command, connector 
 			newstate = command.Red
 			color = "FAIL"
 		}
-		if newstate != state {
+		if newstate != state || (newstate != command.Green && counter == remind && remind != 0) {
 			var message models.Message
 			message.Routes = connector.Routes
 			message.In.Process = false
@@ -100,6 +106,9 @@ func check(commandMsgs chan<- models.Message, command models.Command, connector 
 			message.Out.Status = color
 			commandMsgs <- message
 			state = newstate
+		}
+		if counter >= remind {
+			counter = 0
 		}
 		time.Sleep(time.Duration(interval) * time.Minute)
 	}
