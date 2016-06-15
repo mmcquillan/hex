@@ -22,14 +22,7 @@ type Connector struct {
 		Yellow string
 		Red    string
 	}
-	Commands []struct {
-		Match   string
-		Output  string
-		Outputs []string
-		Cmd     string
-		Args    string
-		Help    string
-	}
-	Routes []Route
-	Debug  bool
+	Commands []Command
+	Routes   []Route
+	Debug    bool
 }
