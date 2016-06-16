@@ -71,8 +71,7 @@ func (x Webhook) Publish(connector models.Connector, message models.Message, tar
 
 // Help Webhook help information
 func (x Webhook) Help(connector models.Connector) (help string) {
-	help += fmt.Sprintf("Webhooks enabled at %s:%s/webhook/\n", connector.Server, connector.Port)
-	return help
+	return
 }
 
 func webhookHandler(w http.ResponseWriter, r *http.Request) {
