@@ -72,7 +72,7 @@ func (x Slack) Publish(connector models.Connector, message models.Message, targe
 			TitleLink:  message.Out.Link,
 			Text:       message.Out.Detail,
 			Color:      color,
-			MarkdownIn: []string{"Text"},
+			MarkdownIn: []string{"text"},
 		}
 		params.Attachments = []slack.Attachment{attachment}
 	} else {
