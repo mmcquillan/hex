@@ -59,6 +59,7 @@ This connector is the next generation to replace the exec, ssh and monitor conne
             "HideHelp": false,
             "RunCheck": true,
             "Interval": 1,
+            "Remind": 15,
             "Green": "*OK*",
             "Yellow": "*WARNING*",
             "Red": "*CRITICAL*"
@@ -70,8 +71,10 @@ This connector is the next generation to replace the exec, ssh and monitor conne
     }
 ```
 
-Notes:
+*Usage*
 * To make local calls to the system, leave out the Server, Port, Login, Pass values.
+
+*Fields*
 
 _Type_ This specifies the type of connector, in this case, 'exec2'
 
@@ -81,15 +84,28 @@ _Active_ This is a boolean value to set this connector to be activated
 
 _Debug_ This is a boolean value to set if the connector shows debug information in the logs
 
-_Server_ 
+_Server_ The server address or IP to connect to
 
-_Port_
+_Port_ The port number to connect to (Default: 22)
 
-_Login_
+_Login_ The user to login with
 
-_Pass_
+_Pass_ The password to connect with
 
-_Commands_
+_Commands_:
+
+    _Name_ Readable name of check
+    _Match_ Command (###Matching)[matching]
+    _Output_ Formatting for the output of the command, use `%stdout%` as the output
+    _Cmd_ The command to execute (do not include arguements)
+    _Args_ The arguments, space deliminated
+    _HideHelp_ A boolean to show or hide the help when displaying help (Default: false)
+    _RunCheck_ A boolean that will have Jane periodically run this (Default: false)
+    _Interval_ An integer that is the number of minutes between checks when RunCheck is true (Default: 1)
+    _Remind_ An integer which is the number of units of Interval to wait before reminding of a non-Green status, with Zero being no reminders (Default: 0)
+    _Green_ A (###Matching)[match] to identify what is in a green state
+    _Yellow_ A (###Matching)[match] to identify what is in a yellow state
+    _Red_ A (###Matching)[match] to identify what is in a red state
 
 
 ### Routes
