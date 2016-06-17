@@ -106,7 +106,7 @@
     },
 
     {"Type": "exec2", "ID": "ExecTwo", "Active": true,
-      "Server": "elasticsearch1.somecompany.com", "Port": "22", "Login": "jane", "Pass": "abc123", "Interval": 1,
+      "Server": "elasticsearch1.somecompany.com", "Port": "22", "Login": "jane", "Pass": "abc123",
       "Commands": [
         {
             "Name": "Apt Check",
