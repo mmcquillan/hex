@@ -1,10 +1,10 @@
 # Jane
 
-Jane is a bot to pull information and conduct operational activities in your chatops scenario - even in a command line way. This bot is written in go and is made to be configuration driven. Contributions are welcome via pull requests. If you want to know why the name 'Jane' was chosen, talk to @kcwinner.
+Jane is a chatops bot written in Go and is completely configuration driven. Contributions are welcome via pull requests. If you want to know why the name 'Jane' was chosen talk to @kcwinner.
 
 
 ## Getting Started
-* This is developed using Go 1.5.3
+* Developed using Go 1.5.3
 * Pull the project with 'go get github.com/projectjane/jane'
 * Compile with 'go install jane.go'
 * Use the samples in the startup folder for different environments
@@ -19,9 +19,9 @@ The entire configuration of the site is done via a json config file. The configu
 
 
 ## Connectors
-Connectors are what Jane uses to pull in information, interpret them and issue out a response. The Routes specify where the results from the input should be written to or * for all. The Target can specify a channel in the case of slack. To add a new connector, Put them in the connectors folder and make an entry in connectors/list.go.
+Connectors are what Jane uses to pull in information, interpret it, and issue out a response. The Routes specify where the results from the input should be written to or * for all. The Target can specify a channel in the case of Slack. 
 
-For the connector configuration, when adding routes, you must specify the ID of the connector you want to route response to.
+For the connector configuration, when adding routes, you must specify the ID of the connector you want to route the response to.
 
 Supported connectors:
 * bamboo - Atlassian Bamboo integration
@@ -43,7 +43,7 @@ Supported connectors:
 
 ### Exec2 Connector
 
-This connector is the next generation to replace the exec, ssh and monitor connectors. It provides a single means of making local and remote calls to linux systems. You can allow these calls to be made by command, but also mark them with the RunCheck property to set Jane to check them. This combined with the interpreter for output, makes it a very capable monitoring platform.
+This connector is the next generation to replace the exec, ssh and monitor connectors. It provides a single means of making local and remote calls to Linux systems. You can allow these calls to be made by command, but also mark the calls with the RunCheck property to set Jane to check them. This combined with the interpreter for output, makes it a very capable monitoring platform.
 
 ####Example:
 
@@ -101,7 +101,7 @@ _Match_ - Command (###Matching)[matching]
 
 _Output_ - Formatting for the output of the command, use `%stdout%` as the output
 
-_Cmd_ - The command to execute (do not include arguements)
+_Cmd_ - The command to execute (do not include arguments)
 
 _Args_ - The arguments, space deliminated
 
@@ -126,7 +126,7 @@ _Routes_ - One or more [routes](#routes)
 
 ### Routes
 
-Routes can exist for connectors that listen or interpret commands. Routes can have more than one connector if you would like to send messages to more than one place. There is also matching on the message to filter which messages get sent.
+Routes can exist for connectors that listen to or interpret commands. Routes can have more than one connector if you would like to send messages to more than one place. Jane also matches on the routes to filter which messages get sent.
 
 ####Example:
 
@@ -172,4 +172,4 @@ Commands are implemented to act upon messages. They can do any task based on the
 
 ### Publishers
 
-Publishers are a means of communicating back out to the world. A publisher will take the message handed to it, format it and send it through it's implemented publish method.
+Publishers are a means of communicating back out to the world. A publisher will take the message handed to it, format it, and send it through its implemented publish method.
