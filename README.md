@@ -47,65 +47,78 @@ Supported connectors:
 This connector is the next generation to replace the exec, ssh and monitor connectors. It provides a single means of making local and remote calls to linux systems. You can allow these calls to be made by command, but also mark them with the RunCheck property to set Jane to check them. This combined with the interpreter for output, makes it a very capable monitoring platform.
 
 ```
-    {"Type": "exec2", "ID": "ExecTwo", "Active": true,
-      "Server": "elasticsearch1.somecompany.com", "Port": "22", "Login": "jane", "Pass": "abc123",
-      "Commands": [
-        {
-            "Name": "Apt Check",
-            "Match": "jane elasticsearch1 aptcheck",
-            "Output": "```%stdout% ```",
-            "Cmd": "/usr/lib/nagios/plugins/check_apt",
-            "Args": "",
-            "HideHelp": false,
-            "RunCheck": true,
-            "Interval": 1,
-            "Remind": 15,
-            "Green": "*OK*",
-            "Yellow": "*WARNING*",
-            "Red": "*CRITICAL*"
-        },
-      ],
-      "Routes": [
-        {"Match": "*", "Connectors": "slack", "Target": "#devops"}
-      ]
-    }
+{"Type": "exec2", "ID": "ExecTwo", "Active": true,
+  "Server": "elasticsearch1.somecompany.com", "Port": "22", "Login": "jane", "Pass": "abc123",
+  "Commands": [
+    {
+        "Name": "Apt Check",
+        "Match": "jane elasticsearch1 aptcheck",
+        "Output": "```%stdout% ```",
+        "Cmd": "/usr/lib/nagios/plugins/check_apt",
+        "Args": "",
+        "HideHelp": false,
+        "RunCheck": true,
+        "Interval": 1,
+        "Remind": 15,
+        "Green": "*OK*",
+        "Yellow": "*WARNING*",
+        "Red": "*CRITICAL*"
+    },
+  ],
+  "Routes": [
+    {"Match": "*", "Connectors": "slack", "Target": "#devops"}
+  ]
+}
 ```
 
-*Usage*
+*Usage:*
 * To make local calls to the system, leave out the Server, Port, Login, Pass values.
 
-*Fields*
+*Fields:*
 
-_Type_ This specifies the type of connector, in this case, 'exec2'
+_Type_ - This specifies the type of connector, in this case, 'exec2'
 
-_ID_ This should be a unique identifier for this connector
+_ID_ - This should be a unique identifier for this connector
 
-_Active_ This is a boolean value to set this connector to be activated
+_Active_ - This is a boolean value to set this connector to be activated
 
-_Debug_ This is a boolean value to set if the connector shows debug information in the logs
+_Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 
-_Server_ The server address or IP to connect to
+_Server_ - The server address or IP to connect to
 
-_Port_ The port number to connect to (Default: 22)
+_Port_ - The port number to connect to (Default: 22)
 
-_Login_ The user to login with
+_Login_ - The user to login with
 
-_Pass_ The password to connect with
+_Pass_ - The password to connect with
 
-_Commands_:
+_Commands_ - One or more commands to execute against the defined server
 
-    _Name_ Readable name of check
-    _Match_ Command (###Matching)[matching]
-    _Output_ Formatting for the output of the command, use `%stdout%` as the output
-    _Cmd_ The command to execute (do not include arguements)
-    _Args_ The arguments, space deliminated
-    _HideHelp_ A boolean to show or hide the help when displaying help (Default: false)
-    _RunCheck_ A boolean that will have Jane periodically run this (Default: false)
-    _Interval_ An integer that is the number of minutes between checks when RunCheck is true (Default: 1)
-    _Remind_ An integer which is the number of units of Interval to wait before reminding of a non-Green status, with Zero being no reminders (Default: 0)
-    _Green_ A (###Matching)[match] to identify what is in a green state
-    _Yellow_ A (###Matching)[match] to identify what is in a yellow state
-    _Red_ A (###Matching)[match] to identify what is in a red state
+_Name_ - Readable name of check
+
+_Match_ - Command (###Matching)[matching]
+
+_Output_ - Formatting for the output of the command, use `%stdout%` as the output
+
+_Cmd_ - The command to execute (do not include arguements)
+
+_Args_ - The arguments, space deliminated
+
+_HideHelp_ - A boolean to show or hide the help when displaying help (Default: false)
+
+_RunCheck_ - A boolean that will have Jane periodically run this (Default: false)
+
+_Interval_ - An integer that is the number of minutes between checks when RunCheck is true (Default: 1)
+
+_Remind_ - An integer which is the number of units of Interval to wait before reminding of a non-Green status, with Zero being no reminders (Default: 0)
+
+_Green_ - A (###Matching)[match] to identify what is in a green state
+
+_Yellow_ - A (###Matching)[match] to identify what is in a yellow state
+
+_Red_ - A (###Matching)[match] to identify what is in a red state
+
+_Routes_ - One or more (###Routes)[routes]
 
 
 ### Routes
@@ -113,10 +126,10 @@ _Commands_:
 Routes can exist for connectors that listen or interpret commands. Routes can have more than one connector if you would like to send messages to more than one place. There is also matching on the message to filter which messages get sent.
 
 ```
-    "Routes": [
-      {"Match": "*", "Connectors": "slack", "Target": "#devops"},
-      {"Match": "*DANGER*", "Connectors": "slack", "Target": "@matt"}
-    ]
+"Routes": [
+  {"Match": "*", "Connectors": "slack", "Target": "#devops"},
+  {"Match": "*DANGER*", "Connectors": "slack", "Target": "@matt"}
+]
 ```
 
 
@@ -126,16 +139,21 @@ Routes can exist for connectors that listen or interpret commands. Routes can ha
 Matching within Jane has a simple string matching with wild cards.
 
 Examples:
+
 `*failure*`
+
 `*failure`
+
 `failure*`
+
 
 For anything more complex, you can use Regular Expressions.
 
 Example:
+
 `/fail(.+)/`
 
 
 ### Architecture Notes
 
-The general architecture of Jane is 
+The general architecture of Jane is ...
