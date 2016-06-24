@@ -1,10 +1,11 @@
 package core
 
 import (
-	"github.com/projectjane/jane/connectors"
-	"github.com/projectjane/jane/models"
 	"log"
 	"strings"
+
+	"github.com/projectjane/jane/connectors"
+	"github.com/projectjane/jane/models"
 )
 
 func Commands(commandMsgs <-chan models.Message, publishMsgs chan<- models.Message, config *models.Config) {
@@ -57,6 +58,9 @@ func staticCommands(message models.Message, publishMsgs chan<- models.Message, c
 	}
 	if strings.ToLower(strings.TrimSpace(message.In.Text)) == "jane whoami" {
 		WhoAmI(message, publishMsgs)
+	}
+	if strings.ToLower(strings.TrimSpace(message.In.Text)) == "jane generate password" {
+		GeneratePassword(message, publishMsgs)
 	}
 }
 
