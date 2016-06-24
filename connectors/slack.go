@@ -68,10 +68,11 @@ func (x Slack) Publish(connector models.Connector, message models.Message, targe
 	if message.Out.Detail != "" {
 		color := slackColorMe(message.Out.Status)
 		attachment := slack.Attachment{
-			Title:     message.Out.Text,
-			TitleLink: message.Out.Link,
-			Text:      message.Out.Detail,
-			Color:     color,
+			Title:      message.Out.Text,
+			TitleLink:  message.Out.Link,
+			Text:       message.Out.Detail,
+			Color:      color,
+			MarkdownIn: []string{"text"},
 		}
 		params.Attachments = []slack.Attachment{attachment}
 	} else {

@@ -16,27 +16,36 @@ type Exec2 struct {
 
 func (x Exec2) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
-	var interval = 1
-	if connector.Interval > 0 {
-		interval = connector.Interval
-	}
-	var state = make(map[string]string)
-	for _, chk := range connector.Checks {
-		state[chk.Name] = chk.Green
-	}
-	for {
-		check(&state, commandMsgs, connector)
-		time.Sleep(time.Duration(interval) * time.Minute)
+	for _, command := range connector.Commands {
+		if command.RunCheck {
+			if connector.Debug {
+				log.Print("Starting Listener for " + connector.ID + " " + command.Name)
+			}
+			go check(commandMsgs, command, connector)
+		}
 	}
 }
 
 func (x Exec2) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
-	for _, c := range connector.Commands {
-		if match, tokens := parse.Match(c.Match, message.In.Text); match {
+	for _, command := range connector.Commands {
+		if match, tokens := parse.Match(command.Match, message.In.Text); match {
 			msg := strings.Replace(strings.Join(tokens, " "), "\"", "", -1)
-			args := strings.Replace(c.Args, "%msg%", msg, -1)
-			out := callCmd(c.Cmd, args, connector)
-			message.Out.Text = strings.Replace(c.Output, "%stdout%", out, -1)
+			args := strings.Replace(command.Args, "%msg%", msg, -1)
+			out := callCmd(command.Cmd, args, connector)
+			var color = "NONE"
+			var match = false
+			if match, _ = parse.Match(command.Green, out); match {
+				color = "SUCCESS"
+			}
+			if match, _ = parse.Match(command.Yellow, out); match {
+				color = "WARN"
+			}
+			if match, _ = parse.Match(command.Red, out); match {
+				color = "FAIL"
+			}
+			message.Out.Text = connector.ID + " " + command.Name
+			message.Out.Detail = strings.Replace(command.Output, "%stdout%", out, -1)
+			message.Out.Status = color
 			publishMsgs <- message
 		}
 	}
@@ -47,53 +56,61 @@ func (x Exec2) Publish(connector models.Connector, message models.Message, targe
 }
 
 func (x Exec2) Help(connector models.Connector) (help string) {
-	for _, c := range connector.Commands {
-		if c.Help != "" {
-			help += c.Help + "\n"
-		} else {
-			help += c.Match + "\n"
+	for _, command := range connector.Commands {
+		if !command.HideHelp {
+			if command.Help != "" {
+				help += command.Help + "\n"
+			} else {
+				help += command.Match + "\n"
+			}
 		}
 	}
 	return help
 }
 
-func check(state *map[string]string, commandMsgs chan<- models.Message, connector models.Connector) {
-	if connector.Debug {
-		log.Print("Check Run for " + connector.ID)
+func check(commandMsgs chan<- models.Message, command models.Command, connector models.Connector) {
+	var state = command.Green
+	var interval = 1
+	var remind = 0
+	if command.Interval > 0 {
+		interval = command.Interval
 	}
-	for _, chk := range connector.Checks {
-		if connector.Debug {
-			log.Print("Starting " + connector.ID + " - " + chk.Name)
-		}
+	if command.Remind > 0 {
+		remind = command.Remind
+	}
+	var counter = 0
+	for {
 		var color = "NONE"
 		var match = false
 		var newstate = ""
-		out := callCmd(chk.Check, chk.Args, connector)
-		if match, _ = parse.Match(chk.Green, out); match {
-			newstate = chk.Green
+		counter += 1
+		out := callCmd(command.Cmd, command.Args, connector)
+		if match, _ = parse.Match(command.Green, out); match {
+			newstate = command.Green
 			color = "SUCCESS"
 		}
-		if match, _ = parse.Match(chk.Yellow, out); match {
-			newstate = chk.Yellow
+		if match, _ = parse.Match(command.Yellow, out); match {
+			newstate = command.Yellow
 			color = "WARN"
 		}
-		if match, _ = parse.Match(chk.Red, out); match {
-			newstate = chk.Red
+		if match, _ = parse.Match(command.Red, out); match {
+			newstate = command.Red
 			color = "FAIL"
 		}
-		if newstate != (*state)[chk.Name] {
+		if newstate != state || (newstate != command.Green && counter == remind && remind != 0) {
 			var message models.Message
 			message.Routes = connector.Routes
 			message.In.Process = false
-			message.Out.Text = connector.ID + " " + chk.Name
-			message.Out.Detail = out
+			message.Out.Text = connector.ID + " " + command.Name
+			message.Out.Detail = strings.Replace(command.Output, "%stdout%", out, -1)
 			message.Out.Status = color
 			commandMsgs <- message
-			(*state)[chk.Name] = newstate
+			state = newstate
 		}
-		if connector.Debug {
-			log.Print("Completed " + connector.ID + " - " + chk.Name)
+		if counter >= remind {
+			counter = 0
 		}
+		time.Sleep(time.Duration(interval) * time.Minute)
 	}
 }
 

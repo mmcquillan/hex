@@ -106,13 +106,21 @@
     },
 
     {"Type": "exec2", "ID": "ExecTwo", "Active": true,
-      "Server": "elasticsearch1.somecompany.com", "Port": "22", "Login": "jane", "Pass": "abc123", "Interval": 1,
-      "Checks": [
-        {"Name": "Apt Check", "Check": "/usr/lib/nagios/plugins/check_apt", "Args": "", "Green": "*OK*", "Yellow": "*WARNING*", "Red": "*CRITICAL*"},
-        {"Name": "Disk Check", "Check": "/usr/lib/nagios/plugins/check_disk", "Args": "-w10% -c5% -A","Green": "*OK*", "Yellow": "*WARNING*", "Red": "*CRITICAL*"},
-        {"Name": "Elasticsearch Check", "Check": "/usr/lib/nagios/plugins/check_procs", "Args": "-a elasticsearch -c1:1","Green": "*OK*", "Yellow": "*WARNING*", "Red": "*CRITICAL*"}
-      ],
+      "Server": "elasticsearch1.somecompany.com", "Port": "22", "Login": "jane", "Pass": "abc123",
       "Commands": [
+        {
+            "Name": "Apt Check",
+            "Match": "jane elasticsearch1 aptcheck",
+            "Output": "```%stdout% ```",
+            "Cmd": "/usr/lib/nagios/plugins/check_apt",
+            "Args": "",
+            "HideHelp": false,
+            "RunCheck": true,
+            "Interval": 1,
+            "Green": "*OK*",
+            "Yellow": "*WARNING*",
+            "Red": "*CRITICAL*"
+        }, 
         {"Match": "big", "Output": "```%stdout%```", "Cmd": "/usr/bin/figlet", "Args": "-w80 %msg%"},
         {"Match": "log", "Output": "```%stdout% ```", "Cmd": "/usr/bin/tail", "Args": "-n8 /var/log/jane.log"},
         {"Match": "cal", "Output": "```%stdout% ```", "Cmd": "/usr/bin/cal", "Args": "-h %msg%"}
