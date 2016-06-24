@@ -34,8 +34,8 @@ func (x Jira) Publish(connector models.Connector, message models.Message, target
 }
 
 func (x Jira) Help(connector models.Connector) (help string) {
-	help += "jira - mention a jira ticket and it'll be displayed\n"
-	help += "jira create {project key} {summary}"
+	help += "jira {key-number}\n"
+	help += "jira create {issueType} {project key} {summary}\n"
 	return help
 }
 
@@ -116,24 +116,24 @@ func createJiraIssue(message models.Message, publishMsgs chan<- models.Message, 
 
 	issueJson, err := json.Marshal(issue)
 	if err != nil {
-		log.Println(err)
-
+		log.Printf("Error marshaling jira json: %s", err)
 		return
 	}
 
 	req, err := http.NewRequest("POST", "https://"+connector.Server+"/rest/api/2/issue", bytes.NewBuffer(issueJson))
 	if err != nil {
-		log.Print(err)
+		log.Printf("Jira Create Error: %s", err)
 		message.Out.Text = "Failed to create issue"
 		publishMsgs <- message
 		return
 	}
+
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Authorization", "Basic "+auth)
 
 	response, err := client.Do(req)
 	if err != nil {
-		log.Print(err)
+		log.Printf("Error performing jira create request: %s", err)
 	}
 	defer response.Body.Close()
 	body, err := ioutil.ReadAll(response.Body)
@@ -153,14 +153,14 @@ func parseJiraIssue(message models.Message, publishMsgs chan<- models.Message, c
 	issues := jiraRegex.FindAllString(message.In.Text, -1)
 	for _, issue := range issues {
 		if connector.Debug {
-			log.Print("Jira match: " + issue)
+			log.Println("Jira match: " + issue)
 		}
 
 		client := &http.Client{}
 		auth := encodeB64(connector.Login + ":" + connector.Pass)
 		req, err := http.NewRequest("GET", "https://"+connector.Server+"/rest/api/2/issue/"+issue, nil)
 		if err != nil {
-			log.Print(err)
+			log.Printf("Error creating jira request: %s", err)
 			return
 		}
 
@@ -169,13 +169,13 @@ func parseJiraIssue(message models.Message, publishMsgs chan<- models.Message, c
 
 		response, err := client.Do(req)
 		if err != nil {
-			log.Print(err)
+			log.Printf("Error requesting jira issue: %s", err)
 			return
 		}
 		defer response.Body.Close()
 		body, err := ioutil.ReadAll(response.Body)
 		if err != nil {
-			log.Print(err)
+			log.Println(err)
 		}
 		var ticket ticket
 		json.Unmarshal(body, &ticket)
