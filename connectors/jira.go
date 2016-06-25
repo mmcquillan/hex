@@ -34,7 +34,6 @@ func (x Jira) Publish(connector models.Connector, message models.Message, target
 }
 
 func (x Jira) Help(connector models.Connector) (help string) {
-	help += "jira {key-number}\n"
 	help += "jira create {issueType} {project key} {summary}\n"
 	return help
 }
