@@ -71,7 +71,7 @@ type createObject struct {
 type createFields struct {
 	Project   project   `json:"project"`
 	Summary   string    `json:"summary"`
-	IssueType issueType `json:"issueType"`
+	IssueType issueType `json:"issuetype"`
 }
 
 type project struct {
@@ -137,11 +137,16 @@ func createJiraIssue(message models.Message, publishMsgs chan<- models.Message, 
 	defer response.Body.Close()
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		log.Print(err)
+		log.Println(err)
 	}
 
 	var created createdIssue
-	json.Unmarshal(body, &created)
+	err = json.Unmarshal(body, &created)
+	if err != nil {
+		message.Out.Text = "Error creating ticket"
+		publishMsgs <- message
+		return
+	}
 
 	message.Out.Text = created.Key
 	publishMsgs <- message
