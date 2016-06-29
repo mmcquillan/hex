@@ -124,8 +124,48 @@ _Routes_ - One or more [routes](#routes)
 
 ### Webhook Connector
 
-This connector is
+This connector opens a port for Jane to receive webhook calls. Webhooks calls are matched against the list. Json can be interpreted and used to substitute into the output string. 
 
+
+####Example:
+
+```
+{"Type": "webhook", "ID": "Integrations", "Active": true, "Debug": true,
+      "Port": "8080",
+      "Commands": [
+        {
+            "Name": "Loggly Alerts",
+            "Match": "/publish/loggly/alerts",
+            "Output": "```{alert_name} - {search_link}```",
+            "Red": "*alert*"
+        },
+          {
+            "Name": "Git Commits",
+            "Match": "/command/git/commit",
+            "Output": "jane build stuff"
+          }
+      ],
+      "Routes": [
+          {"Match": "*", "Connectors": "*", "Target": "#devops"}
+      ]
+    }
+```
+
+####Usage:
+* /command
+* /publish
+
+####Fields:
+
+_Type_ - This specifies the type of connector, in this case, 'exec2'
+
+_ID_ - This should be a unique identifier for this connector
+
+_Active_ - This is a boolean value to set this connector to be activated
+
+_Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+
+_Port_ - The port number to listen to (should be above 1024 if not running as a privledged user)
 
 
 ## Core Concepts
