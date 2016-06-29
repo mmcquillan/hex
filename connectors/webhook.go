@@ -63,78 +63,73 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 	if webhook.Connector.Debug {
 		log.Print("Webhook Incoming URL: " + url)
 	}
-	if strings.HasPrefix(url, "/command/") || strings.HasPrefix(url, "/publish/") {
-		rawbody, err := ioutil.ReadAll(r.Body)
-		body := string(rawbody)
-		if err != nil {
-			log.Print(err)
-		}
-		defer r.Body.Close()
-		if webhook.Connector.Debug {
-			log.Print("Webhook Incoming Body: " + body)
-		}
-		bodyParsed, err := gabs.ParseJSON([]byte(body))
-		if err != nil {
-			log.Print(err)
-		}
-		for _, c := range webhook.Connector.Commands {
-			if match, _ := parse.Match(c.Match, url); match {
+	rawbody, err := ioutil.ReadAll(r.Body)
+	body := string(rawbody)
+	if err != nil {
+		log.Print(err)
+	}
+	defer r.Body.Close()
+	if webhook.Connector.Debug {
+		log.Print("Webhook Incoming Body: " + body)
+	}
+	bodyParsed, err := gabs.ParseJSON([]byte(body))
+	if err != nil {
+		log.Print(err)
+	}
+	for _, c := range webhook.Connector.Commands {
+		if match, _ := parse.Match(c.Match, url); match {
+			if webhook.Connector.Debug {
+				log.Print("Webhook Match: " + c.Match)
+			}
+			out := c.Output
+			re := regexp.MustCompile("{(.*)}")
+			subs := re.FindAllString(c.Output, -1)
+			for _, sub := range subs {
 				if webhook.Connector.Debug {
-					log.Print("Webhook Match: " + c.Match)
+					log.Print("Webhook Sub: " + sub)
 				}
-				out := c.Output
-				re := regexp.MustCompile("{(.*)}")
-				subs := re.FindAllString(c.Output, -1)
-				for _, sub := range subs {
+				sub_clean := strings.Replace(sub, "{", "", -1)
+				sub_clean = strings.Replace(sub_clean, "}", "", -1)
+				value, ok := bodyParsed.Path(sub_clean).Data().(string)
+				if ok {
 					if webhook.Connector.Debug {
-						log.Print("Webhook Sub: " + sub)
+						log.Print("Webhook Val: " + value)
 					}
-					sub_clean := strings.Replace(sub, "{", "", -1)
-					sub_clean = strings.Replace(sub_clean, "}", "", -1)
-					value, ok := bodyParsed.Path(sub_clean).Data().(string)
-					if ok {
-						if webhook.Connector.Debug {
-							log.Print("Webhook Val: " + value)
-						}
-						out = strings.Replace(out, sub, value, -1)
-					}
-				}
-				out = strings.Replace(out, "{}", body, -1)
-				if strings.HasPrefix(url, "/command/") {
-					var m models.Message
-					m.Routes = webhook.Connector.Routes
-					m.In.Source = webhook.Connector.ID
-					m.In.Text = out
-					m.In.Process = true
-					webhook.CommandMsgs <- m
-				} else if strings.HasPrefix(url, "/publish/") {
-					var color = "NONE"
-					var match = false
-					if match, _ = parse.Match(c.Green, out); match {
-						color = "SUCCESS"
-					}
-					if match, _ = parse.Match(c.Yellow, out); match {
-						color = "WARN"
-					}
-					if match, _ = parse.Match(c.Red, out); match {
-						color = "FAIL"
-					}
-					var m models.Message
-					m.Routes = webhook.Connector.Routes
-					m.In.Source = webhook.Connector.ID
-					m.In.Text = r.URL.Path
-					m.In.Process = false
-					m.Out.Text = c.Name
-					m.Out.Detail = out
-					m.Out.Status = color
-					webhook.CommandMsgs <- m
+					out = strings.Replace(out, sub, value, -1)
 				}
 			}
+			out = strings.Replace(out, "{}", body, -1)
+			if c.Process {
+				var m models.Message
+				m.Routes = webhook.Connector.Routes
+				m.In.Source = webhook.Connector.ID
+				m.In.Text = out
+				m.In.Process = true
+				webhook.CommandMsgs <- m
+			} else {
+				var color = "NONE"
+				var match = false
+				if match, _ = parse.Match(c.Green, out); match {
+					color = "SUCCESS"
+				}
+				if match, _ = parse.Match(c.Yellow, out); match {
+					color = "WARN"
+				}
+				if match, _ = parse.Match(c.Red, out); match {
+					color = "FAIL"
+				}
+				var m models.Message
+				m.Routes = webhook.Connector.Routes
+				m.In.Source = webhook.Connector.ID
+				m.In.Text = r.URL.Path
+				m.In.Process = false
+				m.Out.Text = c.Name
+				m.Out.Detail = out
+				m.Out.Status = color
+				webhook.CommandMsgs <- m
+			}
 		}
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("JaneBot"))
-	} else {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("¯\\_(ツ)_/¯"))
 	}
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("JaneBot"))
 }
