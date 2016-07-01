@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -59,9 +60,13 @@ func (x Webhook) Help(connector models.Connector) (help string) {
 }
 
 func webhookHandler(w http.ResponseWriter, r *http.Request) {
-	url := r.URL.Path
+	reqUrl := r.URL.Path
+	reqQs, err := url.QueryUnescape(r.URL.RawQuery)
+	if err != nil {
+		log.Print(err)
+	}
 	if webhook.Connector.Debug {
-		log.Print("Webhook Incoming URL: " + url)
+		log.Print("Webhook Incoming URL: " + reqUrl)
 	}
 	rawbody, err := ioutil.ReadAll(r.Body)
 	body := string(rawbody)
@@ -73,31 +78,36 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 		log.Print("Webhook Incoming Body: " + body)
 	}
 	bodyParsed, err := gabs.ParseJSON([]byte(body))
+	isJson := true
 	if err != nil {
 		log.Print(err)
+		isJson = false
 	}
 	for _, c := range webhook.Connector.Commands {
-		if match, _ := parse.Match(c.Match, url); match {
+		if match, _ := parse.Match(c.Match, reqUrl); match {
 			if webhook.Connector.Debug {
 				log.Print("Webhook Match: " + c.Match)
 			}
 			out := c.Output
-			re := regexp.MustCompile("{(.*)}")
-			subs := re.FindAllString(c.Output, -1)
-			for _, sub := range subs {
-				if webhook.Connector.Debug {
-					log.Print("Webhook Sub: " + sub)
-				}
-				sub_clean := strings.Replace(sub, "{", "", -1)
-				sub_clean = strings.Replace(sub_clean, "}", "", -1)
-				value, ok := bodyParsed.Path(sub_clean).Data().(string)
-				if ok {
+			if isJson {
+				re := regexp.MustCompile("{(.*)}")
+				subs := re.FindAllString(c.Output, -1)
+				for _, sub := range subs {
 					if webhook.Connector.Debug {
-						log.Print("Webhook Val: " + value)
+						log.Print("Webhook Sub: " + sub)
 					}
-					out = strings.Replace(out, sub, value, -1)
+					sub_clean := strings.Replace(sub, "{", "", -1)
+					sub_clean = strings.Replace(sub_clean, "}", "", -1)
+					value, ok := bodyParsed.Path(sub_clean).Data().(string)
+					if ok {
+						if webhook.Connector.Debug {
+							log.Print("Webhook Val: " + value)
+						}
+						out = strings.Replace(out, sub, value, -1)
+					}
 				}
 			}
+			out = strings.Replace(out, "{?}", reqQs, -1)
 			out = strings.Replace(out, "{}", body, -1)
 			if c.Process {
 				var m models.Message
@@ -121,7 +131,7 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 				var m models.Message
 				m.Routes = webhook.Connector.Routes
 				m.In.Source = webhook.Connector.ID
-				m.In.Text = r.URL.Path
+				m.In.Text = reqUrl
 				m.In.Process = false
 				m.Out.Text = c.Name
 				m.Out.Detail = out
