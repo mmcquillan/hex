@@ -124,7 +124,7 @@ _Routes_ - One or more [routes](#routes)
 
 ### Webhook Connector
 
-This connector opens a port for Jane to receive webhook calls. Webhooks calls are matched against the list. Json can be interpreted and used to substitute into the output string. 
+This connector opens a port for Jane to receive webhook calls. Webhooks calls are matched against the command list matches. Json can be interpreted and used to substitute into the output string. 
 
 
 ####Example:
@@ -135,15 +135,23 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
       "Commands": [
         {
             "Name": "Loggly Alerts",
-            "Match": "/publish/loggly/alerts",
+            "Match": "/loggly/alerts",
+            "Process": false,
             "Output": "```{alert_name} - {search_link}```",
             "Red": "*alert*"
         },
-          {
+        {
             "Name": "Git Commits",
-            "Match": "/command/git/commit",
+            "Match": "/git/commit",
+            "Process": true,
             "Output": "jane build stuff"
-          }
+        },
+        {
+            "Name": "Messages",
+            "Match": "/messages",
+            "Process": false,
+            "Output": "{?}"
+        }
       ],
       "Routes": [
           {"Match": "*", "Connectors": "*", "Target": "#devops"}
@@ -166,6 +174,24 @@ _Active_ - This is a boolean value to set this connector to be activated
 _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 
 _Port_ - The port number to listen to (should be above 1024 if not running as a privledged user)
+
+_Commands_ - One or more commands to match the incoming webhook
+
+_Name_ - Name of the matching webhook check
+
+_Match_ - Webhook URL (###Matching)[matching] (this will always be after the server name and port)
+
+_Process_ - This defines if the incoming message should be processed by the other connector commands (true) or just published out to the routes (false) (Default: false)
+
+_Output_ - This is the formatting for the output. Use the (https://github.com/Jeffail/gabs#parsing-and-searching-json)[json parsing rules] or '{}' to output the entire json payload or '{?}' to output the query string.
+
+_Green_ - A [match](#matching) to identify what is in a green state
+
+_Yellow_ - A [match](#matching) to identify what is in a yellow state
+
+_Red_ - A [match](#matching) to identify what is in a red state
+
+_Routes_ - One or more [routes](#routes)
 
 
 ## Core Concepts
