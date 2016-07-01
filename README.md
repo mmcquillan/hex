@@ -28,7 +28,7 @@ Supported connectors:
 * cli - Command line interface
 * email - Email
 * exec - Execution of applications
-* [exec2](#exec2-connector) - Next generation of the exec/ssh/monitor connector
+* [exec2](#exec2-connector) - Execution of commands with monitoring capability
 * imageme - Pull back images or animated gifs
 * jira - Atlassian Jira integration
 * monitor - Monitor of systems
@@ -38,7 +38,7 @@ Supported connectors:
 * ssh - Execute commands on remote systems
 * twilio - send SMS alerts
 * website - Monitor return code of websites
-* [webhook](#webhook-connector) - listen at http://.../webhook/ 
+* [webhook](#webhook-connector) - Listener for webhooks
 * wolfram - Execute queries against Wolfram Alpha
 
 ### Exec2 Connector
