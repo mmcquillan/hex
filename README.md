@@ -159,9 +159,6 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
     }
 ```
 
-####Usage:
-* /command
-* /publish
 
 ####Fields:
 
