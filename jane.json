@@ -90,12 +90,19 @@
     },
 
     {"Type": "webhook", "ID": "webhook", "Active": true,
-      "Server": "http://localhost", "Port": "8080",
+      "Port": "8080",
+      "Commands": [
+        {
+            "Name": "Loggly Check",
+            "Match": "/loggly/xyz",
+            "Output": "```{alert_name}```",
+            "Green": "*OK*",
+            "Yellow": "*WARNING*",
+            "Red": "*CRITICAL*"
+        }
+      ],
       "Routes": [
           {"Match": "*", "Connectors": "*", "Target": "#devops"}
-      ],
-      "Commands": [
-        {"Match": "publish"}
       ]
     },
 
