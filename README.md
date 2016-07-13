@@ -1,6 +1,9 @@
 # Jane
 
-Jane is a chatops bot written in Go and is completely configuration driven. Contributions are welcome via pull requests. If you want to know why the name 'Jane' was chosen talk to @kcwinner.
+Jane is a chatops bot written in Go and is completely configuration driven. Contributions are welcome via pull requests.
+
+## History
+Jane was started as a way of getting DevOps tasks and feedback into Slack. There are a billion other bots, but we wanted to learn Go, so this was a fun way to learn it and meet our needs. The name "Jane" was chosen by @kcwinner because he is a big fan of the _Ender's Game_ books. The name is not meant to be gender specific and can be effectively changed when you set your bot up.
 
 
 ## Getting Started
