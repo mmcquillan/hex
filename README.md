@@ -1,6 +1,9 @@
 # Jane
 
-Jane is a chatops bot written in Go and is completely configuration driven. Contributions are welcome via pull requests. If you want to know why the name 'Jane' was chosen talk to @kcwinner.
+Jane is a chatops bot written in Go and is completely configuration driven. Contributions are welcome via pull requests.
+
+## History
+Jane was started as a way of getting DevOps tasks and feedback into Slack. There are a billion other bots, but we wanted to learn Go, so this was a fun way to learn it and meet our needs. The name "Jane" was chosen by @kcwinner because he is a big fan of the _Ender's Game_ books. The name is not meant to be gender specific and can be effectively changed when you set your bot up.
 
 
 ## Getting Started
@@ -28,7 +31,7 @@ Supported connectors:
 * cli - Command line interface
 * email - Email
 * exec - Execution of applications
-* [exec2](#exec2-connector) - Next generation of the exec/ssh/monitor connector
+* [exec2](#exec2-connector) - Execution of commands with monitoring capability
 * imageme - Pull back images or animated gifs
 * jira - Atlassian Jira integration
 * monitor - Monitor of systems
@@ -38,7 +41,7 @@ Supported connectors:
 * ssh - Execute commands on remote systems
 * twilio - send SMS alerts
 * website - Monitor return code of websites
-* webhook - listen at http://.../webhook/ 
+* [webhook](#webhook-connector) - Listener for webhooks
 * wolfram - Execute queries against Wolfram Alpha
 
 ### Exec2 Connector
@@ -112,6 +115,75 @@ _RunCheck_ - A boolean that will have Jane periodically run this (Default: false
 _Interval_ - An integer that is the number of minutes between checks when RunCheck is true (Default: 1)
 
 _Remind_ - An integer which is the number of units of Interval to wait before reminding of a non-Green status, with Zero being no reminders (Default: 0)
+
+_Green_ - A [match](#matching) to identify what is in a green state
+
+_Yellow_ - A [match](#matching) to identify what is in a yellow state
+
+_Red_ - A [match](#matching) to identify what is in a red state
+
+_Routes_ - One or more [routes](#routes)
+
+
+### Webhook Connector
+
+This connector opens a port for Jane to receive webhook calls. Webhooks calls are matched against the command list matches. Json can be interpreted and used to substitute into the output string. 
+
+
+####Example:
+
+```
+{"Type": "webhook", "ID": "Integrations", "Active": true, "Debug": true,
+      "Port": "8080",
+      "Commands": [
+        {
+            "Name": "Loggly Alerts",
+            "Match": "/loggly/alerts",
+            "Process": false,
+            "Output": "```{alert_name} - {search_link}```",
+            "Red": "*alert*"
+        },
+        {
+            "Name": "Git Commits",
+            "Match": "/git/commit",
+            "Process": true,
+            "Output": "jane build stuff"
+        },
+        {
+            "Name": "Messages",
+            "Match": "/messages",
+            "Process": false,
+            "Output": "{?}"
+        }
+      ],
+      "Routes": [
+          {"Match": "*", "Connectors": "*", "Target": "#devops"}
+      ]
+    }
+```
+
+
+####Fields:
+
+_Type_ - This specifies the type of connector, in this case, 'exec2'
+
+_ID_ - This should be a unique identifier for this connector
+
+_Active_ - This is a boolean value to set this connector to be activated
+
+_Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+
+_Port_ - The port number to listen to (should be above 1024 if not running as a privledged user)
+
+_Commands_ - One or more commands to match the incoming webhook
+
+_Name_ - Name of the matching webhook check
+
+_Match_ - Webhook URL (###Matching)[matching] (this will always be after the server name and port)
+
+_Process_ - This defines if the incoming message should be processed by the other connector commands (true) or just published out to the routes (false) (Default: false)
+
+_Output_ - This is the formatting for the output. Use the (https://github.com/Jeffail/gabs#parsing-and-searching-json)[json parsing rules] or '{}' to output the entire json payload or '{?}' to output the query string.
 
 _Green_ - A [match](#matching) to identify what is in a green state
 

@@ -8,6 +8,7 @@ type Command struct {
 	Cmd      string
 	Args     string
 	Help     string
+	Process  bool
 	HideHelp bool
 	RunCheck bool
 	Interval int
