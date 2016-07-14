@@ -90,7 +90,7 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			out := c.Output
 			if isJson {
-				re := regexp.MustCompile("{(.*)}")
+				re := regexp.MustCompile("{([^\\s]*)}")
 				subs := re.FindAllString(c.Output, -1)
 				for _, sub := range subs {
 					if webhook.Connector.Debug {

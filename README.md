@@ -246,4 +246,5 @@ Commands are implemented to act upon messages. They can do any task based on the
 
 Publishers are a means of communicating back out to the world. A publisher will take the message handed to it, format it, and send it through its implemented publish method.
 
-.
+
+
