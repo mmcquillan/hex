@@ -26,28 +26,25 @@ Supported connectors:
 * bamboo - Atlassian Bamboo integration
 * cli - Command line interface
 * email - Email
-* exec - Execution of applications
-* [exec2](#exec2-connector) - Execution of commands with monitoring capability
+* [exec](#exec-connector) - Execution of commands with monitoring capability
 * imageme - Pull back images or animated gifs
 * jira - Atlassian Jira integration
-* monitor - Monitor of systems
 * response - Text Responses
 * rss - RSS Feed
 * slack - Slack chat
-* ssh - Execute commands on remote systems
 * twilio - send SMS alerts
 * website - Monitor return code of websites
 * [webhook](#webhook-connector) - Listener for webhooks
 * wolfram - Execute queries against Wolfram Alpha
 
-### Exec2 Connector
+### Exec Connector
 
 This connector is the next generation to replace the exec, ssh and monitor connectors. It provides a single means of making local and remote calls to Linux systems. You can allow these calls to be made by command, but also mark the calls with the RunCheck property to set Jane to check them. This combined with the interpreter for output, makes it a very capable monitoring platform.
 
 ####Example:
 
 ```
-{"Type": "exec2", "ID": "ExecTwo", "Active": true,
+{"Type": "exec", "ID": "Elastic Search", "Active": true,
   "Server": "elasticsearch1.somecompany.com", "Port": "22", "Login": "jane", "Pass": "abc123",
   "Commands": [
     {
@@ -64,7 +61,7 @@ This connector is the next generation to replace the exec, ssh and monitor conne
         "Green": "*OK*",
         "Yellow": "*WARNING*",
         "Red": "*CRITICAL*"
-    },
+    }
   ],
   "Routes": [
     {"Match": "*", "Connectors": "slack", "Target": "#devops"}
