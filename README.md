@@ -61,6 +61,7 @@ This connector is the next generation to replace the exec, ssh and monitor conne
         "Cmd": "/usr/lib/nagios/plugins/check_apt",
         "Args": "",
         "HideHelp": false,
+        "Help": "jane elasticsearch1 aptcheck - To check our elasticsearch!",
         "RunCheck": true,
         "Interval": 1,
         "Remind": 15,
@@ -96,6 +97,8 @@ _Login_ - The user to login with
 
 _Pass_ - The password to connect with
 
+_Users_ - List of users who can execute the commands in this connector (###Security)[security]
+
 _Commands_ - One or more commands to execute against the defined server
 
 _Name_ - Readable name of check
@@ -106,9 +109,11 @@ _Output_ - Formatting for the output of the command, use `%stdout%` as the outpu
 
 _Cmd_ - The command to execute (do not include arguments)
 
-_Args_ - The arguments, space deliminated
+_Args_ - The arguments, space deliminated (you can access anything after the match above with %msg%)
 
 _HideHelp_ - A boolean to show or hide the help when displaying help (Default: false)
+
+_Help_ - Optional help text, otherwise it'll show the Match value
 
 _RunCheck_ - A boolean that will have Jane periodically run this (Default: false)
 
@@ -175,6 +180,8 @@ _Debug_ - This is a boolean value to set if the connector shows debug informatio
 
 _Port_ - The port number to listen to (should be above 1024 if not running as a privledged user)
 
+_Users_ - List of users who can execute the commands in this connector (###Security)[security]
+
 _Commands_ - One or more commands to match the incoming webhook
 
 _Name_ - Name of the matching webhook check
@@ -230,6 +237,22 @@ Jane uses a consistent string matching method throughout.
 `/fail(.+)/` - Regular expression matching
 
 
+### Security
+
+The way of securing who can execute actions via Jane is by setting an optional list of users who are allowed to run commands on connectors that implement commands.
+
+####Example:
+
+```
+"Users": "matt,ken,joe"
+```
+
+#### Usage:
+* This only applies to connectors that implement commands which users can execute
+* The list of users is comma delimited
+* The user name is dependant on the connector type, you can run "jane whoami" to get your name
+
+
 ## Architecture
 
 Jane makes heavy use of the Go thread and channel features. Each connector can implement one of the three phases of the Jane bot messaging - Listeners, Commands and Publishers
@@ -246,5 +269,3 @@ Commands are implemented to act upon messages. They can do any task based on the
 
 Publishers are a means of communicating back out to the world. A publisher will take the message handed to it, format it, and send it through its implemented publish method.
 
-
-.
