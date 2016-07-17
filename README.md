@@ -23,9 +23,9 @@ Connectors are what Jane uses to pull in information, interpret it, and issue ou
 For the connector configuration, when adding routes, you must specify the ID of the connector you want to route the response to.
 
 Supported connectors:
-* bamboo - Atlassian Bamboo integration
-* cli - Command line interface
-* email - Email
+* [bamboo](#bamboo-connector) - Atlassian Bamboo integration
+* [cli](#cli-connector) - Command line interface
+* [email](#email-connector) - Email
 * [exec](#exec-connector) - Execution of commands with monitoring capability
 * imageme - Pull back images or animated gifs
 * jira - Atlassian Jira integration
@@ -37,11 +37,95 @@ Supported connectors:
 * [webhook](#webhook-connector) - Listener for webhooks
 * wolfram - Execute queries against Wolfram Alpha
 
+
+### Bamboo Connector
+
+This connector was written to integrate bamboo builds. It was written against the bamboo cloud/hosted solution, but should be compatible with installed versions. This connector listens for and displays builds and deploys in addition to letting you execute the builds (but not deploys because the bamboo api is dated).
+
+#### Example:
+
+```
+{"Type": "bamboo", "ID": "bamboo server", "Active": true, "Debug": true,
+   "Server": "<URL>.atlassian.net", "Login": "<JIRA USER>", "Pass": "<JIRA PASS>",
+   "Routes": [
+       {"Match": "*", "Connectors": "*", "Target": "#devops"}
+   ]
+}
+```
+
+#### Usage:
+* Run builds: `bamboo build <build key>`
+* Get build status: `bamboo status <environment or build key>`
+* Make sure to sepecify where you want the build and deploy messages to end up in the routes
+
+#### Fields:
+* _Type_ - This specifies the type of connector, in this case, 'exec2'
+* _ID_ - This should be a unique identifier for this connector
+* _Active_ - This is a boolean value to set this connector to be activated
+* _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+* _Server_ - The bamboo server address
+* _Login_ - The bamboo user to login with
+* _Pass_ - The bamboo password to connect with
+* _Users_ - List of users who can execute the commands in this connector [security](#security)
+* _Routes_ - One or more [routes](#routes)
+
+
+### Cli Connector
+
+This connector runs Jane via the command line interface instead of as a daemon and is helpful for debugging, or just indulging your command line love.
+
+#### Example:
+
+```
+{"Type": "cli", "ID": "term-bot", "Active": true, "Debug": false,
+  "Routes": [
+    {"Match": "*", "Connectors": "term-bot", "Target": ""}
+  ]
+}
+```
+
+#### Fields:
+* _Type_ - This specifies the type of connector, in this case, 'exec2'
+* _ID_ - This should be a unique identifier for this connector
+* _Active_ - This is a boolean value to set this connector to be activated
+* _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+* _Routes_ - One or more [routes](#routes)
+
+
+### Email Connector
+
+*NOTE - This is experimental and untested*
+This connector allows for the sending of emails. Point the connector to a valid SMTP server.
+
+#### Example:
+
+```
+{"Type": "email", "ID": "EmailServer", "Active": false,
+  "Server": "smtp-server.myserver.com", "Port": "465",
+  "Login": "smtpuser", "Pass": "smtppassword",
+  "From": "jane@myserver.com"
+}
+```
+
+#### Usage:
+* Make sure to sepecify the to address in the target for routes to send emails
+
+#### Fields:
+* _Type_ - This specifies the type of connector, in this case, 'exec2'
+* _ID_ - This should be a unique identifier for this connector
+* _Active_ - This is a boolean value to set this connector to be activated
+* _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+* _Server_ - The SMTP server
+* _Port_ - The port for the SMTP server
+* _Login_ - The SMTP login
+* _Pass_ - The SMTP password
+
+
 ### Exec Connector
 
-This connector is the next generation to replace the exec, ssh and monitor connectors. It provides a single means of making local and remote calls to Linux systems. You can allow these calls to be made by command, but also mark the calls with the RunCheck property to set Jane to check them. This combined with the interpreter for output, makes it a very capable monitoring platform.
+This connector provides a single means of making local and remote calls to Linux systems. You can allow these calls to be made by command, but also mark the calls with the RunCheck property to set Jane to check them. This combined with the interpreter for output, makes it a very capable monitoring platform.
 
-####Example:
+#### Example:
 
 ```
 {"Type": "exec", "ID": "Elastic Search", "Active": true,
@@ -69,10 +153,10 @@ This connector is the next generation to replace the exec, ssh and monitor conne
 }
 ```
 
-####Usage:
+#### Usage:
 * To make local calls to the system, leave out the Server, Port, Login, Pass values.
 
-####Fields:
+#### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'exec2'
 * _ID_ - This should be a unique identifier for this connector
 * _Active_ - This is a boolean value to set this connector to be activated
@@ -104,7 +188,7 @@ This connector is the next generation to replace the exec, ssh and monitor conne
 This connector opens a port for Jane to receive webhook calls. Webhooks calls are matched against the command list matches. Json can be interpreted and used to substitute into the output string. 
 
 
-####Example:
+#### Example:
 
 ```
 {"Type": "webhook", "ID": "Integrations", "Active": true, "Debug": true,
@@ -137,7 +221,7 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
 ```
 
 
-####Fields:
+#### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'exec2'
 * _ID_ - This should be a unique identifier for this connector
 * _Active_ - This is a boolean value to set this connector to be activated
@@ -157,11 +241,30 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
 
 ## Core Concepts
 
+
+### Aliases
+
+With Jane, you can create aliases for commands.
+
+#### Example:
+
+```
+"Aliases": [
+  {"Match": "jane build app", "Output": "bamboo build KEY-PLAN"},
+  {"Match": "jane monitor prod", "Output": "jane monitor prod1 && jane monitor prod2 && jane monitor prod3"}
+]
+```
+
+#### Fields:
+* _Match_ - This will do a straight string match (does not support wildcards)
+* _Output_ - This is the command that will be run when matched
+
+
 ### Routes
 
 Routes can exist for connectors that listen to or interpret commands. Routes can have more than one connector if you would like to send messages to more than one place. Jane also matches on the routes to filter which messages get sent.
 
-####Example:
+#### Example:
 
 ```
 "Routes": [
@@ -174,7 +277,7 @@ Routes can exist for connectors that listen to or interpret commands. Routes can
 * Some connector publishers allow you to specify a Target, such as Slack which uses a target for a channel
 * Match follows the Jane [match rules](#matching)
 
-####Fields:
+#### Fields:
 * _Match_ - This will match the message or any message with "*" using the [match](#matching)
 * _Connectors_ - The connector name (ID) or "*" to match all connectors
 * _Target_ - The target which is connector specific or "*" for all
@@ -184,7 +287,7 @@ Routes can exist for connectors that listen to or interpret commands. Routes can
 
 Jane uses a consistent string matching method throughout.
 
-####Examples:
+#### Examples:
 
 `*failure*` - Match anywhere in a string
 
@@ -199,7 +302,7 @@ Jane uses a consistent string matching method throughout.
 
 The way of securing who can execute actions via Jane is by setting an optional list of users who are allowed to run commands on connectors that implement commands.
 
-####Example:
+#### Example:
 
 ```
 "Users": "matt,ken,joe"
@@ -237,4 +340,3 @@ Publishers are a means of communicating back out to the world. A publisher will 
 * Compile with 'go install jane.go'
 * Use the sample _jane.json_ file checked in as a starting point
 * Run your code and config with `go run jane.go --config ~/jane.json`
-
