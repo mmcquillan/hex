@@ -84,10 +84,10 @@ This connector is the next generation to replace the exec, ssh and monitor conne
 * _Port_ - The port number to connect to (Default: 22)
 * _Login_ - The user to login with
 * _Pass_ - The password to connect with
-* _Users_ - List of users who can execute the commands in this connector [###Security](security)
+* _Users_ - List of users who can execute the commands in this connector [security](#security)
 * _Commands_ - One or more commands to execute against the defined server
   * _Name_ - Readable name of check
-  * _Match_ - Command (###Matching)[matching]
+  * _Match_ - Command [match](#matching)
   * _Output_ - Formatting for the output of the command, use `%stdout%` as the output
   * _Cmd_ - The command to execute (do not include arguments)
   * _Args_ - The arguments, space deliminated (you can access anything after the match above with %msg%)
@@ -146,10 +146,10 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 * _Port_ - The port number to listen to (should be above 1024 if not running as a privledged user)
-* _Users_ - List of users who can execute the commands in this connector [###Security](security)
+* _Users_ - List of users who can execute the commands in this connector [security](#security)
 * _Commands_ - One or more commands to match the incoming webhook
   * _Name_ - Name of the matching webhook check
-  * _Match_ - Webhook URL (###Matching)[matching] (this will always be after the server name and port)
+  * _Match_ - Webhook URL [match](#matching) (this will always be after the server name and port)
   * _Process_ - This defines if the incoming message should be processed by the other connector commands (true) or just published out to the routes (false) (Default: false)
   * _Output_ - This is the formatting for the output. Use the (https://github.com/Jeffail/gabs#parsing-and-searching-json)[json parsing rules] or '{}' to output the entire json payload or '{?}' to output the query string.
   * _Green_ - A [match](#matching) to identify what is in a green state
