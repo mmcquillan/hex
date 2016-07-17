@@ -2,16 +2,18 @@ package connectors
 
 import (
 	"fmt"
+	"github.com/Jeffail/gabs"
+	"github.com/projectjane/jane/models"
+	"github.com/projectjane/jane/parse"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
-
-	"github.com/projectjane/jane/models"
 )
 
-// Webhook Struct for manipulating the webhook connector
 type Webhook struct {
 	CommandMsgs chan<- models.Message
 	Connector   models.Connector
@@ -19,7 +21,6 @@ type Webhook struct {
 
 var webhook Webhook
 
-// Listen Webhook listener
 func (x Webhook) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 
@@ -38,7 +39,7 @@ func (x Webhook) Listen(commandMsgs chan<- models.Message, connector models.Conn
 		log.Printf("Starting Webhook connector at: %s", server.Addr)
 	}
 
-	http.HandleFunc("/webhook/", webhookHandler)
+	http.HandleFunc("/", webhookHandler)
 
 	err := server.ListenAndServe()
 	if err != nil {
@@ -46,80 +47,99 @@ func (x Webhook) Listen(commandMsgs chan<- models.Message, connector models.Conn
 	}
 }
 
-// Command Webhook command parser
 func (x Webhook) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
-	if message.In.Process && connector.Type == "webhook" {
-		if connector.Debug {
-			log.Printf("Processing command: %s", message.In.Text)
-		}
-
-		for _, c := range connector.Commands {
-			if strings.HasPrefix(strings.ToLower(message.In.Text), strings.ToLower(c.Match)) {
-				msg := strings.TrimSpace(strings.Replace(message.In.Text, c.Match, "", 1))
-
-				message.Out.Text = msg
-				publishMsgs <- message
-			}
-		}
-	}
+	return
 }
 
-// Publish Webhook does not publish
 func (x Webhook) Publish(connector models.Connector, message models.Message, target string) {
 	return
 }
 
-// Help Webhook help information
 func (x Webhook) Help(connector models.Connector) (help string) {
 	return
 }
 
 func webhookHandler(w http.ResponseWriter, r *http.Request) {
-	var segs []string
-
-	// get everything past /webhook/
-	webhookString := r.URL.Path[9:]
-
-	segs = strings.Split(webhookString, "+")
-
-	if len(segs) < 2 || segs[1] == "" {
-		segs = strings.Split(webhookString, "/")
-
-		if len(segs) < 1 {
-			w.WriteHeader(http.StatusNotFound)
-			log.Println("Route not found")
-			fmt.Fprintf(w, "Route not found")
-			return
-		}
-	}
-
-	if segs[0] == "" {
-		w.WriteHeader(http.StatusNotFound)
-		log.Println("Empty webhook command")
-		fmt.Fprintf(w, "Empty webhook command")
-		return
-	}
-
-	body, err := ioutil.ReadAll(r.Body)
+	reqUrl := r.URL.Path
+	reqQs, err := url.QueryUnescape(r.URL.RawQuery)
 	if err != nil {
-		log.Println(err)
+		log.Print(err)
+	}
+	if webhook.Connector.Debug {
+		log.Print("Webhook Incoming URL: " + reqUrl)
+	}
+	rawbody, err := ioutil.ReadAll(r.Body)
+	body := string(rawbody)
+	if err != nil {
+		log.Print(err)
 	}
 	defer r.Body.Close()
-
-	command := strings.Join(segs[0:], " ")
-
 	if webhook.Connector.Debug {
-		log.Printf("Command received: %s", command)
+		log.Print("Webhook Incoming Body: " + body)
 	}
-
-	var m models.Message
-	m.Routes = webhook.Connector.Routes
-	m.In.Source = webhook.Connector.ID
-	m.In.Text = command
-	m.In.Process = true
-	m.Out.Detail = string(body)
-	webhook.CommandMsgs <- m
-
+	bodyParsed, err := gabs.ParseJSON([]byte(body))
+	isJson := true
+	if err != nil {
+		log.Print(err)
+		isJson = false
+	}
+	for _, c := range webhook.Connector.Commands {
+		if match, _ := parse.Match(c.Match, reqUrl); match {
+			if webhook.Connector.Debug {
+				log.Print("Webhook Match: " + c.Match)
+			}
+			out := c.Output
+			if isJson {
+				re := regexp.MustCompile("{([^\\s]*)}")
+				subs := re.FindAllString(c.Output, -1)
+				for _, sub := range subs {
+					if webhook.Connector.Debug {
+						log.Print("Webhook Sub: " + sub)
+					}
+					sub_clean := strings.Replace(sub, "{", "", -1)
+					sub_clean = strings.Replace(sub_clean, "}", "", -1)
+					value, ok := bodyParsed.Path(sub_clean).Data().(string)
+					if ok {
+						if webhook.Connector.Debug {
+							log.Print("Webhook Val: " + value)
+						}
+						out = strings.Replace(out, sub, value, -1)
+					}
+				}
+			}
+			out = strings.Replace(out, "{?}", reqQs, -1)
+			out = strings.Replace(out, "{}", body, -1)
+			if c.Process {
+				var m models.Message
+				m.Routes = webhook.Connector.Routes
+				m.In.Source = webhook.Connector.ID
+				m.In.Text = out
+				m.In.Process = true
+				webhook.CommandMsgs <- m
+			} else {
+				var color = "NONE"
+				var match = false
+				if match, _ = parse.Match(c.Green, out); match {
+					color = "SUCCESS"
+				}
+				if match, _ = parse.Match(c.Yellow, out); match {
+					color = "WARN"
+				}
+				if match, _ = parse.Match(c.Red, out); match {
+					color = "FAIL"
+				}
+				var m models.Message
+				m.Routes = webhook.Connector.Routes
+				m.In.Source = webhook.Connector.ID
+				m.In.Text = reqUrl
+				m.In.Process = false
+				m.Out.Text = c.Name
+				m.Out.Detail = out
+				m.Out.Status = color
+				webhook.CommandMsgs <- m
+			}
+		}
+	}
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Request received."))
+	w.Write([]byte("JaneBot"))
 }

@@ -9,9 +9,9 @@ import (
 )
 
 func Commands(commandMsgs <-chan models.Message, publishMsgs chan<- models.Message, config *models.Config) {
-	log.Print("Initializing Commands")
 	for {
 		message := <-commandMsgs
+		log.Printf("%+v", message)
 		aliasCommands(&message, config)
 		messages := splitCommands(message)
 		for _, m := range messages {
