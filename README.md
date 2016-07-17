@@ -1,21 +1,17 @@
 # Jane
 
-Jane is a chatops bot written in Go and is completely configuration driven. Contributions are welcome via pull requests.
-
-## History
-Jane was started as a way of getting DevOps tasks and feedback into Slack. There are a billion other bots, but we wanted to learn Go, so this was a fun way to learn it and meet our needs. The name "Jane" was chosen by @kcwinner because he is a big fan of the _Ender's Game_ books. The name is not meant to be gender specific and can be effectively changed when you set your bot up.
+Jane is a chatops bot written in Go and is completely configuration driven. Contributions are welcome via pull requests. Jane was started as a way of getting DevOps tasks and feedback into Slack. There are a billion other bots, but we wanted to learn Go, so this was a fun way to learn it and meet our needs. The name "Jane" was chosen by @kcwinner because he is a big fan of the _Ender's Game_ books. The name is not meant to be gender specific and can be effectively changed when you set your bot up.
 
 
-## Getting Started
-* Developed using Go 1.5.3
-* Pull the project with 'go get github.com/projectjane/jane'
-* Compile with 'go install jane.go'
-* Use the samples in the startup folder for different environments
+## Running
+
+### Install
+Soon we will create a better path to install Jane, but for now, you can compile and use the startup scripts in the startup directory.
 
 
-## Configuration
-The entire configuration of the site is done via a json config file. The configuration file is expected to be named 'jane.config' and will be looked for in this order:
-* -config config.json - Pass in a configuration file location as a command line parameter
+### Configuration
+The configuration of Jane is via a json config file. The configuration file is expected to be named 'jane.config' and will be looked for in this order:
+* --config config.json - Pass in a configuration file location as a command line parameter
 * ./jane.json - the location of the jane binary
 * ~/jane.json - the home directory of the user
 * /etc/jane.json - the global config
@@ -181,6 +177,10 @@ Routes can exist for connectors that listen to or interpret commands. Routes can
 * Some connector publishers allow you to specify a Target, such as Slack which uses a target for a channel
 * Match follows the Jane [match rules](#matching)
 
+####Fields:
+* _Match_ - This will match the message or any message with "*" using the [match](#matching)
+* _Connectors_ - The connector name (ID) or "*" to match all connectors
+* _Target_ - The target which is connector specific or "*" for all
 
 
 ### Matching
@@ -229,4 +229,15 @@ Commands are implemented to act upon messages. They can do any task based on the
 ### Publishers
 
 Publishers are a means of communicating back out to the world. A publisher will take the message handed to it, format it, and send it through its implemented publish method.
+
+
+## Getting Involved
+
+### Development Environment
+* Get your toes wet with Go
+* Setup your Go 1.5.3 environment
+* Pull the project with 'go get github.com/projectjane/jane'
+* Compile with 'go install jane.go'
+* Use the sample _jane.json_ file checked in as a starting point
+* Run your code and config with `go run jane.go --config ~/jane.json`
 
