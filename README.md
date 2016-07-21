@@ -171,7 +171,7 @@ This connector provides a single means of making local and remote calls to Linux
   * _Match_ - Command [match](#matching)
   * _Output_ - Formatting for the output of the command, use `%stdout%` as the output
   * _Cmd_ - The command to execute (do not include arguments)
-  * _Args_ - The arguments, space deliminated (you can access anything after the match above with %msg%)
+  * _Args_ - The arguments, space deliminated (you can access anything after the match above with %msg% or positionaly with {0}, etc)
   * _HideHelp_ - A boolean to show or hide the help when displaying help (Default: false)
   * _Help_ - Optional help text, otherwise it'll show the Match value
   * _RunCheck_ - A boolean that will have Jane periodically run this (Default: false)

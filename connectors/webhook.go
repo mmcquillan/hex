@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"regexp"
 	"strconv"
 	"strings"
 )
@@ -90,21 +89,20 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			out := c.Output
 			if isJson {
-				re := regexp.MustCompile("{([^\\s]*)}")
-				subs := re.FindAllString(c.Output, -1)
-				for _, sub := range subs {
-					if webhook.Connector.Debug {
-						log.Print("Webhook Sub: " + sub)
-					}
-					sub_clean := strings.Replace(sub, "{", "", -1)
-					sub_clean = strings.Replace(sub_clean, "}", "", -1)
-					value, ok := bodyParsed.Path(sub_clean).Data().(string)
-					if ok {
+				if match, subs := parse.Substitution(c.Output); match {
+					for _, sub := range subs {
 						if webhook.Connector.Debug {
-							log.Print("Webhook Val: " + value)
+							log.Print("Webhook Sub: " + sub)
 						}
-						out = strings.Replace(out, sub, value, -1)
+						value, ok := bodyParsed.Path(parse.Strip(sub)).Data().(string)
+						if ok {
+							if webhook.Connector.Debug {
+								log.Print("Webhook Val: " + value)
+							}
+							out = strings.Replace(out, sub, value, -1)
+						}
 					}
+
 				}
 			}
 			out = strings.Replace(out, "{?}", reqQs, -1)
