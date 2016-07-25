@@ -1,17 +1,17 @@
 # Jane
 
-Jane is a chatops bot written in Go and is completely configuration driven. Contributions are welcome via pull requests. Jane was started as a way of getting DevOps tasks and feedback into Slack. There are a billion other bots, but we wanted to learn Go, so this was a fun way to learn it and meet our needs. The name "Jane" was chosen by @kcwinner because he is a big fan of the _Ender's Game_ books. The name is not meant to be gender specific and can be effectively changed when you set your bot up.
+Jane is a chatops bot written in Go and is completely configuration driven. Contributions are welcome via pull requests. Jane was started as a way of getting DevOps tasks and feedback into Slack. There are a billion other bots, but we wanted to learn Go, so this was a fun way to learn it and meet our needs. The name "Jane" was chosen by @kcwinner because he is a big fan of the [_Ender's Game_ books](https://en.wikipedia.org/wiki/Jane_(Ender%27s_Game)). The name is not meant to be gender specific and can be effectively changed when you set your bot up.
 
 
 ## Running
 
 ### Install
-Soon we will create a better path to install Jane, but for now, you can compile and use the startup scripts in the startup directory.
+Soon we will create a better path to install Jane, but for now, you can compile and use the startup scripts in the startup directory or run via [Docker](https://hub.docker.com/r/projectjane/jane/).
 
 
 ### Configuration
-The configuration of Jane is via a json config file. The configuration file is expected to be named 'jane.config' and will be looked for in this order:
-* --config config.json - Pass in a configuration file location as a command line parameter
+The configuration of Jane is via a json config file. The configuration file is expected to be named 'jane.json' and will be looked for in this order:
+* --config <file name> - Pass in a configuration file location as a command line parameter
 * ./jane.json - the location of the jane binary
 * ~/jane.json - the home directory of the user
 * /etc/jane.json - the global config
