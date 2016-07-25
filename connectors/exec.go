@@ -7,7 +7,6 @@ import (
 	"golang.org/x/crypto/ssh"
 	"log"
 	"os/exec"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -30,12 +29,9 @@ func (x Exec) Listen(commandMsgs chan<- models.Message, connector models.Connect
 func (x Exec) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	for _, command := range connector.Commands {
 		if match, tokens := parse.Match(command.Match, message.In.Text); match {
-			msg := strings.Replace(strings.Join(tokens, " "), "\"", "", -1)
-			args := strings.Replace(command.Args, "%msg%", msg, -1)
-			for i := 0; i < len(tokens); i++ {
-				args = strings.Replace(args, "{"+strconv.Itoa(i)+"}", tokens[i], -1)
-			}
-			args = strings.Replace(args, "{*}", strings.Join(tokens, " "), -1)
+			args := parse.Substitute(command.Args, tokens)
+			log.Printf("%+v", tokens)
+			log.Print(args)
 			out := callCmd(command.Cmd, args, connector)
 			var color = "NONE"
 			var match = false

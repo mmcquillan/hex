@@ -2,10 +2,11 @@ package parse
 
 import (
 	"regexp"
+	"strconv"
 	"strings"
 )
 
-func Match(pattern string, value string) (match bool, tokens []string) {
+func Match(pattern string, value string) (match bool, tokens map[string]string) {
 	pattern = strings.ToLower(pattern)
 	ws := strings.HasPrefix(pattern, "*")
 	we := strings.HasSuffix(pattern, "*")
@@ -16,7 +17,13 @@ func Match(pattern string, value string) (match bool, tokens []string) {
 		pattern = strings.Replace(pattern, "*", "", -1)
 	}
 	value = strings.TrimSpace(value)
-	tokens = strings.Split(strings.TrimSpace(strings.Replace(value, pattern, "", 1)), " ")
+	tokens = make(map[string]string)
+	tokens["0"] = value
+	ta := strings.Split(strings.TrimSpace(strings.Replace(value, pattern, "", 1)), " ")
+	for i := 0; i < len(ta); i++ {
+		tokens[strconv.Itoa(i+1)] = ta[i]
+	}
+	tokens["*"] = strings.Join(ta, " ")
 	value = strings.ToLower(value)
 	match = false
 	if re {

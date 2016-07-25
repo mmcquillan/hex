@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
 type Wolfram struct {
@@ -21,7 +20,7 @@ func (x Wolfram) Listen(commandMsgs chan<- models.Message, connector models.Conn
 
 func (x Wolfram) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	if match, tokens := parse.Match("wolfram*", message.In.Text); match {
-		message.Out.Text = callWolfram(strings.Join(tokens, " "), connector.Key)
+		message.Out.Text = callWolfram(tokens["*"], connector.Key)
 		publishMsgs <- message
 	}
 }
