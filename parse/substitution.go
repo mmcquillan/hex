@@ -1,7 +1,6 @@
 package parse
 
 import (
-	"log"
 	"os"
 	"regexp"
 	"strings"
@@ -10,9 +9,7 @@ import (
 func Substitute(value string, tokens map[string]string) (result string) {
 	if match, hits := SubstitutionVars(value); match {
 		for _, hit := range hits {
-			log.Print("hit: " + hit)
 			if _, ok := tokens[Strip(hit)]; ok {
-				log.Print("val: " + tokens[Strip(hit)])
 				value = strings.Replace(value, hit, tokens[Strip(hit)], -1)
 			} else {
 				value = strings.Replace(value, hit, os.Getenv(Strip(hit)), -1)
