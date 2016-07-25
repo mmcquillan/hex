@@ -32,6 +32,10 @@ The basic configurtion file should include these elements:
 ```
 
 
+### Environment Variables
+To protect sensitive data, you can set Connector Server, Port, Login and Pass as an environment variable, should the connector support those values. Use the format `${SLACK_TOKEN}` to use the environment variable SLACK_TOKEN. Additionally, environment variables can be used in output values on many connectors as well.
+
+
 ## Connectors
 Connectors are what Jane uses to pull in information, interpret it, and issue out a response. The Routes specify where the results from the input should be written to or * for all. The Target can specify a channel in the case of Slack. 
 

@@ -18,7 +18,7 @@ func Match(pattern string, value string) (match bool, tokens map[string]string) 
 	}
 	value = strings.TrimSpace(value)
 	tokens = make(map[string]string)
-	tokens["0"] = value
+	tokens["0"] = pattern
 	ta := strings.Split(strings.TrimSpace(strings.Replace(value, pattern, "", 1)), " ")
 	for i := 0; i < len(ta); i++ {
 		tokens[strconv.Itoa(i+1)] = ta[i]

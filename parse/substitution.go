@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func Substitute(value string, tokens map[string]string) (result string) {
+func Substitute(value string, tokens map[string]string) string {
 	if match, hits := SubstitutionVars(value); match {
 		for _, hit := range hits {
 			if _, ok := tokens[Strip(hit)]; ok {
@@ -14,6 +14,15 @@ func Substitute(value string, tokens map[string]string) (result string) {
 			} else {
 				value = strings.Replace(value, hit, os.Getenv(Strip(hit)), -1)
 			}
+		}
+	}
+	return value
+}
+
+func SubstituteInputs(value string) string {
+	if match, hits := SubstitutionVars(value); match {
+		for _, hit := range hits {
+			value = strings.Replace(value, hit, os.Getenv(Strip(hit)), -1)
 		}
 	}
 	return value
