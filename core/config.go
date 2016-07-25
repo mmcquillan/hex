@@ -6,6 +6,7 @@ import (
 	"github.com/kardianos/osext"
 	"github.com/mitchellh/go-homedir"
 	"github.com/projectjane/jane/models"
+	"github.com/projectjane/jane/parse"
 	"io/ioutil"
 	"log"
 	"os"
@@ -15,6 +16,7 @@ func LoadConfig(params models.Params) (config models.Config) {
 	configFile := locateConfig(params)
 	if checkConfig(configFile) {
 		config = readConfig(configFile)
+		subConfig(&config)
 		if params.Validate {
 			fmt.Println("SUCCESS - Config file is valid: " + configFile)
 			os.Exit(0)
@@ -64,6 +66,15 @@ func readConfig(location string) (config models.Config) {
 		log.Print(err)
 	}
 	return config
+}
+
+func subConfig(config *models.Config) {
+	for i := 0; i < len(config.Connectors); i++ {
+		config.Connectors[i].Server = parse.SubstituteInputs(config.Connectors[i].Server)
+		config.Connectors[i].Port = parse.SubstituteInputs(config.Connectors[i].Port)
+		config.Connectors[i].Login = parse.SubstituteInputs(config.Connectors[i].Login)
+		config.Connectors[i].Pass = parse.SubstituteInputs(config.Connectors[i].Pass)
+	}
 }
 
 func checkConfig(location string) (exists bool) {

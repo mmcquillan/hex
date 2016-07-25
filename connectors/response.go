@@ -23,10 +23,10 @@ func (x Response) Command(message models.Message, publishMsgs chan<- models.Mess
 	for _, c := range connector.Commands {
 		if match, tokens := parse.Match(c.Match, message.In.Text); match {
 			if len(c.Outputs) == 0 {
-				message.Out.Text = strings.Replace(c.Output, "%msg%", strings.Join(tokens, " "), -1)
+				message.Out.Text = parse.Substitute(c.Output, tokens)
 			} else {
 				i := rand.Intn(len(c.Outputs))
-				message.Out.Text = strings.Replace(c.Outputs[i], "%msg%", strings.Join(tokens, " "), -1)
+				message.Out.Text = parse.Substitute(c.Outputs[i], tokens)
 			}
 			publishMsgs <- message
 		}

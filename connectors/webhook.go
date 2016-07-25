@@ -9,9 +9,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"regexp"
 	"strconv"
-	"strings"
 )
 
 type Webhook struct {
@@ -43,7 +41,7 @@ func (x Webhook) Listen(commandMsgs chan<- models.Message, connector models.Conn
 
 	err := server.ListenAndServe()
 	if err != nil {
-		panic(err)
+		log.Print(err)
 	}
 }
 
@@ -88,27 +86,28 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 			if webhook.Connector.Debug {
 				log.Print("Webhook Match: " + c.Match)
 			}
+			tokens := make(map[string]string)
+			tokens["?"] = reqQs
+			tokens["*"] = body
 			out := c.Output
 			if isJson {
-				re := regexp.MustCompile("{([^\\s]*)}")
-				subs := re.FindAllString(c.Output, -1)
-				for _, sub := range subs {
-					if webhook.Connector.Debug {
-						log.Print("Webhook Sub: " + sub)
-					}
-					sub_clean := strings.Replace(sub, "{", "", -1)
-					sub_clean = strings.Replace(sub_clean, "}", "", -1)
-					value, ok := bodyParsed.Path(sub_clean).Data().(string)
-					if ok {
+				if match, subs := parse.SubstitutionVars(c.Output); match {
+					for _, sub := range subs {
 						if webhook.Connector.Debug {
-							log.Print("Webhook Val: " + value)
+							log.Print("Webhook Sub: " + sub)
 						}
-						out = strings.Replace(out, sub, value, -1)
+						value, ok := bodyParsed.Path(parse.Strip(sub)).Data().(string)
+						if ok {
+							if webhook.Connector.Debug {
+								log.Print("Webhook Val: " + value)
+							}
+							tokens[parse.Strip(sub)] = value
+						}
 					}
+
 				}
 			}
-			out = strings.Replace(out, "{?}", reqQs, -1)
-			out = strings.Replace(out, "{}", body, -1)
+			out = parse.Substitute(out, tokens)
 			if c.Process {
 				var m models.Message
 				m.Routes = webhook.Connector.Routes

@@ -29,22 +29,21 @@ func (x Exec) Listen(commandMsgs chan<- models.Message, connector models.Connect
 func (x Exec) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	for _, command := range connector.Commands {
 		if match, tokens := parse.Match(command.Match, message.In.Text); match {
-			msg := strings.Replace(strings.Join(tokens, " "), "\"", "", -1)
-			args := strings.Replace(command.Args, "%msg%", msg, -1)
-			out := callCmd(command.Cmd, args, connector)
+			args := parse.Substitute(command.Args, tokens)
+			tokens["STDOUT"] = callCmd(command.Cmd, args, connector)
 			var color = "NONE"
 			var match = false
-			if match, _ = parse.Match(command.Green, out); match {
+			if match, _ = parse.Match(command.Green, tokens["STDOUT"]); match {
 				color = "SUCCESS"
 			}
-			if match, _ = parse.Match(command.Yellow, out); match {
+			if match, _ = parse.Match(command.Yellow, tokens["STDOUT"]); match {
 				color = "WARN"
 			}
-			if match, _ = parse.Match(command.Red, out); match {
+			if match, _ = parse.Match(command.Red, tokens["STDOUT"]); match {
 				color = "FAIL"
 			}
 			message.Out.Text = connector.ID + " " + command.Name
-			message.Out.Detail = strings.Replace(command.Output, "%stdout%", out, -1)
+			message.Out.Detail = parse.Substitute(command.Output, tokens)
 			message.Out.Status = color
 			publishMsgs <- message
 		}

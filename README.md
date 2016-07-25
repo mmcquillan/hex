@@ -32,6 +32,10 @@ The basic configurtion file should include these elements:
 ```
 
 
+### Environment Variables
+To protect sensitive data, you can set Connector Server, Port, Login and Pass as an environment variable, should the connector support those values. Use the format `${SLACK_TOKEN}` to use the environment variable SLACK_TOKEN. Additionally, environment variables can be used in output values on many connectors as well.
+
+
 ## Connectors
 Connectors are what Jane uses to pull in information, interpret it, and issue out a response. The Routes specify where the results from the input should be written to or * for all. The Target can specify a channel in the case of Slack. 
 
@@ -149,7 +153,7 @@ This connector provides a single means of making local and remote calls to Linux
     {
         "Name": "Apt Check",
         "Match": "jane elasticsearch1 aptcheck",
-        "Output": "```%stdout% ```",
+        "Output": "```${STDOUT}```",
         "Cmd": "/usr/lib/nagios/plugins/check_apt",
         "Args": "",
         "HideHelp": false,
@@ -184,9 +188,9 @@ This connector provides a single means of making local and remote calls to Linux
 * _Commands_ - One or more commands to execute against the defined server
   * _Name_ - Readable name of check
   * _Match_ - Command [match](#matching)
-  * _Output_ - Formatting for the output of the command, use `%stdout%` as the output
+  * _Output_ - Formatting for the output of the command, use `${STDOUT}` as the output
   * _Cmd_ - The command to execute (do not include arguments)
-  * _Args_ - The arguments, space deliminated (you can access anything after the match above with %msg%)
+  * _Args_ - The arguments, space deliminated (you can access anything after the match above with positional variables like ${1}, ${2}, etc or ${*} for all input after the match)
   * _HideHelp_ - A boolean to show or hide the help when displaying help (Default: false)
   * _Help_ - Optional help text, otherwise it'll show the Match value
   * _RunCheck_ - A boolean that will have Jane periodically run this (Default: false)
@@ -333,7 +337,7 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
         "Name": "Loggly Alerts",
         "Match": "/loggly/alerts",
         "Process": false,
-        "Output": "```{alert_name} - {search_link}```",
+        "Output": "```${alert_name} - ${search_link}```",
         "Red": "*alert*"
     },
     {
@@ -346,7 +350,7 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
         "Name": "Messages",
         "Match": "/messages",
         "Process": false,
-        "Output": "{?}"
+        "Output": "${?}"
     }
   ],
   "Routes": [
@@ -368,7 +372,7 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
   * _Name_ - Name of the matching webhook check
   * _Match_ - Webhook URL [match](#matching) (this will always be after the server name and port)
   * _Process_ - This defines if the incoming message should be processed by the other connector commands (true) or just published out to the routes (false) (Default: false)
-  * _Output_ - This is the formatting for the output. Use the (https://github.com/Jeffail/gabs#parsing-and-searching-json)[json parsing rules] or '{}' to output the entire json payload or '{?}' to output the query string.
+  * _Output_ - This is the formatting for the output. Use the [json parsing rules](https://github.com/Jeffail/gabs#parsing-and-searching-json) or '${*}' to output the entire json payload or '${?}' to output the query string.
   * _Green_ - A [match](#matching) to identify what is in a green state
   * _Yellow_ - A [match](#matching) to identify what is in a yellow state
   * _Red_ - A [match](#matching) to identify what is in a red state

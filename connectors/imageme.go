@@ -10,7 +10,6 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
 type ImageMe struct {
@@ -23,11 +22,11 @@ func (x ImageMe) Listen(commandMsgs chan<- models.Message, connector models.Conn
 
 func (x ImageMe) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	if match, tokens := parse.Match("image me*", message.In.Text); match {
-		message.Out.Text = callImageMe(strings.Join(tokens, " "), connector.Key, connector.Pass, false)
+		message.Out.Text = callImageMe(tokens["*"], connector.Key, connector.Pass, false)
 		publishMsgs <- message
 	}
 	if match, tokens := parse.Match("animate me*", message.In.Text); match {
-		message.Out.Text = callImageMe(strings.Join(tokens, " "), connector.Key, connector.Pass, true)
+		message.Out.Text = callImageMe(tokens["*"], connector.Key, connector.Pass, true)
 		publishMsgs <- message
 	}
 }
