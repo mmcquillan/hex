@@ -6,7 +6,7 @@ Jane is a chatops bot written in Go and is completely configuration driven. Cont
 ## Running
 
 ### Install
-Soon we will create a better path to install Jane, but for now, you can compile and use the startup scripts in the startup directory.
+Soon we will create a better path to install Jane, but for now, you can compile and use the startup scripts in the startup directory or run via (Docker)[https://hub.docker.com/r/projectjane/jane/].
 
 
 ### Configuration
