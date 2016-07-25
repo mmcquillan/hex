@@ -1,20 +1,35 @@
 # Jane
 
-Jane is a chatops bot written in Go and is completely configuration driven. Contributions are welcome via pull requests. Jane was started as a way of getting DevOps tasks and feedback into Slack. There are a billion other bots, but we wanted to learn Go, so this was a fun way to learn it and meet our needs. The name "Jane" was chosen by @kcwinner because he is a big fan of the _Ender's Game_ books. The name is not meant to be gender specific and can be effectively changed when you set your bot up.
+Jane is a chatops bot written in Go and is completely configuration driven. Contributions are welcome via pull requests. Jane was started as a way of getting DevOps tasks and feedback into Slack. There are a billion other bots, but we wanted to learn Go, so this was a fun way to learn it and meet our needs. The name "Jane" was chosen by @kcwinner because he is a big fan of the [_Ender's Game_ books](https://en.wikipedia.org/wiki/Jane_(Ender%27s_Game)). The name is not meant to be gender specific and can be effectively changed when you set your bot up.
 
 
 ## Running
 
 ### Install
-Soon we will create a better path to install Jane, but for now, you can compile and use the startup scripts in the startup directory.
+Soon we will create a better path to install Jane, but for now, you can compile and use the startup scripts in the startup directory or run via [Docker](https://hub.docker.com/r/projectjane/jane/).
 
 
 ### Configuration
-The configuration of Jane is via a json config file. The configuration file is expected to be named 'jane.config' and will be looked for in this order:
-* --config config.json - Pass in a configuration file location as a command line parameter
+The configuration of Jane is via a json config file. The configuration file is expected to be named 'jane.json' and will be looked for in this order:
+* --config <file name> - Pass in a configuration file location as a command line parameter
 * ./jane.json - the location of the jane binary
 * ~/jane.json - the home directory of the user
 * /etc/jane.json - the global config
+
+
+### Basic Configuration File
+The basic configurtion file should include these elements:
+
+```
+{
+  "Name": "jane",
+  "LogFile": "/var/log/jane.log",
+  "Aliases": [
+  ],
+  "Connectors": [
+  ]
+}
+```
 
 
 ## Connectors
@@ -27,15 +42,15 @@ Supported connectors:
 * [cli](#cli-connector) - Command line interface
 * [email](#email-connector) - Email
 * [exec](#exec-connector) - Execution of commands with monitoring capability
-* imageme - Pull back images or animated gifs
-* jira - Atlassian Jira integration
-* response - Text Responses
-* rss - RSS Feed
-* slack - Slack chat
-* twilio - send SMS alerts
-* website - Monitor return code of websites
+* [imageme](#imageme-connector) - Pull back images or animated gifs
+* [jira](#jira-connector) - Atlassian Jira integration
+* [response](#response-connector) - Text Responses
+* [rss](#rss-connector) - RSS Feed
+* [slack](#slack-connector) - Slack chat
+* [twilio](#twilio-connector) - send SMS alerts
+* [website](#website-connector) - Monitor return code of websites
 * [webhook](#webhook-connector) - Listener for webhooks
-* wolfram - Execute queries against Wolfram Alpha
+* [wolfram](#wolfram-connector) - Execute queries against Wolfram Alpha
 
 
 ### Bamboo Connector
@@ -183,6 +198,126 @@ This connector provides a single means of making local and remote calls to Linux
 * _Routes_ - One or more [routes](#routes)
 
 
+### ImageMe Connector
+Description
+
+#### Example:
+
+#### Usage:
+
+#### Fields:
+
+
+### Jira Connector
+Description
+
+#### Example:
+
+```
+{"Type": "jira", "ID": "jira", "Active": true, "Debug": true,
+    "Server": "<URL>.atlassian.net", "Login": "<JIRA USER>", "Pass": "<JIRA PASS>"
+}
+```
+
+#### Usage:
+
+#### Fields:
+
+
+### Response Connector
+Description
+
+#### Example:
+
+```
+{"Type": "response", "ID": "Text Response", "Active": true, "Debug": false,
+    "Commands": [
+        {"Match": "jane rules", "Output": "*The Three Laws of DevOps Robotics*\n\n1. A robot may not injure a production environment or, through inaction, allow a production environment to come to harm.\n\n2. A robot must obey the orders given it by a command line interface except where such orders would conflict with the First Law.\n\n3. A robot must protect its own production existence as long as such protection does not conflict with the First or Second Laws."}
+    ]
+}
+```
+
+#### Usage:
+
+#### Fields:
+
+
+### RSS Connector
+Description
+
+#### Example:
+
+```
+{"Type": "rss", "ID": "AWS EC2", "Active": true,
+    "Server": "http://status.aws.amazon.com/rss/ec2-us-east-1.rss",
+    "Routes": [
+        {"Match": "*", "Connectors": "slack", "Target": "#devops"}
+    ]
+}
+```
+
+#### Usage:
+
+#### Fields:
+
+
+### Slack Connector
+Description
+
+#### Example:
+
+```
+{"Type": "slack", "ID": "slack", "Active": true,
+  "Key": "<SlackToken>", "Image": ":game_die:"
+}
+```
+
+#### Usage:
+
+#### Fields:
+
+
+### Twilio Connector
+Description
+
+#### Example:
+
+```
+{"Type": "twilio", "ID": "twilio", "Active": true,
+  "Key": "API_KEY",
+  "Pass": "AUTH_TOKEN",
+  "From": "FROM_NUMBER"
+}
+```
+
+#### Usage:
+
+#### Fields:
+
+
+### Website Connector
+Description
+
+#### Example:
+
+```
+{"Type": "website", "ID": "Website Monitor", "Active": true,
+  "Checks": [
+    {"Name": "Yahoo", "Check": "https://www.yahoo.com"},
+    {"Name": "Google", "Check": "https://google.com"}
+  ],
+  "Routes": [
+    {"Match": "*", "Connectors": "slack", "Target": "#devops"},
+    {"Match": "*", "Connectors": "slack", "Target": "@matt"}
+  ]
+}
+```
+
+#### Usage:
+
+#### Fields:
+
+
 ### Webhook Connector
 
 This connector opens a port for Jane to receive webhook calls. Webhooks calls are matched against the command list matches. Json can be interpreted and used to substitute into the output string. 
@@ -220,6 +355,7 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
 }
 ```
 
+#### Usage:
 
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'exec2'
@@ -237,6 +373,22 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
   * _Yellow_ - A [match](#matching) to identify what is in a yellow state
   * _Red_ - A [match](#matching) to identify what is in a red state
 * _Routes_ - One or more [routes](#routes)
+
+
+### Wolfram Connector
+Description
+
+#### Example:
+
+```
+{"Type": "wolfram", "ID": "wolf", "Active": true, "Debug": true,
+  "Key": "<WOLFRAM API KEY>"
+}
+```
+
+#### Usage:
+
+#### Fields:
 
 
 ## Core Concepts
