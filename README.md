@@ -10,8 +10,8 @@ Soon we will create a better path to install Jane, but for now, you can compile 
 
 
 ### Configuration
-The configuration of Jane is via a json config file. The configuration file is expected to be named 'jane.config' and will be looked for in this order:
-* --config config.json - Pass in a configuration file location as a command line parameter
+The configuration of Jane is via a json config file. The configuration file is expected to be named 'jane.json' and will be looked for in this order:
+* --config <file name> - Pass in a configuration file location as a command line parameter
 * ./jane.json - the location of the jane binary
 * ~/jane.json - the home directory of the user
 * /etc/jane.json - the global config
