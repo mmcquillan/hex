@@ -17,6 +17,21 @@ The configuration of Jane is via a json config file. The configuration file is e
 * /etc/jane.json - the global config
 
 
+### Basic Configuration File
+The basic configurtion file should include these elements:
+
+```
+{
+  "Name": "jane",
+  "LogFile": "/var/log/jane.log",
+  "Aliases": [
+  ],
+  "Connectors": [
+  ]
+}
+```
+
+
 ## Connectors
 Connectors are what Jane uses to pull in information, interpret it, and issue out a response. The Routes specify where the results from the input should be written to or * for all. The Target can specify a channel in the case of Slack. 
 
@@ -27,15 +42,15 @@ Supported connectors:
 * [cli](#cli-connector) - Command line interface
 * [email](#email-connector) - Email
 * [exec](#exec-connector) - Execution of commands with monitoring capability
-* imageme - Pull back images or animated gifs
-* jira - Atlassian Jira integration
-* response - Text Responses
-* rss - RSS Feed
-* slack - Slack chat
-* twilio - send SMS alerts
-* website - Monitor return code of websites
+* [imageme](#imageme-connector) - Pull back images or animated gifs
+* [jira](#jira-connector) - Atlassian Jira integration
+* [response](#response-connector) - Text Responses
+* [rss](#rss-connector) - RSS Feed
+* [slack](#slack-connector) - Slack chat
+* [twilio](#twilio-connector) - send SMS alerts
+* [website](#website-connector) - Monitor return code of websites
 * [webhook](#webhook-connector) - Listener for webhooks
-* wolfram - Execute queries against Wolfram Alpha
+* [wolfram](#wolfram-connector) - Execute queries against Wolfram Alpha
 
 
 ### Bamboo Connector
@@ -183,6 +198,126 @@ This connector provides a single means of making local and remote calls to Linux
 * _Routes_ - One or more [routes](#routes)
 
 
+### ImageMe Connector
+Description
+
+#### Example:
+
+#### Usage:
+
+#### Fields:
+
+
+### Jira Connector
+Description
+
+#### Example:
+
+```
+{"Type": "jira", "ID": "jira", "Active": true, "Debug": true,
+    "Server": "<URL>.atlassian.net", "Login": "<JIRA USER>", "Pass": "<JIRA PASS>"
+}
+```
+
+#### Usage:
+
+#### Fields:
+
+
+### Response Connector
+Description
+
+#### Example:
+
+```
+{"Type": "response", "ID": "Text Response", "Active": true, "Debug": false,
+    "Commands": [
+        {"Match": "jane rules", "Output": "*The Three Laws of DevOps Robotics*\n\n1. A robot may not injure a production environment or, through inaction, allow a production environment to come to harm.\n\n2. A robot must obey the orders given it by a command line interface except where such orders would conflict with the First Law.\n\n3. A robot must protect its own production existence as long as such protection does not conflict with the First or Second Laws."}
+    ]
+}
+```
+
+#### Usage:
+
+#### Fields:
+
+
+### RSS Connector
+Description
+
+#### Example:
+
+```
+{"Type": "rss", "ID": "AWS EC2", "Active": true,
+    "Server": "http://status.aws.amazon.com/rss/ec2-us-east-1.rss",
+    "Routes": [
+        {"Match": "*", "Connectors": "slack", "Target": "#devops"}
+    ]
+}
+```
+
+#### Usage:
+
+#### Fields:
+
+
+### Slack Connector
+Description
+
+#### Example:
+
+```
+{"Type": "slack", "ID": "slack", "Active": true,
+  "Key": "<SlackToken>", "Image": ":game_die:"
+}
+```
+
+#### Usage:
+
+#### Fields:
+
+
+### Twilio Connector
+Description
+
+#### Example:
+
+```
+{"Type": "twilio", "ID": "twilio", "Active": true,
+  "Key": "API_KEY",
+  "Pass": "AUTH_TOKEN",
+  "From": "FROM_NUMBER"
+}
+```
+
+#### Usage:
+
+#### Fields:
+
+
+### Website Connector
+Description
+
+#### Example:
+
+```
+{"Type": "website", "ID": "Website Monitor", "Active": true,
+  "Checks": [
+    {"Name": "Yahoo", "Check": "https://www.yahoo.com"},
+    {"Name": "Google", "Check": "https://google.com"}
+  ],
+  "Routes": [
+    {"Match": "*", "Connectors": "slack", "Target": "#devops"},
+    {"Match": "*", "Connectors": "slack", "Target": "@matt"}
+  ]
+}
+```
+
+#### Usage:
+
+#### Fields:
+
+
 ### Webhook Connector
 
 This connector opens a port for Jane to receive webhook calls. Webhooks calls are matched against the command list matches. Json can be interpreted and used to substitute into the output string. 
@@ -220,6 +355,7 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
 }
 ```
 
+#### Usage:
 
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'exec2'
@@ -237,6 +373,22 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
   * _Yellow_ - A [match](#matching) to identify what is in a yellow state
   * _Red_ - A [match](#matching) to identify what is in a red state
 * _Routes_ - One or more [routes](#routes)
+
+
+### Wolfram Connector
+Description
+
+#### Example:
+
+```
+{"Type": "wolfram", "ID": "wolf", "Active": true, "Debug": true,
+  "Key": "<WOLFRAM API KEY>"
+}
+```
+
+#### Usage:
+
+#### Fields:
 
 
 ## Core Concepts

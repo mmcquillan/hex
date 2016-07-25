@@ -2,140 +2,17 @@
   "Name": "jane",
   "LogFile": "/var/log/jane.log",
   "Aliases": [
-    {"Match": "jane build app", "Output": "bamboo build KEY-PLAN"},
-    {"Match": "jane build db", "Output": "bamboo build KEY-DB"}
   ],
   "Connectors": [
 
-    {"Type": "bamboo", "ID": "bamboo", "Active": true, "Debug": true,
-       "Server": "<URL>.atlassian.net", "Login": "<JIRA USER>", "Pass": "<JIRA PASS>",
-       "Routes": [
-           {"Match": "*", "Connectors": "*", "Target": "#devops"}
-       ]
+    {"Type": "cli", "ID": "term-bot", "Active": true, "Debug": false,
+      "Routes": [ {"Match": "*", "Connectors": "*", "Target": "*" } ]
     },
 
-    {"Type": "exec", "ID": "Exec", "Active": true,
+    {"Type": "response", "ID": "Text Response", "Active": true, "Debug": false,
         "Commands": [
-            {"Match": "big", "Output": "```%stdout%```", "Cmd": "/usr/bin/figlet", "Args": "-w80 %msg%"},
-            {"Match": "log", "Output": "```%stdout% ```", "Cmd": "/usr/bin/tail", "Args": "-n8 /var/log/jane.log"},
-            {"Match": "cal", "Output": "```%stdout% ```", "Cmd": "/usr/bin/cal", "Args": "-h %msg%"}
+            {"Match": "jane rules", "Output": "*The Three Laws of DevOps Robotics*\n\n1. A robot may not injure a production environment or, through inaction, allow a production environment to come to harm.\n\n2. A robot must obey the orders given it by a command line interface except where such orders would conflict with the First Law.\n\n3. A robot must protect its own production existence as long as such protection does not conflict with the First or Second Laws."}
         ]
-    }
-
-    {"Type": "jira", "ID": "jira", "Active": true, "Debug": true,
-       "Server": "<URL>.atlassian.net", "Login": "<JIRA USER>", "Pass": "<JIRA PASS>"
-    },
-
-    {"Type": "monitor", "ID": "Elasticsearch Node", "Active": true,
-      "Server": "elasticsearch1.somecompany.com", "Port": "22", "Login": "jane", "Pass": "abc123",
-      "Checks": [
-        {"Name": "Apt Check", "Check": "/usr/lib/nagios/plugins/check_apt"},
-        {"Name": "Disk Check", "Check": "/usr/lib/nagios/plugins/check_disk -w10% -c5% -A"},
-        {"Name": "Elasticsearch Check", "Check": "/usr/lib/nagios/plugins/check_procs -a elasticsearch -c1:1"}
-      ],
-      "Routes": [
-        {"Match": "*", "Connectors": "slack", "Target": "#devops"},
-        {"Match": "*", "Connectors": "slack", "Target": "@matt"}
-      ]
-    },
-
-    {"Type": "response", "ID": "Text Response", "Active": true, "Debug": true,
-        "Commands": [
-            {"Match": "jane", "Outputs": [
-                "\"But I have eyes,\" she said. \"And ears. I see everything in all the Hundred Worlds. I watch the sky through a thousand telescopes. I overhear a trillion conversations every day.\" She giggled a little. \"I'm the best gossip in the universe.\"",
-                "\"Twisted and perverse are the ways of the human mind,\" Jane intoned. \"Pinocchio was such a dolt to try to become a real boy. He was much better off with a wooden head.\"",
-                "\"It's the most charming thing about humans. You are all so sure that the lesser animals are bleeding with envy because they didn't have the good fortune to be born Homo sapiens.\""
-            ]}
-        ]
-    },
-
-    {"Type": "rss", "ID": "AWS EC2", "Active": true,
-      "Server": "http://status.aws.amazon.com/rss/ec2-us-east-1.rss",
-      "Routes": [
-        {"Match": "*", "Connectors": "slack", "Target": "#devops"}
-      ]
-    },
-
-    {"Type": "slack", "ID": "slack", "Active": true,
-      "Key": "<SlackToken>", "Image": ":game_die:"
-    },
-
-    {"Type": "ssh", "ID": "prod", "Active": true,
-      "Server": "prod.server.com", "Port": "22", "Login": "jane", "Pass": "somepassword",
-        "Commands": [
-            {"Match": "jane prodlogs", "Output": "```%stdout%```", "Cmd": "tail", "Args": "-n20 /var/log/someserver.log"}
-        ]
-    },
-
-    {"Type": "website", "ID": "Website Monitor", "Active": true,
-      "Checks": [
-        {"Name": "Yahoo", "Check": "https://www.yahoo.com"},
-        {"Name": "Google", "Check": "https://google.com"}
-      ],
-      "Routes": [
-        {"Match": "*", "Connectors": "slack", "Target": "#devops"},
-        {"Match": "*", "Connectors": "slack", "Target": "@matt"}
-      ]
-    },
-
-    {"Type": "wolfram", "ID": "wolf", "Active": true, "Debug": true,
-      "Key": "<WOLFRAM API KEY>"
-    },
-
-    {"Type": "redis", "ID": "devRedis", "Active": true,
-      "Server": "localhost:6379", "Pass": "",
-      "Commands": [
-        {"Match": "jane flushdb dev"}
-      ]
-    },
-
-    {"Type": "webhook", "ID": "webhook", "Active": true,
-      "Port": "8080",
-      "Commands": [
-        {
-            "Name": "Loggly Check",
-            "Match": "/loggly/xyz",
-            "Output": "```{alert_name}```",
-            "Green": "*OK*",
-            "Yellow": "*WARNING*",
-            "Red": "*CRITICAL*"
-        }
-      ],
-      "Routes": [
-          {"Match": "*", "Connectors": "*", "Target": "#devops"}
-      ]
-    },
-
-    {"Type": "twilio", "ID": "twilio", "Active": true,
-      "Key": "API_KEY",
-      "Pass": "AUTH_TOKEN",
-      "From": "FROM_NUMBER"
-    },
-
-    {"Type": "exec2", "ID": "ExecTwo", "Active": true,
-      "Server": "elasticsearch1.somecompany.com", "Port": "22", "Login": "jane", "Pass": "abc123",
-      "Commands": [
-        {
-            "Name": "Apt Check",
-            "Match": "jane elasticsearch1 aptcheck",
-            "Output": "```%stdout% ```",
-            "Cmd": "/usr/lib/nagios/plugins/check_apt",
-            "Args": "",
-            "HideHelp": false,
-            "RunCheck": true,
-            "Interval": 1,
-            "Green": "*OK*",
-            "Yellow": "*WARNING*",
-            "Red": "*CRITICAL*"
-        }, 
-        {"Match": "big", "Output": "```%stdout%```", "Cmd": "/usr/bin/figlet", "Args": "-w80 %msg%"},
-        {"Match": "log", "Output": "```%stdout% ```", "Cmd": "/usr/bin/tail", "Args": "-n8 /var/log/jane.log"},
-        {"Match": "cal", "Output": "```%stdout% ```", "Cmd": "/usr/bin/cal", "Args": "-h %msg%"}
-      ],
-      "Routes": [
-        {"Match": "*", "Connectors": "slack", "Target": "#devops"},
-        {"Match": "*", "Connectors": "slack", "Target": "@matt"}
-      ]
     }
 
   ]
