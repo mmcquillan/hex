@@ -11,7 +11,13 @@ func Help(message models.Message, publishMsgs chan<- models.Message, config *mod
 	message.Out.Text = "Help for jane..."
 	help := ""
 	for _, alias := range config.Aliases {
-		help += alias.Match + "\n"
+		if !alias.HideHelp {
+			if alias.Help != "" {
+				help += alias.Help + "\n"
+			} else {
+				help += alias.Match + "\n"
+			}
+		}
 	}
 	for _, connector := range config.Connectors {
 		if connector.Active {

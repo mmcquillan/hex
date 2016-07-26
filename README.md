@@ -513,13 +513,16 @@ With Jane, you can create aliases for commands.
 ```
 "Aliases": [
   {"Match": "jane build app", "Output": "bamboo build KEY-PLAN"},
-  {"Match": "jane monitor prod", "Output": "jane monitor prod1 && jane monitor prod2 && jane monitor prod3"}
+  {"Match": "jane monitor prod", "Output": "jane monitor prod1 && jane monitor prod2 && jane monitor prod3"},
+  {"Match": "jane deploy*", "Output": "jane upgrade service ${1}"}
 ]
 ```
 
 #### Fields:
-* _Match_ - This will do a straight string match (does not support wildcards)
-* _Output_ - This is the command that will be run when matched
+* _Match_ - This will match incoming commands with the [match](#matching) rules
+* _Output_ - This is the command that will be run when matched and supports substitutions
+* _HideHelp_ - A boolean to show or hide the help when displaying help (Default: false)
+* _Help_ - Optional help text, otherwise it'll show the Match value
 
 
 ### Routes
@@ -558,6 +561,15 @@ Jane uses a consistent string matching method throughout.
 `*failure` - Match at the end of a string
 
 `/fail(.+)/` - Regular expression matching
+
+
+### Substitutions
+
+Jane uses a format for substitutions which is implemented in most areas. Each connector can add it's own subsitution values.
+
+#### Examples:
+
+`${ENVIRONMENT_VARIABLE}` - Any environment variable available to Jane can be substituted
 
 
 ### Security

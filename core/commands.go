@@ -6,12 +6,12 @@ import (
 
 	"github.com/projectjane/jane/connectors"
 	"github.com/projectjane/jane/models"
+	"github.com/projectjane/jane/parse"
 )
 
 func Commands(commandMsgs <-chan models.Message, publishMsgs chan<- models.Message, config *models.Config) {
 	for {
 		message := <-commandMsgs
-		log.Printf("%+v", message)
 		aliasCommands(&message, config)
 		messages := splitCommands(message)
 		for _, m := range messages {
@@ -45,9 +45,12 @@ func Commands(commandMsgs <-chan models.Message, publishMsgs chan<- models.Messa
 }
 
 func aliasCommands(message *models.Message, config *models.Config) {
+	log.Printf("%+v", message)
 	for _, alias := range config.Aliases {
-		if message.In.Text == alias.Match {
-			message.In.Text = alias.Output
+		if match, tokens := parse.Match(alias.Match, message.In.Text); match {
+			log.Printf("%+v", tokens)
+			message.In.Text = parse.Substitute(alias.Output, tokens)
+			log.Printf("%+v", message)
 		}
 	}
 }
