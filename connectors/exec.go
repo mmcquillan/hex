@@ -101,7 +101,7 @@ func check(commandMsgs chan<- models.Message, command models.Command, connector 
 			message.Routes = connector.Routes
 			message.In.Process = false
 			message.Out.Text = connector.ID + " " + command.Name
-			message.Out.Detail = strings.Replace(command.Output, "%stdout%", out, -1)
+			message.Out.Detail = strings.Replace(command.Output, "${STDOUT}", out, -1)
 			message.Out.Status = color
 			commandMsgs <- message
 			state = newstate
