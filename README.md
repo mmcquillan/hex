@@ -22,7 +22,6 @@ The basic configurtion file should include these elements:
 
 ```
 {
-  "Name": "jane",
   "LogFile": "/var/log/jane.log",
   "Aliases": [
   ],
@@ -104,6 +103,9 @@ This connector runs Jane via the command line interface instead of as a daemon a
 }
 ```
 
+#### Usage:
+* Use the command prompt to type your command and enter to send it.
+
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'exec2'
 * _ID_ - This should be a unique identifier for this connector
@@ -177,7 +179,7 @@ This connector provides a single means of making local and remote calls to Linux
 * To make local calls to the system, leave out the Server, Port, Login, Pass values.
 
 #### Fields:
-* _Type_ - This specifies the type of connector, in this case, 'exec2'
+* _Type_ - This specifies the type of connector, in this case, 'exec'
 * _ID_ - This should be a unique identifier for this connector
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
@@ -208,13 +210,28 @@ Description
 
 #### Example:
 
+```
+{"Type": "imageme", "ID": "imageme", "Active": true,
+  "Key": "<GOOGLE API KEY>", "Pass": "<GOOGLE API PASS>"
+}
+```
+
 #### Usage:
+* Type `imageme <some text>` for an image url to be returned
+* Type `animateme <some text>` for an animated gif to be returned
 
 #### Fields:
+* _Type_ - This specifies the type of connector, in this case, 'imageme'
+* _ID_ - This should be a unique identifier for this connector
+* _Active_ - This is a boolean value to set this connector to be activated
+* _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+* _Key_ - The Google API Key
+* _Pass_ - The Google API Pass
+* _Users_ - List of users who can execute the commands in this connector [security](#security)
 
 
 ### Jira Connector
-Description
+This connector will integrate with your Jira server.
 
 #### Example:
 
@@ -225,12 +242,22 @@ Description
 ```
 
 #### Usage:
+* When a Jira ticket is detected, a link to the ticket will be provided
+* You can also create a Jira issue `jira create <issueType> <project key> <summary>`
 
 #### Fields:
+* _Type_ - This specifies the type of connector, in this case, 'jira'
+* _ID_ - This should be a unique identifier for this connector
+* _Active_ - This is a boolean value to set this connector to be activated
+* _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+* _Server_ - The server url of your Jira instance
+* _Login_ - A Jira user login
+* _Pass_ - A Jira password
+* _Users_ - List of users who can execute the commands in this connector [security](#security)
 
 
 ### Logging Connector
-Description
+The Logging connector will monitor a local file and throw an alert anytime a matched string is detected.
 
 #### Example:
 
@@ -248,12 +275,22 @@ Description
 ```
 
 #### Usage:
+* This is currently limited to the system in which Jane runs on
 
 #### Fields:
+* _Type_ - This specifies the type of connector, in this case, 'logging'
+* _ID_ - This should be a unique identifier for this connector
+* _Active_ - This is a boolean value to set this connector to be activated
+* _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+* _File_ - The file to watch (make sure the Jane process has permission)
+* _Commands_ - One or more commands to execute against the defined server
+  * _Name_ - Readable name of check
+  * _Match_ - String to match in the file [match](#matching)
+* _Routes_ - One or more [routes](#routes)
 
 
 ### Response Connector
-Description
+Jane is capable of responding to questions or outputing fixed phrases.
 
 #### Example:
 
@@ -266,12 +303,22 @@ Description
 ```
 
 #### Usage:
+* You can integrate the input with the output by using the substitution values `${1}` for the first word, or `${*}` for the entire string
 
 #### Fields:
+* _Type_ - This specifies the type of connector, in this case, 'response'
+* _ID_ - This should be a unique identifier for this connector
+* _Active_ - This is a boolean value to set this connector to be activated
+* _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+* _Users_ - List of users who can execute the commands in this connector [security](#security)
+* _Commands_ - One or more commands to execute against the defined server
+  * _Match_ - String to [match](#matching)
+  * _Output_ - String to output, with some positional variable substitution
+  * _Help_ - Optional help text, otherwise it'll show the Match value
 
 
 ### RSS Connector
-Description
+Pull in RSS feeds directly into your bot and see what's going on around the web. Some suggestions are cloud or vendor status pages.
 
 #### Example:
 
@@ -285,12 +332,19 @@ Description
 ```
 
 #### Usage:
+* Some RSS feeds are empty and cause problems for parsing, report any that give you issues
 
 #### Fields:
+* _Type_ - This specifies the type of connector, in this case, 'rss'
+* _ID_ - This should be a unique identifier for this connector
+* _Active_ - This is a boolean value to set this connector to be activated
+* _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+* _Server_ - The server address or IP to connect to
+* _Routes_ - One or more [routes](#routes)
 
 
 ### Slack Connector
-Description
+Slack integration allows for Jane to be interacted with through Slack by both sending and receiving messages.
 
 #### Example:
 
@@ -301,30 +355,47 @@ Description
 ```
 
 #### Usage:
+* Setup Jane as a new integration to get a Slack Token
+* Add Jane to the channels you wish for the bot to listen to
+* You can even direct message Jane
+* Be sure to set the Route Target for specifying where listeners send their messages
 
 #### Fields:
+* _Type_ - This specifies the type of connector, in this case, 'slack'
+* _ID_ - This should be a unique identifier for this connector
+* _Active_ - This is a boolean value to set this connector to be activated
+* _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+* _Key_ - The Slack Token
+* _Image_ - The Slack image to use for messages
 
 
 ### Twilio Connector
-Description
+Twilio provides SMS and Phone integration.
 
 #### Example:
 
 ```
 {"Type": "twilio", "ID": "twilio", "Active": true,
-  "Key": "API_KEY",
-  "Pass": "AUTH_TOKEN",
-  "From": "FROM_NUMBER"
+  "Key": "<API_KEY>",
+  "Pass": "<AUTH_TOKEN>",
+  "From": "<FROM_NUMBER>"
 }
 ```
 
 #### Usage:
 
 #### Fields:
+* _Type_ - This specifies the type of connector, in this case, 'twilio'
+* _ID_ - This should be a unique identifier for this connector
+* _Active_ - This is a boolean value to set this connector to be activated
+* _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+* _Key_ - The Twilio API Key
+* _Pass_ - The Twilio Authorization Token
+* _From_ - The Number to send from
 
 
 ### Website Connector
-Description
+Basic website monitoring that throws alerts when it does not get a 200 OK status from the web server.
 
 #### Example:
 
@@ -339,8 +410,15 @@ Description
 ```
 
 #### Usage:
+* Test the URL to make sure you are pointed to one that gets back a 200 response
 
 #### Fields:
+* _Type_ - This specifies the type of connector, in this case, 'website'
+* _ID_ - This should be a unique identifier for this connector
+* _Active_ - This is a boolean value to set this connector to be activated
+* _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+* _Server_ - The website to monitor
+* _Routes_ - One or more [routes](#routes)
 
 
 ### Webhook Connector
@@ -401,7 +479,7 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
 
 
 ### Wolfram Connector
-Description
+This is an integration to the Wolfram Alpha API
 
 #### Example:
 
@@ -412,8 +490,14 @@ Description
 ```
 
 #### Usage:
+* Type `wolfram <query>` to get results back
 
 #### Fields:
+* _Type_ - This specifies the type of connector, in this case, 'wolfram'
+* _ID_ - This should be a unique identifier for this connector
+* _Active_ - This is a boolean value to set this connector to be activated
+* _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+* _Key_ - Wolfram API Key
 
 
 ## Core Concepts
