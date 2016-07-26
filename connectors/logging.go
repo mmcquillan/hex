@@ -18,12 +18,12 @@ func (x Logging) Listen(commandMsgs chan<- models.Message, connector models.Conn
 		log.Print(err)
 	}
 	for line := range t.Lines {
-		for _, chk := range connector.Checks {
-			if match, _ := parse.Match(chk.Check, line.Text); match {
+		for _, c := range connector.Commands {
+			if match, _ := parse.Match(c.Match, line.Text); match {
 				var m models.Message
 				m.Routes = connector.Routes
 				m.In.Process = false
-				m.Out.Text = connector.File + ": " + chk.Name
+				m.Out.Text = connector.File + ": " + c.Name
 				m.Out.Detail = line.Text
 				commandMsgs <- m
 			}

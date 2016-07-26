@@ -48,6 +48,7 @@ Supported connectors:
 * [exec](#exec-connector) - Execution of commands with monitoring capability
 * [imageme](#imageme-connector) - Pull back images or animated gifs
 * [jira](#jira-connector) - Atlassian Jira integration
+* [logging](#logging-connector) - Logging monitor
 * [response](#response-connector) - Text Responses
 * [rss](#rss-connector) - RSS Feed
 * [slack](#slack-connector) - Slack chat
@@ -228,6 +229,29 @@ Description
 #### Fields:
 
 
+### Logging Connector
+Description
+
+#### Example:
+
+```
+{"Type": "logging", "ID": "jane log", "Active": true,
+  "File": "/home/matt/test.log",
+  "Commands": [
+    {"Name": "Starting Jane", "Match": "*stopping*"},
+    {"Name": "Starting Jane", "Match": "*starting*"}
+  ],
+  "Routes": [
+    {"Match": "*", "Connectors": "term-bot"}
+  ]
+}
+```
+
+#### Usage:
+
+#### Fields:
+
+
 ### Response Connector
 Description
 
@@ -306,10 +330,7 @@ Description
 
 ```
 {"Type": "website", "ID": "Website Monitor", "Active": true,
-  "Checks": [
-    {"Name": "Yahoo", "Check": "https://www.yahoo.com"},
-    {"Name": "Google", "Check": "https://google.com"}
-  ],
+  "Server": "https://google.com",
   "Routes": [
     {"Match": "*", "Connectors": "slack", "Target": "#devops"},
     {"Match": "*", "Connectors": "slack", "Target": "@matt"}
