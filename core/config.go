@@ -12,7 +12,7 @@ import (
 	"os"
 )
 
-func LoadConfig(params models.Params) (config models.Config) {
+func LoadConfig(params models.Params, version string) (config models.Config) {
 	configFile := locateConfig(params)
 	if checkConfig(configFile) {
 		config = readConfig(configFile)
@@ -24,6 +24,7 @@ func LoadConfig(params models.Params) (config models.Config) {
 	} else {
 		os.Exit(1)
 	}
+	config.Version = version
 	return config
 }
 

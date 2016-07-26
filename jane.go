@@ -6,10 +6,12 @@ import (
 	"sync"
 )
 
+var version string
+
 func main() {
 	core.CatchExit()
 	params := core.LoadParams()
-	config := core.LoadConfig(params)
+	config := core.LoadConfig(params, version)
 	core.Logging(&config)
 	commandMsgs := make(chan models.Message, 1)
 	publishMsgs := make(chan models.Message, 1)
