@@ -314,6 +314,7 @@ Jane is capable of responding to questions or outputing fixed phrases.
 * _Commands_ - One or more commands to execute against the defined server
   * _Match_ - String to [match](#matching)
   * _Output_ - String to output, with some positional variable substitution
+  * _HideHelp_ - A boolean to show or hide the help when displaying help (Default: false)
   * _Help_ - Optional help text, otherwise it'll show the Match value
 
 
