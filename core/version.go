@@ -5,6 +5,10 @@ import (
 )
 
 func Version(message models.Message, publishMsgs chan<- models.Message, config *models.Config) {
-	message.Out.Text = "Jane Version: " + config.Version
+	if config.Version != "" {
+		message.Out.Text = "Version: " + config.Version
+	} else {
+		message.Out.Text = "Version: Non Standard Build"
+	}
 	publishMsgs <- message
 }
