@@ -59,6 +59,7 @@ func callRss(lastMarker string, commandMsgs chan<- models.Message, connector mod
 		if item.Date.String() > lastMarker {
 			var m models.Message
 			m.Routes = connector.Routes
+			m.In.Source = connector.ID
 			m.In.Process = false
 			m.Out.Text = connector.ID + " " + html.UnescapeString(sanitize.HTML(item.Title))
 			m.Out.Detail = html.UnescapeString(sanitize.HTML(item.Content))

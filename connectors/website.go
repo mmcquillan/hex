@@ -55,6 +55,7 @@ func (x Website) Listen(commandMsgs chan<- models.Message, connector models.Conn
 			}
 			var m models.Message
 			m.Routes = connector.Routes
+			m.In.Source = connector.ID
 			m.In.Process = false
 			m.Out.Text = connector.ID
 			m.Out.Detail = out

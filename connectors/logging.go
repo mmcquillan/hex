@@ -22,6 +22,7 @@ func (x Logging) Listen(commandMsgs chan<- models.Message, connector models.Conn
 			if match, _ := parse.Match(c.Match, line.Text); match {
 				var m models.Message
 				m.Routes = connector.Routes
+				m.In.Source = connector.ID
 				m.In.Process = false
 				m.Out.Text = connector.File + ": " + c.Name
 				m.Out.Detail = line.Text

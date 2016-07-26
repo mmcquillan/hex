@@ -61,6 +61,7 @@ func listenDeploys(lastMarker string, commandMsgs chan<- models.Message, connect
 			if e.Deploymentresult.ID > 0 && buildTime > lastMarker {
 				var m models.Message
 				m.Routes = connector.Routes
+				m.In.Source = connector.ID
 				m.In.Process = false
 				m.Out.Text = "Bamboo Deploy " + e.Deploymentresult.Deploymentversion.Planbranchname + " " + e.Deploymentresult.Deploymentversion.Name + " to " + e.Environment.Name + " " + e.Deploymentresult.Deploymentstate
 				m.Out.Detail = html.UnescapeString(sanitize.HTML(e.Deploymentresult.Reasonsummary))
@@ -157,6 +158,7 @@ func listenBuilds(lastMarker string, commandMsgs chan<- models.Message, connecto
 			}
 			var m models.Message
 			m.Routes = connector.Routes
+			m.In.Source = connector.ID
 			m.In.Process = false
 			m.Out.Text = "Bamboo Build " + html.UnescapeString(sanitize.HTML(item.Title))
 			m.Out.Detail = html.UnescapeString(sanitize.HTML(item.Content))
