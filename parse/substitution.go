@@ -30,7 +30,7 @@ func SubstituteInputs(value string) string {
 
 func SubstitutionVars(value string) (match bool, tokens []string) {
 	match = false
-	re := regexp.MustCompile("\\${([A-Za-z0-9*_\\-\\.]+)}")
+	re := regexp.MustCompile("\\${([A-Za-z0-9*_\\-\\.\\?]+)}")
 	tokens = re.FindAllString(value, -1)
 	if len(tokens) > 0 {
 		match = true

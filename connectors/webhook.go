@@ -89,7 +89,6 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 			tokens := make(map[string]string)
 			tokens["?"] = reqQs
 			tokens["*"] = body
-			out := c.Output
 			if isJson {
 				if match, subs := parse.SubstitutionVars(c.Output); match {
 					for _, sub := range subs {
@@ -107,7 +106,7 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 
 				}
 			}
-			out = parse.Substitute(out, tokens)
+			out := parse.Substitute(c.Output, tokens)
 			if c.Process {
 				var m models.Message
 				m.Routes = webhook.Connector.Routes
