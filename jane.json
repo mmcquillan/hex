@@ -1,5 +1,4 @@
 {
-  "Name": "jane",
   "LogFile": "/var/log/jane.log",
   "Aliases": [
   ],
