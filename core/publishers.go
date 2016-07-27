@@ -3,6 +3,7 @@ package core
 import (
 	"github.com/projectjane/jane/connectors"
 	"github.com/projectjane/jane/models"
+	"github.com/projectjane/jane/parse"
 	"log"
 	"strings"
 )
@@ -12,7 +13,7 @@ func Publishers(publishMsgs <-chan models.Message, config *models.Config) {
 	for {
 		message := <-publishMsgs
 		for _, route := range message.Routes {
-			if strings.Contains(message.Out.Text, route.Match) || route.Match == "*" {
+			if match, _ := parse.Match(route.Match, message.Out.Text+" "+message.Out.Detail); match || route.Match == "*" {
 				for _, connector := range config.Connectors {
 					if connector.Active {
 						if sendToConnector(connector.ID, route.Connectors) {
