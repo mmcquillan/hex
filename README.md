@@ -313,7 +313,7 @@ Jane is capable of responding to questions or outputing fixed phrases.
 * _Users_ - List of users who can execute the commands in this connector [security](#security)
 * _Commands_ - One or more commands to execute against the defined server
   * _Match_ - String to [match](#matching)
-  * _Output_ - String to output, with some positional variable substitution
+  * _Output_ - String to output, with [substitutions](#substitutions)
   * _HideHelp_ - A boolean to show or hide the help when displaying help (Default: false)
   * _Help_ - Optional help text, otherwise it'll show the Match value
 
@@ -460,6 +460,7 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
 ```
 
 #### Usage:
+* For this connector, the `${?}` represents everything in the URL after the ?
 
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'exec2'
@@ -472,7 +473,7 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
   * _Name_ - Name of the matching webhook check
   * _Match_ - Webhook URL [match](#matching) (this will always be after the server name and port)
   * _Process_ - This defines if the incoming message should be processed by the other connector commands (true) or just published out to the routes (false) (Default: false)
-  * _Output_ - This is the formatting for the output. Use the [json parsing rules](https://github.com/Jeffail/gabs#parsing-and-searching-json) or '${*}' to output the entire json payload or '${?}' to output the query string.
+  * _Output_ - This is the formatting for the output. Use the [json parsing rules](https://github.com/Jeffail/gabs#parsing-and-searching-json), '${?}' to output the query string or the [substitutions](#substitutions).
   * _Green_ - A [match](#matching) to identify what is in a green state
   * _Yellow_ - A [match](#matching) to identify what is in a yellow state
   * _Red_ - A [match](#matching) to identify what is in a red state
@@ -520,7 +521,7 @@ With Jane, you can create aliases for commands.
 
 #### Fields:
 * _Match_ - This will match incoming commands with the [match](#matching) rules
-* _Output_ - This is the command that will be run when matched and supports substitutions
+* _Output_ - This is the command that will be run supports [substitutions](#substitutions)
 * _HideHelp_ - A boolean to show or hide the help when displaying help (Default: false)
 * _Help_ - Optional help text, otherwise it'll show the Match value
 
@@ -570,6 +571,14 @@ Jane uses a format for substitutions which is implemented in most areas. Each co
 #### Examples:
 
 `${ENVIRONMENT_VARIABLE}` - Any environment variable available to Jane can be substituted
+
+`${0}` - This is the matched value for commands
+
+`${1}` - This is the first token after the matched command
+
+`${2} ... ${n}` - This is the second token after the matched command (repeats for as many tokens as are after)
+
+`${*}` - This is all tokens after the matched command
 
 
 ### Security
