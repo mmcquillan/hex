@@ -28,9 +28,13 @@ func (x Twilio) Command(message models.Message, publishMsgs chan<- models.Messag
 
 // Publish Twilio publisher to push messages via Twilio REST Api
 func (x Twilio) Publish(connector models.Connector, message models.Message, target string) {
+	if connector.Debug {
+		log.Print("Starting client connect to twilio: " + connector.ID)
+	}
 	client := &http.Client{}
 
-	req, err := buildRequest(target, message.Out.Text, connector)
+	textmsg := strings.Replace(message.Out.Text+" - "+message.Out.Detail, "```", "", -1)
+	req, err := buildRequest(target, textmsg, connector)
 	if err != nil {
 		log.Println(err)
 	}
