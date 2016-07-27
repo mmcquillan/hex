@@ -1,8 +1,9 @@
-# jane docker file
-FROM golang:1.5.4
-MAINTAINER Project Jane
-ENV GOBIN=/go/bin
-RUN go get github.com/projectjane/jane
-WORKDIR /go/src/github.com/projectjane/jane
-RUN go install jane.go
-ENTRYPOINT /go/bin/jane
+# Example Jane Docker File
+FROM projectjane/jane:beta
+RUN apt-get update --fix-missing \
+  && apt-get install -y build-essential \
+  && git -C /opt clone https://github.com/tj/n \
+  && make install -C /opt/n \
+  && n 5.3 --quiet \
+  && npm install -g azure-cli \
+ADD jane.json /etc/jane.json

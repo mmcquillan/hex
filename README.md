@@ -5,9 +5,15 @@ Jane is a chatops bot written in Go and is completely configuration driven. Cont
 
 ## Running
 
-### Install
-Soon we will create a better path to install Jane, but for now, you can compile and use the startup scripts in the startup directory or run via [Docker](https://hub.docker.com/r/projectjane/jane/).
+### Docker
+Use the [Docker Hub Repo](https://hub.docker.com/r/projectjane/jane/) then run:
 
+```
+docker run --name my-jane -v /some/jane.json:/etc/jane.json -d projectjane/jane
+```
+
+### Install
+You can install Go and build Jane. Look at example startup scripts under the startup directory.
 
 ### Configuration
 The configuration of Jane is via a json config file. The configuration file is expected to be named 'jane.json' and will be looked for in this order:
