@@ -1,7 +1,6 @@
 package core
 
 import (
-	"log"
 	"strings"
 
 	"github.com/projectjane/jane/connectors"
@@ -45,12 +44,9 @@ func Commands(commandMsgs <-chan models.Message, publishMsgs chan<- models.Messa
 }
 
 func aliasCommands(message *models.Message, config *models.Config) {
-	log.Printf("%+v", message)
 	for _, alias := range config.Aliases {
 		if match, tokens := parse.Match(alias.Match, message.In.Text); match {
-			log.Printf("%+v", tokens)
 			message.In.Text = parse.Substitute(alias.Output, tokens)
-			log.Printf("%+v", message)
 		}
 	}
 }
