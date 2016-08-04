@@ -390,6 +390,8 @@ Twilio provides SMS and Phone integration.
 ```
 
 #### Usage:
+* For the target in other connector's routes, you can set the target phone number
+* Multiple phone numbers can be seperated by a comma
 
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'twilio'

@@ -1,7 +1,6 @@
 package connectors
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -34,27 +33,25 @@ func (x Twilio) Publish(connector models.Connector, message models.Message, targ
 	client := &http.Client{}
 
 	textmsg := strings.Replace(message.Out.Text+" - "+message.Out.Detail, "```", "", -1)
-	req, err := buildRequest(target, textmsg, connector)
-	if err != nil {
-		log.Println(err)
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Println(err)
-	}
-	defer resp.Body.Close()
-
-	body, _ := ioutil.ReadAll(resp.Body)
-
-	if connector.Debug {
-		log.Println(string(body))
+	for _, number := range strings.Split(target, ",") {
+		req, err := buildRequest(number, textmsg, connector)
+		if err != nil {
+			log.Println(err)
+		}
+		resp, err := client.Do(req)
+		if err != nil {
+			log.Println(err)
+		}
+		defer resp.Body.Close()
+		body, _ := ioutil.ReadAll(resp.Body)
+		if connector.Debug {
+			log.Println(string(body))
+		}
 	}
 }
 
 // Help Twilio help information
 func (x Twilio) Help(connector models.Connector) (help string) {
-	help += fmt.Sprintf("Twilio messages sent from %s\n", connector.From)
 	return help
 }
 
