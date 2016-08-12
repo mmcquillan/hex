@@ -31,8 +31,12 @@ func (x Twilio) Publish(connector models.Connector, message models.Message, targ
 		log.Print("Starting client connect to twilio: " + connector.ID)
 	}
 	client := &http.Client{}
-
-	textmsg := strings.Replace(message.Out.Text+" - "+message.Out.Detail, "```", "", -1)
+	textmsg := ""
+	if message.Out.Detail != "" {
+		textmsg = strings.Replace(message.Out.Text+" - "+message.Out.Detail, "```", "", -1)
+	} else {
+		textmsg = strings.Replace(message.Out.Text, "```", "", -1)
+	}
 	for _, number := range strings.Split(target, ",") {
 		req, err := buildRequest(number, textmsg, connector)
 		if err != nil {

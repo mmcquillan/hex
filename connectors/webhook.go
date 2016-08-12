@@ -131,8 +131,12 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 				m.In.Source = webhook.Connector.ID
 				m.In.Text = reqUrl
 				m.In.Process = false
-				m.Out.Text = c.Name
-				m.Out.Detail = out
+				if c.Name != "" {
+					m.Out.Text = c.Name
+					m.Out.Detail = out
+				} else {
+					m.Out.Text = out
+				}
 				m.Out.Status = color
 				webhook.CommandMsgs <- m
 			}
