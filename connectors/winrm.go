@@ -35,6 +35,9 @@ func (x WinRM) Command(message models.Message, publishMsgs chan<- models.Message
 			x.Client, err = winrm.NewClient(endpoint, connector.Login, connector.Pass)
 			if err != nil {
 				log.Println("Error connecting to endpoint:", err)
+				message.Out.Text = "Error connecting to endpoint: " + err.Error()
+				publishMsgs <- message
+				return
 			}
 		}
 
