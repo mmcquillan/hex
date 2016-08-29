@@ -44,9 +44,11 @@ func (x WinRM) Command(message models.Message, publishMsgs chan<- models.Message
 	if err != nil {
 		log.Println("Error sending command:", err)
 		message.Out.Text = "Error processing command: "
+		message.Out.Status = "FAIL"
+	} else {
+		message.Out.Text = out
+		message.Out.Status = "SUCCESS"
 	}
-
-	message.Out.Text = out
 
 	publishMsgs <- message
 }
