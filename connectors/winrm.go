@@ -1,11 +1,14 @@
 package connectors
 
 import (
+	"bufio"
+	"bytes"
+	"errors"
 	"log"
-	"os"
 
 	"github.com/masterzen/winrm"
 	"github.com/projectjane/jane/models"
+	"github.com/projectjane/jane/parse"
 )
 
 //WinRM Struct representing a WinRM Connector
@@ -13,26 +16,17 @@ type WinRM struct {
 	Client *winrm.Client
 }
 
-//Listen Standard listen
+//Listen Listen not implemented for WinRM
 func (x WinRM) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
-
-	var err error
-
-	endpoint := winrm.NewEndpoint(connector.Server, 5985, false, false, nil, nil, nil, 0)
-	x.Client, err = winrm.NewClient(endpoint, connector.Login, connector.Pass)
-	if err != nil {
-		log.Println("Error connecting to endpoint:", err)
-	}
 }
 
 //Command Standard command parser
 func (x WinRM) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
-	// shell, err := x.Client.CreateShell()
-	// if err != nil {
-	// 	log.Println("Error creating shell:", err)
-	// }
-	// defer shell.Close()
+	if match, tokens := parse.Match("winrm*", message.In.Text); match {
+		message.Out.Text = callWolfram(tokens["*"], connector.Key)
+		publishMsgs <- message
+	}
 
 	if x.Client == nil {
 		log.Println("Client is nil. Connecting...")
@@ -44,24 +38,47 @@ func (x WinRM) Command(message models.Message, publishMsgs chan<- models.Message
 		if err != nil {
 			log.Println("Error connecting to endpoint:", err)
 		}
-
-		log.Println(x.Client)
 	}
 
-	_, err := x.Client.RunWithInput("ipconfig", os.Stdout, os.Stderr, os.Stdin)
+	out, err := x.sendCommand("ipconfig")
 	if err != nil {
-		panic(err)
+		log.Println("Error sending command:", err)
+		message.Out.Text = "Error processing command: "
 	}
 
+	message.Out.Text = out
+
+	publishMsgs <- message
 }
 
-//Publish Not implemented
+//Publish Not implemented for WinRM
 func (x WinRM) Publish(connector models.Connector, message models.Message, target string) {
 	return
 }
 
 //Help Returns help information for the connector
 func (x WinRM) Help(connector models.Connector) (help string) {
-	help += "winrm"
+	help += "winrm {cmd}"
 	return help
+}
+
+func (x WinRM) sendCommand(command string) (string, error) {
+	var in bytes.Buffer
+	var out bytes.Buffer
+	var e bytes.Buffer
+
+	stdin := bufio.NewReader(&in)
+	stdout := bufio.NewWriter(&out)
+	stderr := bufio.NewWriter(&e)
+
+	_, err := x.Client.RunWithInput(command, stdout, stderr, stdin)
+	if err != nil {
+		return "", err
+	}
+
+	if e.String() != "" {
+		return "", errors.New(e.String())
+	}
+
+	return out.String(), nil
 }
