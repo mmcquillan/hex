@@ -24,33 +24,32 @@ func (x WinRM) Listen(commandMsgs chan<- models.Message, connector models.Connec
 //Command Standard command parser
 func (x WinRM) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	if match, tokens := parse.Match("winrm*", message.In.Text); match {
-		message.Out.Text = callWolfram(tokens["*"], connector.Key)
+		command := tokens["*"]
+
+		if x.Client == nil {
+			log.Println("Client is nil. Connecting...")
+
+			var err error
+
+			endpoint := winrm.NewEndpoint(connector.Server, 5985, false, false, nil, nil, nil, 0)
+			x.Client, err = winrm.NewClient(endpoint, connector.Login, connector.Pass)
+			if err != nil {
+				log.Println("Error connecting to endpoint:", err)
+			}
+		}
+
+		out, err := x.sendCommand(command)
+		if err != nil {
+			log.Println("Error sending command:", err)
+			message.Out.Text = "Error processing command: "
+			message.Out.Status = "FAIL"
+		} else {
+			message.Out.Text = out
+			message.Out.Status = "SUCCESS"
+		}
+
 		publishMsgs <- message
 	}
-
-	if x.Client == nil {
-		log.Println("Client is nil. Connecting...")
-
-		var err error
-
-		endpoint := winrm.NewEndpoint(connector.Server, 5985, false, false, nil, nil, nil, 0)
-		x.Client, err = winrm.NewClient(endpoint, connector.Login, connector.Pass)
-		if err != nil {
-			log.Println("Error connecting to endpoint:", err)
-		}
-	}
-
-	out, err := x.sendCommand("ipconfig")
-	if err != nil {
-		log.Println("Error sending command:", err)
-		message.Out.Text = "Error processing command: "
-		message.Out.Status = "FAIL"
-	} else {
-		message.Out.Text = out
-		message.Out.Status = "SUCCESS"
-	}
-
-	publishMsgs <- message
 }
 
 //Publish Not implemented for WinRM
