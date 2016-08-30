@@ -51,7 +51,6 @@ func RemoteCommand(message models.Message, publishMsgs chan<- models.Message, co
 				color = "FAIL"
 			}
 			message.Out.Text = connector.ID + " " + command.Name
-			log.Println("Output:", command.Output)
 			message.Out.Detail = parse.Substitute(command.Output, tokens)
 			message.Out.Status = color
 			publishMsgs <- message

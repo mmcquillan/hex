@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+//Substitute Function for substituting a string with tokens
 func Substitute(value string, tokens map[string]string) string {
 	if match, hits := SubstitutionVars(value); match {
 		for _, hit := range hits {
