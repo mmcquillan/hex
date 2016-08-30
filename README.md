@@ -626,7 +626,7 @@ Publishers are a means of communicating back out to the world. A publisher will 
 
 ### Development Environment
 * Get your toes wet with Go
-* Setup your Go 1.5.3 environment
+* Setup your Go 1.7.0 environment
 * Pull the project with 'go get github.com/projectjane/jane'
 * Compile with 'go install jane.go'
 * Use the sample _jane.json_ file checked in as a starting point
