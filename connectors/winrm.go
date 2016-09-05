@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
@@ -126,7 +127,12 @@ func checkRM(commandMsgs chan<- models.Message, command models.Command, connecto
 }
 
 func sendCommand(command, args string, connector models.Connector) string {
-	endpoint := winrm.NewEndpoint(connector.Server, 5985, false, false, nil, nil, nil, 0)
+	port := 5985
+	if connector.Port != "" {
+		port, _ = strconv.Atoi(connector.Port)
+	}
+
+	endpoint := winrm.NewEndpoint(connector.Server, port, false, false, nil, nil, nil, 0)
 	rmclient, err := winrm.NewClient(endpoint, connector.Login, connector.Pass)
 	if err != nil {
 		log.Println("Error connecting to endpoint:", err)
