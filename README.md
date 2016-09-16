@@ -16,7 +16,9 @@ docker run --name my-jane -v /some/jane.json:/etc/jane.json -d projectjane/jane
 You can install Go and build Jane. Look at example startup scripts under the startup directory.
 
 ### Configuration
-The configuration of Jane is via a json config file. The configuration file is expected to be named 'jane.json' and will be looked for in this order:
+The configuration of Jane is via a json config file and will be looked for in this order:
+
+* JANE_CONFIG - Environment variable
 * --config <file name> - Pass in a configuration file location as a command line parameter
 * ./jane.json - the location of the jane binary
 * ~/jane.json - the home directory of the user
@@ -39,6 +41,12 @@ The basic configurtion file should include these elements:
 
 ### Environment Variables
 To protect sensitive data, you can set Connector Server, Port, Login and Pass as an environment variable, should the connector support those values. Use the format `${SLACK_TOKEN}` to use the environment variable SLACK_TOKEN. Additionally, environment variables can be used in output values on many connectors as well.
+
+Jane has these builtin environment variables:
+
+* JANE_CONFIG - The path to the configuraiton file
+* JANE_LOGFILE - The path to the logfile
+* JANE_DEBUG - Set as true/false to globally turn on logging
 
 
 ## Connectors

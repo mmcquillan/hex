@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 )
 
 func LoadConfig(params models.Params, version string) (config models.Config) {
@@ -29,28 +30,39 @@ func LoadConfig(params models.Params, version string) (config models.Config) {
 }
 
 func locateConfig(params models.Params) (configFile string) {
+	tryfile := ""
 	file := "jane.json"
 
-	zero := params.ConfigFile
-	if FileExists(zero) {
-		return zero
+	// first try env param
+	tryfile = os.Getenv("JANE_CONFIG")
+	if FileExists(tryfile) {
+		return tryfile
 	}
 
-	first, _ := osext.ExecutableFolder()
-	first += "/" + file
-	if FileExists(first) {
-		return first
+	// second try param
+	tryfile = params.ConfigFile
+	if FileExists(tryfile) {
+		return tryfile
 	}
 
-	second, _ := homedir.Dir()
-	second += "/" + file
-	if FileExists(second) {
-		return second
+	// third try jane config in current executable dir
+	tryfile, _ = osext.ExecutableFolder()
+	tryfile += "/" + file
+	if FileExists(tryfile) {
+		return tryfile
 	}
 
-	third := "/etc/" + file
-	if FileExists(third) {
-		return third
+	// fourth try jane config in home dir
+	tryfile, _ = homedir.Dir()
+	tryfile += "/" + file
+	if FileExists(tryfile) {
+		return tryfile
+	}
+
+	// fifth try jane config in /etc
+	tryfile = "/etc/" + file
+	if FileExists(tryfile) {
+		return tryfile
 	}
 
 	return file
@@ -76,6 +88,16 @@ func subConfig(config *models.Config) {
 		config.Connectors[i].Login = parse.SubstituteInputs(config.Connectors[i].Login)
 		config.Connectors[i].Pass = parse.SubstituteInputs(config.Connectors[i].Pass)
 		config.Connectors[i].Key = parse.SubstituteInputs(config.Connectors[i].Key)
+		if os.Getenv("JANE_DEBUG") != "" {
+			if strings.ToLower(os.Getenv("JANE_DEBUG")) == "true" {
+				config.Connectors[i].Debug = true
+			} else {
+				config.Connectors[i].Debug = false
+			}
+		}
+	}
+	if os.Getenv("JANE_LOGFILE") != "" {
+		config.LogFile = os.Getenv("JANE_LOGFILE")
 	}
 }
 
