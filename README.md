@@ -42,7 +42,7 @@ To protect sensitive data, you can set Connector Server, Port, Login and Pass as
 
 
 ## Connectors
-Connectors are what Jane uses to pull in information, interpret it, and issue out a response. The Routes specify where the results from the input should be written to or * for all. The Target can specify a channel in the case of Slack. 
+Connectors are what Jane uses to pull in information, interpret it, and issue out a response. The Routes specify where the results from the input should be written to or * for all. The Target can specify a channel in the case of Slack.
 
 For the connector configuration, when adding routes, you must specify the ID of the connector you want to route the response to.
 
@@ -432,7 +432,7 @@ Basic website monitoring that throws alerts when it does not get a 200 OK status
 
 ### Webhook Connector
 
-This connector opens a port for Jane to receive webhook calls. Webhooks calls are matched against the command list matches. Json can be interpreted and used to substitute into the output string. 
+This connector opens a port for Jane to receive webhook calls. Webhooks calls are matched against the command list matches. Json can be interpreted and used to substitute into the output string.
 
 
 #### Example:
@@ -482,6 +482,67 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
   * _Match_ - Webhook URL [match](#matching) (this will always be after the server name and port)
   * _Process_ - This defines if the incoming message should be processed by the other connector commands (true) or just published out to the routes (false) (Default: false)
   * _Output_ - This is the formatting for the output. Use the [json parsing rules](https://github.com/Jeffail/gabs#parsing-and-searching-json), '${?}' to output the query string or the [substitutions](#substitutions).
+  * _Green_ - A [match](#matching) to identify what is in a green state
+  * _Yellow_ - A [match](#matching) to identify what is in a yellow state
+  * _Red_ - A [match](#matching) to identify what is in a red state
+* _Routes_ - One or more [routes](#routes)
+
+
+### WinRM Connector
+
+This connector provides a single means of making local and remote calls to Windows systems. You can allow these calls to be made by command, but also mark the calls with the RunCheck property to set Jane to check them. This combined with the interpreter for output, makes it a very capable monitoring platform.
+
+#### Example:
+
+```
+{"Type": "winrm", "ID": "Server 1", "Active": true,
+  "Server": "server1.com", "Port": "5985", "Login": "jane", "Pass": "abc123",
+  "Commands": [
+    {
+        "Name": "Apt Check",
+        "Match": "jane server1 iisstatus",
+        "Output": "```${STDOUT}```",
+        "Cmd": "iisreset /status",
+        "Args": "",
+        "HideHelp": false,
+        "Help": "jane server1 iisstatus - To check iis status of server!",
+        "RunCheck": true,
+        "Interval": 1,
+        "Remind": 15,
+        "Green": "*Running*",
+        "Red": "*Stopped*"
+    }
+  ],
+  "Routes": [
+    {"Match": "*", "Connectors": "slack", "Target": "#devops"}
+  ]
+}
+```
+
+#### Usage:
+* To make local calls to the system, leave out the Server, Port, Login, Pass values.
+
+#### Fields:
+* _Type_ - This specifies the type of connector, in this case, 'exec'
+* _ID_ - This should be a unique identifier for this connector
+* _Active_ - This is a boolean value to set this connector to be activated
+* _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+* _Server_ - The server address or IP to connect to
+* _Port_ - The port number to connect to (Default: 22)
+* _Login_ - The user to login with
+* _Pass_ - The password to connect with
+* _Users_ - List of users who can execute the commands in this connector [security](#security)
+* _Commands_ - One or more commands to execute against the defined server
+  * _Name_ - Readable name of check
+  * _Match_ - Command [match](#matching)
+  * _Output_ - Formatting for the output of the command, use `${STDOUT}` as the output
+  * _Cmd_ - The command to execute (do not include arguments)
+  * _Args_ - The arguments, space deliminated (you can access anything after the match above with positional variables like ${1}, ${2}, etc or ${*} for all input after the match)
+  * _HideHelp_ - A boolean to show or hide the help when displaying help (Default: false)
+  * _Help_ - Optional help text, otherwise it'll show the Match value
+  * _RunCheck_ - A boolean that will have Jane periodically run this (Default: false)
+  * _Interval_ - An integer that is the number of minutes between checks when RunCheck is true (Default: 1)
+  * _Remind_ - An integer which is the number of units of Interval to wait before reminding of a non-Green status, with Zero being no reminders (Default: 0)
   * _Green_ - A [match](#matching) to identify what is in a green state
   * _Yellow_ - A [match](#matching) to identify what is in a yellow state
   * _Red_ - A [match](#matching) to identify what is in a red state
