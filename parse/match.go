@@ -7,7 +7,6 @@ import (
 )
 
 func Match(pattern string, value string) (match bool, tokens map[string]string) {
-	pattern = strings.ToLower(pattern)
 	ws := strings.HasPrefix(pattern, "*")
 	we := strings.HasSuffix(pattern, "*")
 	re := strings.HasPrefix(pattern, "/") && strings.HasSuffix(pattern, "/")
@@ -19,9 +18,12 @@ func Match(pattern string, value string) (match bool, tokens map[string]string) 
 	value = strings.TrimSpace(value)
 	tokens = make(map[string]string)
 	tokens["0"] = pattern
-	ta := strings.Split(strings.TrimSpace(strings.Replace(value, pattern, "", 1)), " ")
+	if !re {
+		pattern = strings.ToLower(pattern)
+	}
+	ta := strings.Split(CIReplace(value, pattern, ""), " ")
 	for i := 0; i < len(ta); i++ {
-		tokens[strconv.Itoa(i+1)] = ta[i]
+		tokens[strconv.Itoa(i+1)] = strings.TrimSpace(ta[i])
 	}
 	tokens["*"] = strings.Join(ta, " ")
 	value = strings.ToLower(value)
@@ -39,4 +41,15 @@ func Match(pattern string, value string) (match bool, tokens map[string]string) 
 		match = true
 	}
 	return match, tokens
+}
+
+func CIReplace(str string, val string, rep string) (ret string) {
+	f := strings.Index(strings.ToLower(str), strings.ToLower(val))
+	if f == -1 {
+		ret = str
+	} else {
+		l := len(val)
+		ret = strings.TrimSpace(str[:f]) + " " + strings.TrimSpace(str[(f+l):])
+	}
+	return ret
 }

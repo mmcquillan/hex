@@ -23,6 +23,7 @@ func init() {
 	List["wolfram"] = reflect.TypeOf(Wolfram{})
 	List["redis"] = reflect.TypeOf(Redis{})
 	List["webhook"] = reflect.TypeOf(Webhook{})
+	List["winrm"] = reflect.TypeOf(WinRM{})
 	List["twilio"] = reflect.TypeOf(Twilio{})
 
 	// depricated

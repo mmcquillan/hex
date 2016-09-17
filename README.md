@@ -16,7 +16,9 @@ docker run --name my-jane -v /some/jane.json:/etc/jane.json -d projectjane/jane
 You can install Go and build Jane. Look at example startup scripts under the startup directory.
 
 ### Configuration
-The configuration of Jane is via a json config file. The configuration file is expected to be named 'jane.json' and will be looked for in this order:
+The configuration of Jane is via a json config file and will be looked for in this order:
+
+* JANE_CONFIG - Environment variable
 * --config <file name> - Pass in a configuration file location as a command line parameter
 * ./jane.json - the location of the jane binary
 * ~/jane.json - the home directory of the user
@@ -42,9 +44,15 @@ The basic configurtion file should include these elements:
 ### Environment Variables
 To protect sensitive data, you can set Connector Server, Port, Login and Pass as an environment variable, should the connector support those values. Use the format `${SLACK_TOKEN}` to use the environment variable SLACK_TOKEN. Additionally, environment variables can be used in output values on many connectors as well.
 
+Jane has these builtin environment variables:
+
+* JANE_CONFIG - The path to the configuraiton file
+* JANE_LOGFILE - The path to the logfile
+* JANE_DEBUG - Set as true/false to globally turn on logging
+
 
 ## Connectors
-Connectors are what Jane uses to pull in information, interpret it, and issue out a response. The Routes specify where the results from the input should be written to or * for all. The Target can specify a channel in the case of Slack. 
+Connectors are what Jane uses to pull in information, interpret it, and issue out a response. The Routes specify where the results from the input should be written to or * for all. The Target can specify a channel in the case of Slack.
 
 For the connector configuration, when adding routes, you must specify the ID of the connector you want to route the response to.
 
@@ -431,7 +439,7 @@ Basic website monitoring that throws alerts when it does not get a 200 OK status
 
 ### Webhook Connector
 
-This connector opens a port for Jane to receive webhook calls. Webhooks calls are matched against the command list matches. Json can be interpreted and used to substitute into the output string. 
+This connector opens a port for Jane to receive webhook calls. Webhooks calls are matched against the command list matches. Json can be interpreted and used to substitute into the output string.
 
 
 #### Example:
@@ -481,6 +489,68 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
   * _Green_ - A [match](#matching) to identify what is in a green state
   * _Yellow_ - A [match](#matching) to identify what is in a yellow state
   * _Red_ - A [match](#matching) to identify what is in a red state
+
+
+### WinRM Connector
+
+This connector provides a single means of making local and remote calls to Windows systems. You can allow these calls to be made by command, but also mark the calls with the RunCheck property to set Jane to check them. This combined with the interpreter for output, makes it a very capable monitoring platform.
+
+#### Example:
+
+```
+{"Type": "winrm", "ID": "Server 1", "Active": true,
+  "Server": "server1.com", "Port": "5985", "Login": "jane", "Pass": "abc123",
+  "Commands": [
+    {
+        "Name": "Apt Check",
+        "Match": "jane server1 iisstatus",
+        "Output": "```${STDOUT}```",
+        "Cmd": "iisreset",
+        "Args": "/status",
+        "HideHelp": false,
+        "Help": "jane server1 iisstatus - To check iis status of server!",
+        "RunCheck": true,
+        "Interval": 1,
+        "Remind": 15,
+        "Green": "*Running*",
+        "Yellow" "*Pending*"
+        "Red": "*Stopped*"
+    }
+  ],
+  "Routes": [
+    {"Match": "*", "Connectors": "slack", "Target": "#devops"}
+  ]
+}
+```
+
+#### Usage:
+* To make local calls to the system, leave out the Server, Port, Login, Pass values.
+
+#### Fields:
+* _Type_ - This specifies the type of connector, in this case, 'winrm'
+* _ID_ - This should be a unique identifier for this connector
+* _Active_ - This is a boolean value to set this connector to be activated
+* _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+* _Server_ - The server address or IP to connect to
+* _Port_ - The port number to connect to (Default: 5985)
+* _Login_ - The user to login with
+* _Pass_ - The password to connect with
+* _Users_ - List of users who can execute the commands in this connector [security](#security)
+* _Commands_ - One or more commands to execute against the defined server
+  * _Name_ - Readable name of check
+  * _Match_ - Command [match](#matching)
+  * _Output_ - Formatting for the output of the command, use `${STDOUT}` as the output
+  * _Cmd_ - The command to execute (do not include arguments)
+  * _Args_ - The arguments, space deliminated (you can access anything after the match above with positional variables like ${1}, ${2}, etc or ${*} for all input after the match)
+  * _HideHelp_ - A boolean to show or hide the help when displaying help (Default: false)
+  * _Help_ - Optional help text, otherwise it'll show the Match value
+  * _RunCheck_ - A boolean that will have Jane periodically run this (Default: false)
+  * _Interval_ - An integer that is the number of minutes between checks when RunCheck is true (Default: 1)
+  * _Remind_ - An integer which is the number of units of Interval to wait before reminding of a non-Green status, with Zero being no reminders (Default: 0)
+  * _Green_ - A [match](#matching) to identify what is in a green state
+  * _Yellow_ - A [match](#matching) to identify what is in a yellow state
+  * _Red_ - A [match](#matching) to identify what is in a red state
+* _Routes_ - One or more [routes](#routes)
 
 
 ### Wolfram Connector
@@ -631,7 +701,7 @@ Publishers are a means of communicating back out to the world. A publisher will 
 
 ### Development Environment
 * Get your toes wet with Go
-* Setup your Go 1.5.3 environment
+* Setup your Go 1.7.0 environment
 * Pull the project with 'go get github.com/projectjane/jane'
 * Compile with 'go install jane.go'
 * Use the sample _jane.json_ file checked in as a starting point
