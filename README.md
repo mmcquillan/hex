@@ -510,6 +510,7 @@ This connector provides a single means of making local and remote calls to Windo
         "Interval": 1,
         "Remind": 15,
         "Green": "*Running*",
+        "Yellow" "*Pending*"
         "Red": "*Stopped*"
     }
   ],
