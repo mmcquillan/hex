@@ -523,12 +523,12 @@ This connector provides a single means of making local and remote calls to Windo
 * To make local calls to the system, leave out the Server, Port, Login, Pass values.
 
 #### Fields:
-* _Type_ - This specifies the type of connector, in this case, 'exec'
+* _Type_ - This specifies the type of connector, in this case, 'winrm'
 * _ID_ - This should be a unique identifier for this connector
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 * _Server_ - The server address or IP to connect to
-* _Port_ - The port number to connect to (Default: 22)
+* _Port_ - The port number to connect to (Default: 5985)
 * _Login_ - The user to login with
 * _Pass_ - The password to connect with
 * _Users_ - List of users who can execute the commands in this connector [security](#security)
