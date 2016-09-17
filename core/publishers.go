@@ -30,7 +30,7 @@ func Publishers(publishMsgs <-chan models.Message, config *models.Config) {
 									log.Print("")
 								}
 								for _, target := range strings.Split(route.Targets, ",") {
-									if target == "*" && message.In.Target != "" {
+									if target == "*" {
 										target = message.In.Target
 									}
 									c := connectors.MakeConnector(connector.Type).(connectors.Connector)
