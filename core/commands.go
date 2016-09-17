@@ -25,7 +25,7 @@ func Commands(commandMsgs <-chan models.Message, publishMsgs chan<- models.Messa
 						} else {
 							users := strings.Split(connector.Users, ",")
 							for _, u := range users {
-								if u == m.In.User || u == m.In.Source {
+								if u == m.In.User || u == m.In.Target {
 									canRun = true
 								}
 							}

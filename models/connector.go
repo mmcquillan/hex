@@ -14,6 +14,5 @@ type Connector struct {
 	Image    string
 	Users    string
 	Commands []Command
-	Routes   []Route
 	Debug    bool
 }

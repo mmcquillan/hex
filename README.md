@@ -32,6 +32,8 @@ The basic configurtion file should include these elements:
   "Aliases": [
   ],
   "Connectors": [
+  ],
+  "Routes": [
   ]
 }
 ```
@@ -71,10 +73,7 @@ This connector was written to integrate bamboo builds. It was written against th
 
 ```
 {"Type": "bamboo", "ID": "bamboo server", "Active": true, "Debug": true,
-   "Server": "<URL>.atlassian.net", "Login": "<JIRA USER>", "Pass": "<JIRA PASS>",
-   "Routes": [
-       {"Match": "*", "Connectors": "*", "Target": "#devops"}
-   ]
+   "Server": "<URL>.atlassian.net", "Login": "<JIRA USER>", "Pass": "<JIRA PASS>"
 }
 ```
 
@@ -92,7 +91,6 @@ This connector was written to integrate bamboo builds. It was written against th
 * _Login_ - The bamboo user to login with
 * _Pass_ - The bamboo password to connect with
 * _Users_ - List of users who can execute the commands in this connector [security](#security)
-* _Routes_ - One or more [routes](#routes)
 
 
 ### Cli Connector
@@ -102,10 +100,7 @@ This connector runs Jane via the command line interface instead of as a daemon a
 #### Example:
 
 ```
-{"Type": "cli", "ID": "term-bot", "Active": true, "Debug": false,
-  "Routes": [
-    {"Match": "*", "Connectors": "term-bot", "Target": ""}
-  ]
+{"Type": "cli", "ID": "term-bot", "Active": true, "Debug": false
 }
 ```
 
@@ -117,7 +112,6 @@ This connector runs Jane via the command line interface instead of as a daemon a
 * _ID_ - This should be a unique identifier for this connector
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
-* _Routes_ - One or more [routes](#routes)
 
 
 ### Email Connector
@@ -174,9 +168,6 @@ This connector provides a single means of making local and remote calls to Linux
         "Yellow": "*WARNING*",
         "Red": "*CRITICAL*"
     }
-  ],
-  "Routes": [
-    {"Match": "*", "Connectors": "slack", "Target": "#devops"}
   ]
 }
 ```
@@ -208,7 +199,6 @@ This connector provides a single means of making local and remote calls to Linux
   * _Green_ - A [match](#matching) to identify what is in a green state
   * _Yellow_ - A [match](#matching) to identify what is in a yellow state
   * _Red_ - A [match](#matching) to identify what is in a red state
-* _Routes_ - One or more [routes](#routes)
 
 
 ### ImageMe Connector
@@ -273,9 +263,6 @@ The Logging connector will monitor a local file and throw an alert anytime a mat
   "Commands": [
     {"Name": "Starting Jane", "Match": "*stopping*"},
     {"Name": "Starting Jane", "Match": "*starting*"}
-  ],
-  "Routes": [
-    {"Match": "*", "Connectors": "term-bot"}
   ]
 }
 ```
@@ -292,7 +279,6 @@ The Logging connector will monitor a local file and throw an alert anytime a mat
 * _Commands_ - One or more commands to execute against the defined server
   * _Name_ - Readable name of check
   * _Match_ - String to match in the file [match](#matching)
-* _Routes_ - One or more [routes](#routes)
 
 
 ### Response Connector
@@ -331,10 +317,7 @@ Pull in RSS feeds directly into your bot and see what's going on around the web.
 
 ```
 {"Type": "rss", "ID": "AWS EC2", "Active": true,
-    "Server": "http://status.aws.amazon.com/rss/ec2-us-east-1.rss",
-    "Routes": [
-        {"Match": "*", "Connectors": "slack", "Target": "#devops"}
-    ]
+    "Server": "http://status.aws.amazon.com/rss/ec2-us-east-1.rss"
 }
 ```
 
@@ -347,7 +330,6 @@ Pull in RSS feeds directly into your bot and see what's going on around the web.
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 * _Server_ - The server address or IP to connect to
-* _Routes_ - One or more [routes](#routes)
 
 
 ### Slack Connector
@@ -391,7 +373,6 @@ Twilio provides SMS and Phone integration.
 
 #### Usage:
 * For the target in other connector's routes, you can set the target phone number
-* Multiple phone numbers can be seperated by a comma
 
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'twilio'
@@ -410,11 +391,7 @@ Basic website monitoring that throws alerts when it does not get a 200 OK status
 
 ```
 {"Type": "website", "ID": "Website Monitor", "Active": true,
-  "Server": "https://google.com",
-  "Routes": [
-    {"Match": "*", "Connectors": "slack", "Target": "#devops"},
-    {"Match": "*", "Connectors": "slack", "Target": "@matt"}
-  ]
+  "Server": "https://google.com"
 }
 ```
 
@@ -427,7 +404,6 @@ Basic website monitoring that throws alerts when it does not get a 200 OK status
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 * _Server_ - The website to monitor
-* _Routes_ - One or more [routes](#routes)
 
 
 ### Webhook Connector
@@ -460,9 +436,6 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
         "Process": false,
         "Output": "${?}"
     }
-  ],
-  "Routes": [
-      {"Match": "*", "Connectors": "*", "Target": "#devops"}
   ]
 }
 ```
@@ -485,7 +458,6 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
   * _Green_ - A [match](#matching) to identify what is in a green state
   * _Yellow_ - A [match](#matching) to identify what is in a yellow state
   * _Red_ - A [match](#matching) to identify what is in a red state
-* _Routes_ - One or more [routes](#routes)
 
 
 ### Wolfram Connector
@@ -542,19 +514,29 @@ Routes can exist for connectors that listen to or interpret commands. Routes can
 
 ```
 "Routes": [
-  {"Match": "*", "Connectors": "slack", "Target": "#devops"},
-  {"Match": "*DANGER*", "Connectors": "slack", "Target": "@matt"}
+    {
+        "Matches": [{"ConnectorType": "*", "ConnectorID": "jane-slack", "Target": "*", "User": "*", "Message": "*"}],
+        "Connectors": "jane-slack", "Targets": "#alerts,*"
+    }
 ]
 ```
 
 #### Usage:
 * Some connector publishers allow you to specify a Target, such as Slack which uses a target for a channel
-* Match follows the Jane [match rules](#matching)
+* Connectors and Targets allow for a comma seperated list of each
+* Message follows the Jane [match rules](#matching)
+* All other fields use an exact match or * for wild card
+* A "*" as a Slack target will return the message to the originating user or channel
 
 #### Fields:
-* _Match_ - This will match the message or any message with "*" using the [match](#matching)
-* _Connectors_ - The connector name (ID) or "*" to match all connectors
-* _Target_ - The target which is connector specific or "*" for all
+* _Matches_ - Multiple matches against messages
+  * _ConnectorType_ - The type such as "slack" or "rss"
+  * _ConnectorID_ - The unique name for a specific connector
+  * _Target_ - The incoming target (such as channel in slack)
+  * _User_ - The user the message originated from
+  * _Message_ - This will match the message or any message with "*" using the [match](#matching)
+* _Connectors_ - A comma seperated list of connector name (ID) or "*" to match all connectors
+* _Target_ - A comma seperated list of target which is connector specific or "*" for all
 
 
 ### Matching

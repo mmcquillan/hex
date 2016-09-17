@@ -54,8 +54,8 @@ func (x Website) Listen(commandMsgs chan<- models.Message, connector models.Conn
 				color = "NONE"
 			}
 			var m models.Message
-			m.Routes = connector.Routes
-			m.In.Source = connector.ID
+			m.In.ConnectorType = connector.Type
+			m.In.ConnectorID = connector.ID
 			m.In.Process = false
 			m.Out.Text = connector.ID
 			m.Out.Detail = out
