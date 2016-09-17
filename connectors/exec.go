@@ -2,13 +2,14 @@ package connectors
 
 import (
 	"bytes"
-	"github.com/projectjane/jane/models"
-	"github.com/projectjane/jane/parse"
-	"golang.org/x/crypto/ssh"
 	"log"
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/projectjane/jane/models"
+	"github.com/projectjane/jane/parse"
+	"golang.org/x/crypto/ssh"
 )
 
 type Exec struct {
