@@ -56,6 +56,7 @@ Supported connectors:
 * [file](#file-connector) - File watcher
 * [imageme](#imageme-connector) - Pull back images or animated gifs
 * [jira](#jira-connector) - Atlassian Jira integration
+* [log](#log-connector) - Log connector to audit Jane calls
 * [response](#response-connector) - Text Responses
 * [rss](#rss-connector) - RSS Feed
 * [slack](#slack-connector) - Slack chat
@@ -279,6 +280,28 @@ This connector will integrate with your Jira server.
 * _Login_ - A Jira user login
 * _Pass_ - A Jira password
 * _Users_ - List of users who can execute the commands in this connector [security](#security)
+
+
+### Log Connector
+The Log connector will write message output to a log file, usually for auditing purposes.
+
+#### Example:
+
+```
+{"Type": "log", "ID": "audit", "Active": true,
+  "File": "/home/matt/messages.log"
+}
+```
+
+#### Usage:
+* This is currently limited to the system in which Jane runs on
+
+#### Fields:
+* _Type_ - This specifies the type of connector, in this case, 'logging'
+* _ID_ - This should be a unique identifier for this connector
+* _Active_ - This is a boolean value to set this connector to be activated
+* _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+* _File_ - The file to watch (make sure the Jane process has permission)
 
 
 ### Response Connector
