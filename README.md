@@ -53,9 +53,9 @@ Supported connectors:
 * [cli](#cli-connector) - Command line interface
 * [email](#email-connector) - Email
 * [exec](#exec-connector) - Execution of commands with monitoring capability
+* [file](#file-connector) - File watcher
 * [imageme](#imageme-connector) - Pull back images or animated gifs
 * [jira](#jira-connector) - Atlassian Jira integration
-* [logging](#logging-connector) - Logging monitor
 * [response](#response-connector) - Text Responses
 * [rss](#rss-connector) - RSS Feed
 * [slack](#slack-connector) - Slack chat
@@ -201,6 +201,35 @@ This connector provides a single means of making local and remote calls to Linux
   * _Red_ - A [match](#matching) to identify what is in a red state
 
 
+### File Connector
+The File watch connector will monitor a local file and throw an alert anytime a matched string is detected.
+
+#### Example:
+
+```
+{"Type": "file", "ID": "jane log", "Active": true,
+  "File": "/home/matt/test.log",
+  "Commands": [
+    {"Name": "Starting Jane", "Match": "*stopping*"},
+    {"Name": "Starting Jane", "Match": "*starting*"}
+  ]
+}
+```
+
+#### Usage:
+* This is currently limited to the system in which Jane runs on
+
+#### Fields:
+* _Type_ - This specifies the type of connector, in this case, 'logging'
+* _ID_ - This should be a unique identifier for this connector
+* _Active_ - This is a boolean value to set this connector to be activated
+* _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+* _File_ - The file to watch (make sure the Jane process has permission)
+* _Commands_ - One or more commands to execute against the defined server
+  * _Name_ - Readable name of check
+  * _Match_ - String to match in the file [match](#matching)
+
+
 ### ImageMe Connector
 Description
 
@@ -250,35 +279,6 @@ This connector will integrate with your Jira server.
 * _Login_ - A Jira user login
 * _Pass_ - A Jira password
 * _Users_ - List of users who can execute the commands in this connector [security](#security)
-
-
-### Logging Connector
-The Logging connector will monitor a local file and throw an alert anytime a matched string is detected.
-
-#### Example:
-
-```
-{"Type": "logging", "ID": "jane log", "Active": true,
-  "File": "/home/matt/test.log",
-  "Commands": [
-    {"Name": "Starting Jane", "Match": "*stopping*"},
-    {"Name": "Starting Jane", "Match": "*starting*"}
-  ]
-}
-```
-
-#### Usage:
-* This is currently limited to the system in which Jane runs on
-
-#### Fields:
-* _Type_ - This specifies the type of connector, in this case, 'logging'
-* _ID_ - This should be a unique identifier for this connector
-* _Active_ - This is a boolean value to set this connector to be activated
-* _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
-* _File_ - The file to watch (make sure the Jane process has permission)
-* _Commands_ - One or more commands to execute against the defined server
-  * _Name_ - Readable name of check
-  * _Match_ - String to match in the file [match](#matching)
 
 
 ### Response Connector

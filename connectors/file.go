@@ -7,10 +7,10 @@ import (
 	"log"
 )
 
-type Logging struct {
+type File struct {
 }
 
-func (x Logging) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+func (x File) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 	seek := tail.SeekInfo{Offset: 0, Whence: 2}
 	t, err := tail.TailFile(connector.File, tail.Config{Follow: true, Location: &seek})
@@ -33,14 +33,14 @@ func (x Logging) Listen(commandMsgs chan<- models.Message, connector models.Conn
 	}
 }
 
-func (x Logging) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func (x File) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 
-func (x Logging) Publish(connector models.Connector, message models.Message, target string) {
+func (x File) Publish(connector models.Connector, message models.Message, target string) {
 	return
 }
 
-func (x Logging) Help(connector models.Connector) (help string) {
+func (x File) Help(connector models.Connector) (help string) {
 	return
 }

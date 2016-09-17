@@ -12,10 +12,9 @@ func init() {
 	List["bamboo"] = reflect.TypeOf(Bamboo{})
 	List["email"] = reflect.TypeOf(Email{})
 	List["exec"] = reflect.TypeOf(Exec{})
-	List["exec2"] = reflect.TypeOf(Exec{})
+	List["file"] = reflect.TypeOf(File{})
 	List["imageme"] = reflect.TypeOf(ImageMe{})
 	List["jira"] = reflect.TypeOf(Jira{})
-	List["logging"] = reflect.TypeOf(Logging{})
 	List["slack"] = reflect.TypeOf(Slack{})
 	List["response"] = reflect.TypeOf(Response{})
 	List["rss"] = reflect.TypeOf(Rss{})
@@ -24,6 +23,10 @@ func init() {
 	List["redis"] = reflect.TypeOf(Redis{})
 	List["webhook"] = reflect.TypeOf(Webhook{})
 	List["twilio"] = reflect.TypeOf(Twilio{})
+
+	// depricated
+	List["exec2"] = reflect.TypeOf(Exec{})
+	List["logging"] = reflect.TypeOf(File{})
 }
 
 func MakeConnector(connType string) interface{} {
