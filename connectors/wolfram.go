@@ -20,6 +20,7 @@ func (x Wolfram) Listen(commandMsgs chan<- models.Message, connector models.Conn
 
 func (x Wolfram) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	if match, tokens := parse.Match("wolfram*", message.In.Text); match {
+		message.In.Tags += "," + connector.Tags
 		message.Out.Text = callWolfram(tokens["*"], connector.Key)
 		publishMsgs <- message
 	}

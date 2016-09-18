@@ -148,6 +148,7 @@ func createJiraIssue(message models.Message, publishMsgs chan<- models.Message, 
 		return
 	}
 
+	message.In.Tags += "," + connector.Tags
 	message.Out.Text = created.Key
 	publishMsgs <- message
 }
@@ -189,6 +190,7 @@ func parseJiraIssue(message models.Message, publishMsgs chan<- models.Message, c
 		if ticket.Fields.Status.Name == "" {
 			return
 		}
+		message.In.Tags += "," + connector.Tags
 		message.Out.Link = "https://" + connector.Server + "/browse/" + issue
 		message.Out.Text = strings.ToUpper(issue) + " - " + ticket.Fields.Summary
 		message.Out.Detail = fmt.Sprintf("Status: %s\nPriority: %s\nAssignee: %s\n",

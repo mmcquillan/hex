@@ -96,6 +96,28 @@ func subConfig(config *models.Config) {
 			}
 		}
 	}
+	for i := 0; i < len(config.Routes); i++ {
+		for m := 0; m < len(config.Routes[i].Matches); m++ {
+			if config.Routes[i].Matches[m].ConnectorType == "" {
+				config.Routes[i].Matches[m].ConnectorType = "*"
+			}
+			if config.Routes[i].Matches[m].ConnectorID == "" {
+				config.Routes[i].Matches[m].ConnectorID = "*"
+			}
+			if config.Routes[i].Matches[m].Tags == "" {
+				config.Routes[i].Matches[m].Tags = "*"
+			}
+			if config.Routes[i].Matches[m].Target == "" {
+				config.Routes[i].Matches[m].Target = "*"
+			}
+			if config.Routes[i].Matches[m].User == "" {
+				config.Routes[i].Matches[m].User = "*"
+			}
+			if config.Routes[i].Matches[m].Message == "" {
+				config.Routes[i].Matches[m].Message = "*"
+			}
+		}
+	}
 	if os.Getenv("JANE_LOGFILE") != "" {
 		config.LogFile = os.Getenv("JANE_LOGFILE")
 	}
