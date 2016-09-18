@@ -16,10 +16,11 @@ func Publishers(publishMsgs <-chan models.Message, config *models.Config) {
 			for _, m := range route.Matches {
 				match := true
 				match, _ = parse.Match(m.Message, message.Out.Text+" "+message.Out.Detail)
-				match = matchRoute(match, message.In.ConnectorType, m.ConnectorType)
-				match = matchRoute(match, message.In.ConnectorID, m.ConnectorID)
-				match = matchRoute(match, message.In.Target, m.Target)
-				match = matchRoute(match, message.In.User, m.User)
+				matchRoute(&match, message.In.ConnectorType, m.ConnectorType)
+				matchRoute(&match, message.In.ConnectorID, m.ConnectorID)
+				matchRouteTags(&match, message.In.Tags, m.Tags)
+				matchRoute(&match, message.In.Target, m.Target)
+				matchRoute(&match, message.In.User, m.User)
 				if match {
 					for _, connector := range config.Connectors {
 						if connector.Active {
@@ -45,18 +46,35 @@ func Publishers(publishMsgs <-chan models.Message, config *models.Config) {
 	}
 }
 
-func matchRoute(pmatch bool, mValue string, rValue string) (match bool) {
-	match = false
-	if pmatch {
+func matchRoute(match *bool, mValue string, rValue string) {
+	if match {
 		if mValue == rValue {
 			match = true
 		} else {
 			if rValue == "*" {
 				match = true
+			} else {
+				match = false
 			}
 		}
 	}
-	return match
+}
+
+func matchRouteTags(match *bool, mValue string, rValue string) {
+	if match {
+		if rValue != "*" {
+			match = false
+			mList := strings.Split(mValue, ",")
+			rList := strings.Split(rValue, ",")
+			for _, m := range mList {
+				for _, r := range rList {
+					if m == r {
+						match = true
+					}
+				}
+			}
+		}
+	}
 }
 
 func sendToConnector(connId string, connectors string) (send bool) {

@@ -35,6 +35,7 @@ func (x Slack) Listen(commandMsgs chan<- models.Message, connector models.Connec
 					var m models.Message
 					m.In.ConnectorType = connector.Type
 					m.In.ConnectorID = connector.ID
+					m.In.Tags = connector.Tags
 					m.In.Target = ev.Channel
 					m.In.User = ev.User
 					m.In.Text = html.UnescapeString(ev.Text)

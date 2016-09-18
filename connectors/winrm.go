@@ -112,6 +112,7 @@ func checkRM(commandMsgs chan<- models.Message, command models.Command, connecto
 			var message models.Message
 			message.In.ConnectorType = connector.Type
 			message.In.ConnectorID = connector.ID
+			message.In.Tags = connector.Tags
 			message.In.Process = false
 			message.Out.Text = connector.ID + " " + command.Name
 			message.Out.Detail = strings.Replace(command.Output, "${STDOUT}", out, -1)

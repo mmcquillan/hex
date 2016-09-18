@@ -30,6 +30,7 @@ func (x Cli) Listen(commandMsgs chan<- models.Message, connector models.Connecto
 		var m models.Message
 		m.In.ConnectorType = connector.Type
 		m.In.ConnectorID = connector.ID
+		m.In.Tags = connector.Tags
 		m.In.User = u.Username
 		m.In.Text = req
 		m.In.Process = true

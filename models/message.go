@@ -4,6 +4,7 @@ type Message struct {
 	In struct {
 		ConnectorType string
 		ConnectorID   string
+		Tags          string
 		Target        string
 		User          string
 		Text          string
