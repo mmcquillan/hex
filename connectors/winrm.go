@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/masterzen/winrm"
 	"github.com/projectjane/jane/models"
 	"github.com/projectjane/jane/parse"
+	"github.com/projectjane/winrm"
 )
 
 //WinRM Struct representing a WinRM Connector
