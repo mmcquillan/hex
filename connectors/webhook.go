@@ -109,8 +109,9 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 			out := parse.Substitute(c.Output, tokens)
 			if c.Process {
 				var m models.Message
-				m.Routes = webhook.Connector.Routes
-				m.In.Source = webhook.Connector.ID
+				m.In.ConnectorType = webhook.Connector.Type
+				m.In.ConnectorID = webhook.Connector.ID
+				m.In.Tags = webhook.Connector.Tags
 				m.In.Text = out
 				m.In.Process = true
 				webhook.CommandMsgs <- m
@@ -127,8 +128,9 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 					color = "FAIL"
 				}
 				var m models.Message
-				m.Routes = webhook.Connector.Routes
-				m.In.Source = webhook.Connector.ID
+				m.In.ConnectorType = webhook.Connector.Type
+				m.In.ConnectorID = webhook.Connector.ID
+				m.In.Tags = webhook.Connector.Tags
 				m.In.Text = reqUrl
 				m.In.Process = false
 				if c.Name != "" {

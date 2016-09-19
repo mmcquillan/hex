@@ -12,19 +12,64 @@ func Publishers(publishMsgs <-chan models.Message, config *models.Config) {
 	log.Print("Initializing Publishers")
 	for {
 		message := <-publishMsgs
-		for _, route := range message.Routes {
-			if match, _ := parse.Match(route.Match, message.Out.Text+" "+message.Out.Detail); match || route.Match == "*" {
-				for _, connector := range config.Connectors {
-					if connector.Active {
-						if sendToConnector(connector.ID, route.Connectors) {
-							if connector.Debug {
-								log.Print("Broadcasting to " + connector.ID + " (type:" + connector.Type + ") for route " + route.Connectors)
-								log.Printf("Message: %+v", message)
-								log.Print("")
+		for _, route := range config.Routes {
+			for _, m := range route.Matches {
+				match := true
+				match, _ = parse.Match(m.Message, message.Out.Text+" "+message.Out.Detail)
+				matchRoute(&match, message.In.ConnectorType, m.ConnectorType)
+				matchRoute(&match, message.In.ConnectorID, m.ConnectorID)
+				matchRouteTags(&match, message.In.Tags, m.Tags)
+				matchRoute(&match, message.In.Target, m.Target)
+				matchRoute(&match, message.In.User, m.User)
+				if match {
+					for _, connector := range config.Connectors {
+						if connector.Active {
+							if sendToConnector(connector.ID, route.Connectors) {
+								if connector.Debug {
+									log.Print("Broadcasting to " + connector.ID + " (type:" + connector.Type + ") for route " + route.Connectors)
+									log.Printf("Message: %+v", message)
+									log.Print("")
+								}
+								for _, target := range strings.Split(route.Targets, ",") {
+									if target == "*" {
+										target = message.In.Target
+									}
+									c := connectors.MakeConnector(connector.Type).(connectors.Connector)
+									c.Publish(connector, message, target)
+								}
 							}
-							c := connectors.MakeConnector(connector.Type).(connectors.Connector)
-							c.Publish(connector, message, route.Target)
 						}
+					}
+				}
+			}
+		}
+	}
+}
+
+func matchRoute(match *bool, mValue string, rValue string) {
+	if *match {
+		if mValue == rValue {
+			*match = true
+		} else {
+			if rValue == "*" {
+				*match = true
+			} else {
+				*match = false
+			}
+		}
+	}
+}
+
+func matchRouteTags(match *bool, mValue string, rValue string) {
+	if *match {
+		if rValue != "*" {
+			*match = false
+			mList := strings.Split(mValue, ",")
+			rList := strings.Split(rValue, ",")
+			for _, m := range mList {
+				for _, r := range rList {
+					if m == r {
+						*match = true
 					}
 				}
 			}

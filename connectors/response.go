@@ -28,6 +28,7 @@ func (x Response) Command(message models.Message, publishMsgs chan<- models.Mess
 				i := rand.Intn(len(c.Outputs))
 				message.Out.Text = parse.Substitute(c.Outputs[i], tokens)
 			}
+			message.In.Tags += "," + connector.Tags
 			publishMsgs <- message
 		}
 	}

@@ -3,6 +3,7 @@ package models
 type Connector struct {
 	Type     string
 	ID       string
+	Tags     string
 	Active   bool
 	Server   string
 	Port     string
@@ -14,6 +15,5 @@ type Connector struct {
 	Image    string
 	Users    string
 	Commands []Command
-	Routes   []Route
 	Debug    bool
 }

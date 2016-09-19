@@ -37,20 +37,18 @@ func (x Twilio) Publish(connector models.Connector, message models.Message, targ
 	} else {
 		textmsg = strings.Replace(message.Out.Text, "```", "", -1)
 	}
-	for _, number := range strings.Split(target, ",") {
-		req, err := buildRequest(number, textmsg, connector)
-		if err != nil {
-			log.Println(err)
-		}
-		resp, err := client.Do(req)
-		if err != nil {
-			log.Println(err)
-		}
-		defer resp.Body.Close()
-		body, _ := ioutil.ReadAll(resp.Body)
-		if connector.Debug {
-			log.Println(string(body))
-		}
+	req, err := buildRequest(target, textmsg, connector)
+	if err != nil {
+		log.Println(err)
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println(err)
+	}
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	if connector.Debug {
+		log.Println(string(body))
 	}
 }
 

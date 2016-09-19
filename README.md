@@ -34,6 +34,8 @@ The basic configurtion file should include these elements:
   "Aliases": [
   ],
   "Connectors": [
+  ],
+  "Routes": [
   ]
 }
 ```
@@ -50,18 +52,17 @@ Jane has these builtin environment variables:
 
 
 ## Connectors
-Connectors are what Jane uses to pull in information, interpret it, and issue out a response. The Routes specify where the results from the input should be written to or * for all. The Target can specify a channel in the case of Slack.
-
-For the connector configuration, when adding routes, you must specify the ID of the connector you want to route the response to.
+Connectors are what Jane uses to pull in information, interpret it, and issue out a response.
 
 Supported connectors:
 * [bamboo](#bamboo-connector) - Atlassian Bamboo integration
 * [cli](#cli-connector) - Command line interface
 * [email](#email-connector) - Email
 * [exec](#exec-connector) - Execution of commands with monitoring capability
+* [file](#file-connector) - File watcher
 * [imageme](#imageme-connector) - Pull back images or animated gifs
 * [jira](#jira-connector) - Atlassian Jira integration
-* [logging](#logging-connector) - Logging monitor
+* [log](#log-connector) - Log connector to audit Jane calls
 * [response](#response-connector) - Text Responses
 * [rss](#rss-connector) - RSS Feed
 * [slack](#slack-connector) - Slack chat
@@ -79,10 +80,7 @@ This connector was written to integrate bamboo builds. It was written against th
 
 ```
 {"Type": "bamboo", "ID": "bamboo server", "Active": true, "Debug": true,
-   "Server": "<URL>.atlassian.net", "Login": "<JIRA USER>", "Pass": "<JIRA PASS>",
-   "Routes": [
-       {"Match": "*", "Connectors": "*", "Target": "#devops"}
-   ]
+   "Server": "<URL>.atlassian.net", "Login": "<JIRA USER>", "Pass": "<JIRA PASS>"
 }
 ```
 
@@ -94,13 +92,13 @@ This connector was written to integrate bamboo builds. It was written against th
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'exec2'
 * _ID_ - This should be a unique identifier for this connector
+* _Tags_ - Comma seperated list of tags that can be used to match against routes
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 * _Server_ - The bamboo server address
 * _Login_ - The bamboo user to login with
 * _Pass_ - The bamboo password to connect with
 * _Users_ - List of users who can execute the commands in this connector [security](#security)
-* _Routes_ - One or more [routes](#routes)
 
 
 ### Cli Connector
@@ -110,10 +108,7 @@ This connector runs Jane via the command line interface instead of as a daemon a
 #### Example:
 
 ```
-{"Type": "cli", "ID": "term-bot", "Active": true, "Debug": false,
-  "Routes": [
-    {"Match": "*", "Connectors": "term-bot", "Target": ""}
-  ]
+{"Type": "cli", "ID": "term-bot", "Active": true, "Debug": false
 }
 ```
 
@@ -123,9 +118,9 @@ This connector runs Jane via the command line interface instead of as a daemon a
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'exec2'
 * _ID_ - This should be a unique identifier for this connector
+* _Tags_ - Comma seperated list of tags that can be used to match against routes
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
-* _Routes_ - One or more [routes](#routes)
 
 
 ### Email Connector
@@ -149,6 +144,7 @@ This connector allows for the sending of emails. Point the connector to a valid 
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'exec2'
 * _ID_ - This should be a unique identifier for this connector
+* _Tags_ - Comma seperated list of tags that can be used to match against routes
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 * _Server_ - The SMTP server
@@ -182,9 +178,6 @@ This connector provides a single means of making local and remote calls to Linux
         "Yellow": "*WARNING*",
         "Red": "*CRITICAL*"
     }
-  ],
-  "Routes": [
-    {"Match": "*", "Connectors": "slack", "Target": "#devops"}
   ]
 }
 ```
@@ -195,6 +188,7 @@ This connector provides a single means of making local and remote calls to Linux
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'exec'
 * _ID_ - This should be a unique identifier for this connector
+* _Tags_ - Comma seperated list of tags that can be used to match against routes
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 * _Server_ - The server address or IP to connect to
@@ -216,7 +210,36 @@ This connector provides a single means of making local and remote calls to Linux
   * _Green_ - A [match](#matching) to identify what is in a green state
   * _Yellow_ - A [match](#matching) to identify what is in a yellow state
   * _Red_ - A [match](#matching) to identify what is in a red state
-* _Routes_ - One or more [routes](#routes)
+
+
+### File Connector
+The File watch connector will monitor a local file and throw an alert anytime a matched string is detected.
+
+#### Example:
+
+```
+{"Type": "file", "ID": "jane log", "Active": true,
+  "File": "/home/matt/test.log",
+  "Commands": [
+    {"Name": "Starting Jane", "Match": "*stopping*"},
+    {"Name": "Starting Jane", "Match": "*starting*"}
+  ]
+}
+```
+
+#### Usage:
+* This is currently limited to the system in which Jane runs on
+
+#### Fields:
+* _Type_ - This specifies the type of connector, in this case, 'logging'
+* _ID_ - This should be a unique identifier for this connector
+* _Tags_ - Comma seperated list of tags that can be used to match against routes
+* _Active_ - This is a boolean value to set this connector to be activated
+* _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+* _File_ - The file to watch (make sure the Jane process has permission)
+* _Commands_ - One or more commands to execute against the defined server
+  * _Name_ - Readable name of check
+  * _Match_ - String to match in the file [match](#matching)
 
 
 ### ImageMe Connector
@@ -237,6 +260,7 @@ Description
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'imageme'
 * _ID_ - This should be a unique identifier for this connector
+* _Tags_ - Comma seperated list of tags that can be used to match against routes
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 * _Key_ - The Google API Key
@@ -262,6 +286,7 @@ This connector will integrate with your Jira server.
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'jira'
 * _ID_ - This should be a unique identifier for this connector
+* _Tags_ - Comma seperated list of tags that can be used to match against routes
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 * _Server_ - The server url of your Jira instance
@@ -270,21 +295,14 @@ This connector will integrate with your Jira server.
 * _Users_ - List of users who can execute the commands in this connector [security](#security)
 
 
-### Logging Connector
-The Logging connector will monitor a local file and throw an alert anytime a matched string is detected.
+### Log Connector
+The Log connector will write message output to a log file, usually for auditing purposes.
 
 #### Example:
 
 ```
-{"Type": "logging", "ID": "jane log", "Active": true,
-  "File": "/home/matt/test.log",
-  "Commands": [
-    {"Name": "Starting Jane", "Match": "*stopping*"},
-    {"Name": "Starting Jane", "Match": "*starting*"}
-  ],
-  "Routes": [
-    {"Match": "*", "Connectors": "term-bot"}
-  ]
+{"Type": "log", "ID": "audit", "Active": true,
+  "File": "/home/matt/messages.log"
 }
 ```
 
@@ -294,13 +312,10 @@ The Logging connector will monitor a local file and throw an alert anytime a mat
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'logging'
 * _ID_ - This should be a unique identifier for this connector
+* _Tags_ - Comma seperated list of tags that can be used to match against routes
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 * _File_ - The file to watch (make sure the Jane process has permission)
-* _Commands_ - One or more commands to execute against the defined server
-  * _Name_ - Readable name of check
-  * _Match_ - String to match in the file [match](#matching)
-* _Routes_ - One or more [routes](#routes)
 
 
 ### Response Connector
@@ -322,6 +337,7 @@ Jane is capable of responding to questions or outputing fixed phrases.
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'response'
 * _ID_ - This should be a unique identifier for this connector
+* _Tags_ - Comma seperated list of tags that can be used to match against routes
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 * _Users_ - List of users who can execute the commands in this connector [security](#security)
@@ -339,10 +355,7 @@ Pull in RSS feeds directly into your bot and see what's going on around the web.
 
 ```
 {"Type": "rss", "ID": "AWS EC2", "Active": true,
-    "Server": "http://status.aws.amazon.com/rss/ec2-us-east-1.rss",
-    "Routes": [
-        {"Match": "*", "Connectors": "slack", "Target": "#devops"}
-    ]
+    "Server": "http://status.aws.amazon.com/rss/ec2-us-east-1.rss"
 }
 ```
 
@@ -352,10 +365,10 @@ Pull in RSS feeds directly into your bot and see what's going on around the web.
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'rss'
 * _ID_ - This should be a unique identifier for this connector
+* _Tags_ - Comma seperated list of tags that can be used to match against routes
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 * _Server_ - The server address or IP to connect to
-* _Routes_ - One or more [routes](#routes)
 
 
 ### Slack Connector
@@ -378,6 +391,7 @@ Slack integration allows for Jane to be interacted with through Slack by both se
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'slack'
 * _ID_ - This should be a unique identifier for this connector
+* _Tags_ - Comma seperated list of tags that can be used to match against routes
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 * _Key_ - The Slack Token
@@ -399,11 +413,11 @@ Twilio provides SMS and Phone integration.
 
 #### Usage:
 * For the target in other connector's routes, you can set the target phone number
-* Multiple phone numbers can be seperated by a comma
 
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'twilio'
 * _ID_ - This should be a unique identifier for this connector
+* _Tags_ - Comma seperated list of tags that can be used to match against routes
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 * _Key_ - The Twilio API Key
@@ -418,11 +432,7 @@ Basic website monitoring that throws alerts when it does not get a 200 OK status
 
 ```
 {"Type": "website", "ID": "Website Monitor", "Active": true,
-  "Server": "https://google.com",
-  "Routes": [
-    {"Match": "*", "Connectors": "slack", "Target": "#devops"},
-    {"Match": "*", "Connectors": "slack", "Target": "@matt"}
-  ]
+  "Server": "https://google.com"
 }
 ```
 
@@ -432,10 +442,10 @@ Basic website monitoring that throws alerts when it does not get a 200 OK status
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'website'
 * _ID_ - This should be a unique identifier for this connector
+* _Tags_ - Comma seperated list of tags that can be used to match against routes
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 * _Server_ - The website to monitor
-* _Routes_ - One or more [routes](#routes)
 
 
 ### Webhook Connector
@@ -468,9 +478,6 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
         "Process": false,
         "Output": "${?}"
     }
-  ],
-  "Routes": [
-      {"Match": "*", "Connectors": "*", "Target": "#devops"}
   ]
 }
 ```
@@ -481,6 +488,7 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'exec2'
 * _ID_ - This should be a unique identifier for this connector
+* _Tags_ - Comma seperated list of tags that can be used to match against routes
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 * _Port_ - The port number to listen to (should be above 1024 if not running as a privledged user)
@@ -493,7 +501,6 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
   * _Green_ - A [match](#matching) to identify what is in a green state
   * _Yellow_ - A [match](#matching) to identify what is in a yellow state
   * _Red_ - A [match](#matching) to identify what is in a red state
-* _Routes_ - One or more [routes](#routes)
 
 
 ### WinRM Connector
@@ -521,9 +528,6 @@ This connector provides a single means of making local and remote calls to Windo
         "Yellow" "*Pending*"
         "Red": "*Stopped*"
     }
-  ],
-  "Routes": [
-    {"Match": "*", "Connectors": "slack", "Target": "#devops"}
   ]
 }
 ```
@@ -534,6 +538,7 @@ This connector provides a single means of making local and remote calls to Windo
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'winrm'
 * _ID_ - This should be a unique identifier for this connector
+* _Tags_ - Comma seperated list of tags that can be used to match against routes
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 * _Server_ - The server address or IP to connect to
@@ -555,7 +560,6 @@ This connector provides a single means of making local and remote calls to Windo
   * _Green_ - A [match](#matching) to identify what is in a green state
   * _Yellow_ - A [match](#matching) to identify what is in a yellow state
   * _Red_ - A [match](#matching) to identify what is in a red state
-* _Routes_ - One or more [routes](#routes)
 
 
 ### Wolfram Connector
@@ -575,6 +579,7 @@ This is an integration to the Wolfram Alpha API
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'wolfram'
 * _ID_ - This should be a unique identifier for this connector
+* _Tags_ - Comma seperated list of tags that can be used to match against routes
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 * _Key_ - Wolfram API Key
@@ -606,25 +611,42 @@ With Jane, you can create aliases for commands.
 
 ### Routes
 
-Routes can exist for connectors that listen to or interpret commands. Routes can have more than one connector if you would like to send messages to more than one place. Jane also matches on the routes to filter which messages get sent.
+Routes are a way of specifying where messages from connectors get sent to once processed by Jane. For example, you may want incoming slack messages to end up in the originating channel or alerts to all get routed to an alerts channel and to page via Twilio. Many options are available and you will have to experiment what set of matching criteria will meet your needs.
 
 #### Example:
 
+General example of match all to route to slack:
 ```
 "Routes": [
-  {"Match": "*", "Connectors": "slack", "Target": "#devops"},
-  {"Match": "*DANGER*", "Connectors": "slack", "Target": "@matt"}
+    {
+        "Matches": [{"ConnectorType": "*", "ConnectorID": "jane-slack", "Tags": "*", "Target": "*", "User": "*", "Message": "*"}],
+        "Connectors": "jane-slack", "Targets": "#alerts,*"
+    }
 ]
+```
+
+Example of enabling slack so that all requests to Jane end up in the originating channel or DM.
+```
+{ "Matches": [{"ConnectorType": "slack"}], "Connectors": "jane-slack", "Targets": "*" }
 ```
 
 #### Usage:
 * Some connector publishers allow you to specify a Target, such as Slack which uses a target for a channel
-* Match follows the Jane [match rules](#matching)
+* Connectors and Targets allow for a comma seperated list of each
+* Message follows the Jane [match rules](#matching)
+* All other fields use an exact match or * for wild card
+* A "*" as a Slack target will return the message to the originating user or channel
 
 #### Fields:
-* _Match_ - This will match the message or any message with "*" using the [match](#matching)
-* _Connectors_ - The connector name (ID) or "*" to match all connectors
-* _Target_ - The target which is connector specific or "*" for all
+* _Matches_ - Multiple matches against messages
+  * _ConnectorType_ - The type such as "slack" or "rss"
+  * _ConnectorID_ - The unique name for a specific connector
+  * _Tags_ - Comma seperated list of tags to match against tags in connectors
+  * _Target_ - The incoming target (such as channel in slack)
+  * _User_ - The user the message originated from
+  * _Message_ - This will match the message or any message with "*" using the [match](#matching)
+* _Connectors_ - A comma seperated list of connector name (ID) or "*" to match all connectors
+* _Target_ - A comma seperated list of target which is connector specific or "*" for all
 
 
 ### Matching

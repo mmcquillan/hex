@@ -33,6 +33,7 @@ func (x Redis) Command(message models.Message, publishMsgs chan<- models.Message
 
 			status := FlushDb(environment)
 			log.Println(status.String())
+			message.In.Tags += "," + connector.Tags
 			message.Out.Text = fmt.Sprintf("Redis Server: %s\nStatus:%s", connector.Server, status.String())
 			publishMsgs <- message
 			return

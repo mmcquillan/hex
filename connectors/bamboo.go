@@ -60,8 +60,9 @@ func listenDeploys(lastMarker string, commandMsgs chan<- models.Message, connect
 			buildTime := strconv.FormatInt(e.Deploymentresult.Finisheddate, 10)
 			if e.Deploymentresult.ID > 0 && buildTime > lastMarker {
 				var m models.Message
-				m.Routes = connector.Routes
-				m.In.Source = connector.ID
+				m.In.ConnectorType = connector.Type
+				m.In.ConnectorID = connector.ID
+				m.In.Tags = connector.Tags
 				m.In.Process = false
 				m.Out.Text = "Bamboo Deploy " + e.Deploymentresult.Deploymentversion.Planbranchname + " " + e.Deploymentresult.Deploymentversion.Name + " to " + e.Environment.Name + " " + e.Deploymentresult.Deploymentstate
 				m.Out.Detail = html.UnescapeString(sanitize.HTML(e.Deploymentresult.Reasonsummary))
@@ -82,6 +83,7 @@ func commandBuild(message models.Message, publishMsgs chan<- models.Message, con
 	tokens := strings.Split(message.In.Text, " ")
 	queue := bambooapi.Queue(connector.Server, connector.Login, connector.Pass, tokens[2])
 	log.Printf("%+v", queue)
+	message.In.Tags += "," + connector.Tags
 	if queue.StatusCode > 0 {
 		message.Out.Text = "Problem queueing build: " + tokens[2]
 	} else {
@@ -99,6 +101,7 @@ func commandDeployStatus(message models.Message, publishMsgs chan<- models.Messa
 		for _, e := range de.Environmentstatuses {
 			detail := e.Deploymentresult.Deploymentversion.Name + " to " + e.Environment.Name
 			if strings.Contains(strings.ToLower(detail), strings.ToLower(tokens[2])) {
+				message.In.Tags += "," + connector.Tags
 				message.Out.Text = "Bamboo Deploy " + detail + " " + e.Deploymentresult.Deploymentstate
 				message.Out.Detail = html.UnescapeString(sanitize.HTML(e.Deploymentresult.Reasonsummary))
 				message.Out.Link = "https://" + connector.Server + "/builds/deploy/viewDeploymentResult.action?deploymentResultId=" + strconv.Itoa(e.Deploymentresult.ID)
@@ -118,6 +121,7 @@ func commandBuildStatus(message models.Message, publishMsgs chan<- models.Messag
 	b := bambooapi.BuildResults(connector.Server, connector.Login, connector.Pass)
 	for _, be := range b.Results.Result {
 		if strings.Contains(strings.ToLower(be.Plan.Shortname), strings.ToLower(tokens[2])) {
+			message.In.Tags += "," + connector.Tags
 			message.Out.Text = "Bamboo Build " + be.Plan.Shortname
 			message.Out.Detail = be.Plan.Name + " #" + strconv.Itoa(be.Buildnumber)
 			message.Out.Link = be.Link.Href
@@ -157,8 +161,9 @@ func listenBuilds(lastMarker string, commandMsgs chan<- models.Message, connecto
 				status = "FAIL"
 			}
 			var m models.Message
-			m.Routes = connector.Routes
-			m.In.Source = connector.ID
+			m.In.ConnectorType = connector.Type
+			m.In.ConnectorID = connector.ID
+			m.In.Tags = connector.Tags
 			m.In.Process = false
 			m.Out.Text = "Bamboo Build " + html.UnescapeString(sanitize.HTML(item.Title))
 			m.Out.Detail = html.UnescapeString(sanitize.HTML(item.Content))

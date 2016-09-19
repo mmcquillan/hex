@@ -32,15 +32,11 @@ func (x Slack) Listen(commandMsgs chan<- models.Message, connector models.Connec
 						log.Print("Evaluating incoming slack message")
 					}
 
-					var r []models.Route
-					r = append(r, models.Route{Match: "*", Connectors: connector.ID, Target: ev.Channel})
-					for _, cr := range connector.Routes {
-						r = append(r, cr)
-					}
-
 					var m models.Message
-					m.Routes = r
-					m.In.Source = connector.ID
+					m.In.ConnectorType = connector.Type
+					m.In.ConnectorID = connector.ID
+					m.In.Tags = connector.Tags
+					m.In.Target = ev.Channel
 					m.In.User = ev.User
 					m.In.Text = html.UnescapeString(ev.Text)
 					m.In.Process = true

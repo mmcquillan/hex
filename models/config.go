@@ -5,4 +5,5 @@ type Config struct {
 	LogFile    string
 	Aliases    []Alias
 	Connectors []Connector
+	Routes     []Route
 }
