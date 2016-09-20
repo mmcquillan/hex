@@ -97,25 +97,23 @@ func subConfig(config *models.Config) {
 		}
 	}
 	for i := 0; i < len(config.Routes); i++ {
-		for m := 0; m < len(config.Routes[i].Matches); m++ {
-			if config.Routes[i].Matches[m].ConnectorType == "" {
-				config.Routes[i].Matches[m].ConnectorType = "*"
-			}
-			if config.Routes[i].Matches[m].ConnectorID == "" {
-				config.Routes[i].Matches[m].ConnectorID = "*"
-			}
-			if config.Routes[i].Matches[m].Tags == "" {
-				config.Routes[i].Matches[m].Tags = "*"
-			}
-			if config.Routes[i].Matches[m].Target == "" {
-				config.Routes[i].Matches[m].Target = "*"
-			}
-			if config.Routes[i].Matches[m].User == "" {
-				config.Routes[i].Matches[m].User = "*"
-			}
-			if config.Routes[i].Matches[m].Message == "" {
-				config.Routes[i].Matches[m].Message = "*"
-			}
+		if config.Routes[i].Match.ConnectorType == "" {
+			config.Routes[i].Match.ConnectorType = "*"
+		}
+		if config.Routes[i].Match.ConnectorID == "" {
+			config.Routes[i].Match.ConnectorID = "*"
+		}
+		if config.Routes[i].Match.Tags == "" {
+			config.Routes[i].Match.Tags = "*"
+		}
+		if config.Routes[i].Match.Target == "" {
+			config.Routes[i].Match.Target = "*"
+		}
+		if config.Routes[i].Match.User == "" {
+			config.Routes[i].Match.User = "*"
+		}
+		if config.Routes[i].Match.Message == "" {
+			config.Routes[i].Match.Message = "*"
 		}
 	}
 	if os.Getenv("JANE_LOGFILE") != "" {

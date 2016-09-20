@@ -5,7 +5,6 @@ import (
 	"github.com/projectjane/jane/models"
 	"github.com/projectjane/jane/parse"
 	"log"
-	"strings"
 )
 
 func Publishers(publishMsgs <-chan models.Message, config *models.Config) {
@@ -21,28 +20,31 @@ func Publishers(publishMsgs <-chan models.Message, config *models.Config) {
 	for {
 		message := <-publishMsgs
 		for _, route := range config.Routes {
-			for _, m := range route.Matches {
-				match := true
-				match, _ = parse.Match(m.Message, message.Out.Text+" "+message.Out.Detail)
-				matchRoute(&match, message.In.ConnectorType, m.ConnectorType)
-				matchRoute(&match, message.In.ConnectorID, m.ConnectorID)
-				matchRouteTags(&match, message.In.Tags, m.Tags)
-				matchRoute(&match, message.In.Target, m.Target)
-				matchRoute(&match, message.In.User, m.User)
-				if match {
-					for _, connector := range config.Connectors {
-						if connector.Active && sendToConnector(connector.ID, route.Connectors) {
-							message.Out.Target = route.Targets
-							chans[connector.ID] <- message
-						}
-					}
-				}
+			match := true
+			if _, chk := chans[route.Publish.ConnectorID]; !chk {
+				match = false
+			}
+			matchRouteFull(&match, message.Out.Text+" "+message.Out.Detail, route.Match.Message)
+			matchRouteSimple(&match, message.In.ConnectorType, route.Match.ConnectorType)
+			matchRouteSimple(&match, message.In.ConnectorID, route.Match.ConnectorID)
+			matchRouteTags(&match, message.In.Tags, route.Match.Tags)
+			matchRouteSimple(&match, message.In.Target, route.Match.Target)
+			matchRouteSimple(&match, message.In.User, route.Match.User)
+			if match {
+				message.Out.Target = route.Publish.Target
+				chans[route.Publish.ConnectorID] <- message
 			}
 		}
 	}
 }
 
-func matchRoute(match *bool, mValue string, rValue string) {
+func matchRouteFull(match *bool, mValue string, rValue string) {
+	if *match {
+		*match, _ = parse.Match(rValue, mValue)
+	}
+}
+
+func matchRouteSimple(match *bool, mValue string, rValue string) {
 	if *match {
 		*match = parse.SimpleMatch(mValue, rValue)
 	}
@@ -52,18 +54,4 @@ func matchRouteTags(match *bool, mValue string, rValue string) {
 	if *match {
 		*match = parse.TagMatch(mValue, rValue)
 	}
-}
-
-func sendToConnector(connId string, connectors string) (send bool) {
-	send = false
-	if connectors == "*" {
-		send = true
-	}
-	r := strings.Split(connectors, ",")
-	for _, v := range r {
-		if v == connId {
-			send = true
-		}
-	}
-	return send
 }

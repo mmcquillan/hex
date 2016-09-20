@@ -611,42 +611,41 @@ With Jane, you can create aliases for commands.
 
 ### Routes
 
-Routes are a way of specifying where messages from connectors get sent to once processed by Jane. For example, you may want incoming slack messages to end up in the originating channel or alerts to all get routed to an alerts channel and to page via Twilio. Many options are available and you will have to experiment what set of matching criteria will meet your needs.
+Routes are a way of specifying where messages from connectors get sent once processed by Jane. For example, you may want incoming slack messages to end up in the originating channel or alerts to all get routed to an alerts channel and to page via Twilio. Many options are available and you will have to experiment what set of matching criteria will meet your needs.
 
 #### Example:
 
-General example of match all to route to slack:
+General example of match connectors marked with a tag of 'alerts' to route to slack:
 ```
-"Routes": [
-    {
-        "Matches": [{"ConnectorType": "*", "ConnectorID": "jane-slack", "Tags": "*", "Target": "*", "User": "*", "Message": "*"}],
-        "Connectors": "jane-slack", "Targets": "#alerts,*"
-    }
+Routes": [
+    { "Match": {"Tags": "alerts"}, "Publish": {"ConnectorID": "jane-slack"} }
 ]
 ```
 
 Example of enabling slack so that all requests to Jane end up in the originating channel or DM.
 ```
-{ "Matches": [{"ConnectorType": "slack"}], "Connectors": "jane-slack", "Targets": "*" }
+Routes": [
+    { "Match": {"ConnectorType": "slack"}, "Publish": {"ConnectorID": "jane-slack", "Target": "*"} }
+]
 ```
 
 #### Usage:
 * Some connector publishers allow you to specify a Target, such as Slack which uses a target for a channel
-* Connectors and Targets allow for a comma seperated list of each
 * Message follows the Jane [match rules](#matching)
 * All other fields use an exact match or * for wild card
 * A "*" as a Slack target will return the message to the originating user or channel
 
 #### Fields:
-* _Matches_ - Multiple matches against messages
+* _Match_ - Matches against messages
   * _ConnectorType_ - The type such as "slack" or "rss"
   * _ConnectorID_ - The unique name for a specific connector
   * _Tags_ - Comma seperated list of tags to match against tags in connectors
   * _Target_ - The incoming target (such as channel in slack)
   * _User_ - The user the message originated from
   * _Message_ - This will match the message or any message with "*" using the [match](#matching)
-* _Connectors_ - A comma seperated list of connector name (ID) or "*" to match all connectors
-* _Target_ - A comma seperated list of target which is connector specific or "*" for all
+* _Publish_ - Where to send the message to
+  * _ConnectorID_ - The name of the connector to publish messages to
+  * _Target_ - The target, used by some connector publishers
 
 
 ### Matching

@@ -1,7 +1,7 @@
 package models
 
 type Route struct {
-	Matches []struct {
+	Match struct {
 		ConnectorType string
 		ConnectorID   string
 		Tags          string
@@ -9,6 +9,8 @@ type Route struct {
 		User          string
 		Message       string
 	}
-	Connectors string
-	Targets    string
+	Publish struct {
+		ConnectorID string
+		Target      string
+	}
 }
