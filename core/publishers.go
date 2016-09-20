@@ -48,32 +48,13 @@ func Publishers(publishMsgs <-chan models.Message, config *models.Config) {
 
 func matchRoute(match *bool, mValue string, rValue string) {
 	if *match {
-		if mValue == rValue {
-			*match = true
-		} else {
-			if rValue == "*" {
-				*match = true
-			} else {
-				*match = false
-			}
-		}
+		*match = parse.SimpleMatch(mValue, rValue)
 	}
 }
 
 func matchRouteTags(match *bool, mValue string, rValue string) {
 	if *match {
-		if rValue != "*" {
-			*match = false
-			mList := strings.Split(mValue, ",")
-			rList := strings.Split(rValue, ",")
-			for _, m := range mList {
-				for _, r := range rList {
-					if m == r {
-						*match = true
-					}
-				}
-			}
-		}
+		*match = parse.TagMatch(mValue, rValue)
 	}
 }
 
