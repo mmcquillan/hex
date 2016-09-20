@@ -52,7 +52,7 @@ func (x Exec) Command(message models.Message, publishMsgs chan<- models.Message,
 	}
 }
 
-func (x Exec) Publish(connector models.Connector, message models.Message, target string) {
+func (x Exec) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 

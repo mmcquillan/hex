@@ -11,6 +11,7 @@ type Message struct {
 		Process       bool
 	}
 	Out struct {
+		Target string
 		Text   string
 		Detail string
 		Link   string

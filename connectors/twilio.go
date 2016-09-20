@@ -26,29 +26,34 @@ func (x Twilio) Command(message models.Message, publishMsgs chan<- models.Messag
 }
 
 // Publish Twilio publisher to push messages via Twilio REST Api
-func (x Twilio) Publish(connector models.Connector, message models.Message, target string) {
-	if connector.Debug {
-		log.Print("Starting client connect to twilio: " + connector.ID)
-	}
-	client := &http.Client{}
-	textmsg := ""
-	if message.Out.Detail != "" {
-		textmsg = strings.Replace(message.Out.Text+" - "+message.Out.Detail, "```", "", -1)
-	} else {
-		textmsg = strings.Replace(message.Out.Text, "```", "", -1)
-	}
-	req, err := buildRequest(target, textmsg, connector)
-	if err != nil {
-		log.Println(err)
-	}
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Println(err)
-	}
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-	if connector.Debug {
-		log.Println(string(body))
+func (x Twilio) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
+	for {
+		message := <-publishMsgs
+		if connector.Debug {
+			log.Print("Starting client connect to twilio: " + connector.ID)
+		}
+		client := &http.Client{}
+		textmsg := ""
+		if message.Out.Detail != "" {
+			textmsg = strings.Replace(message.Out.Text+" - "+message.Out.Detail, "```", "", -1)
+		} else {
+			textmsg = strings.Replace(message.Out.Text, "```", "", -1)
+		}
+		for _, target := range strings.Split(message.Out.Target, ",") {
+			req, err := buildRequest(target, textmsg, connector)
+			if err != nil {
+				log.Println(err)
+			}
+			resp, err := client.Do(req)
+			if err != nil {
+				log.Println(err)
+			}
+			defer resp.Body.Close()
+			body, _ := ioutil.ReadAll(resp.Body)
+			if connector.Debug {
+				log.Println(string(body))
+			}
+		}
 	}
 }
 

@@ -49,7 +49,7 @@ func (x Webhook) Command(message models.Message, publishMsgs chan<- models.Messa
 	return
 }
 
-func (x Webhook) Publish(connector models.Connector, message models.Message, target string) {
+func (x Webhook) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 

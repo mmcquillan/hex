@@ -38,7 +38,7 @@ func (x File) Command(message models.Message, publishMsgs chan<- models.Message,
 	return
 }
 
-func (x File) Publish(connector models.Connector, message models.Message, target string) {
+func (x File) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 

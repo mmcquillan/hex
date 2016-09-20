@@ -59,7 +59,7 @@ func (x WinRM) Command(message models.Message, publishMsgs chan<- models.Message
 }
 
 //Publish Not implemented for WinRM
-func (x WinRM) Publish(connector models.Connector, message models.Message, target string) {
+func (x WinRM) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 

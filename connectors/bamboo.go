@@ -38,7 +38,7 @@ func (x Bamboo) Command(message models.Message, publishMsgs chan<- models.Messag
 	}
 }
 
-func (x Bamboo) Publish(connector models.Connector, message models.Message, target string) {
+func (x Bamboo) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 

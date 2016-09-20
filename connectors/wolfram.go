@@ -26,7 +26,7 @@ func (x Wolfram) Command(message models.Message, publishMsgs chan<- models.Messa
 	}
 }
 
-func (x Wolfram) Publish(connector models.Connector, message models.Message, target string) {
+func (x Wolfram) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 

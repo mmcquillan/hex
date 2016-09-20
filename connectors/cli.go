@@ -43,19 +43,22 @@ func (x Cli) Command(message models.Message, publishMsgs chan<- models.Message, 
 	fmt.Print("\njane> ")
 }
 
-func (x Cli) Publish(connector models.Connector, message models.Message, target string) {
-	switch message.Out.Status {
-	case "SUCCESS":
-		color.Set(color.FgGreen)
-	case "WARN":
-		color.Set(color.FgYellow)
-	case "FAIL":
-		color.Set(color.FgRed)
-	}
-	fmt.Println(message.Out.Text)
-	color.Unset()
-	if message.Out.Detail != "" {
-		fmt.Println(message.Out.Detail)
+func (x Cli) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
+	for {
+		message := <-publishMsgs
+		switch message.Out.Status {
+		case "SUCCESS":
+			color.Set(color.FgGreen)
+		case "WARN":
+			color.Set(color.FgYellow)
+		case "FAIL":
+			color.Set(color.FgRed)
+		}
+		fmt.Println(message.Out.Text)
+		color.Unset()
+		if message.Out.Detail != "" {
+			fmt.Println(message.Out.Detail)
+		}
 	}
 }
 

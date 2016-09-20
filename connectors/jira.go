@@ -29,7 +29,7 @@ func (x Jira) Command(message models.Message, publishMsgs chan<- models.Message,
 	}
 }
 
-func (x Jira) Publish(connector models.Connector, message models.Message, target string) {
+func (x Jira) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 

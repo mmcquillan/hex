@@ -27,7 +27,7 @@ func (x Rss) Command(message models.Message, publishMsgs chan<- models.Message, 
 	return
 }
 
-func (x Rss) Publish(connector models.Connector, message models.Message, target string) {
+func (x Rss) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 

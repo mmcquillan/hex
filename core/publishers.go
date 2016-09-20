@@ -10,6 +10,14 @@ import (
 
 func Publishers(publishMsgs <-chan models.Message, config *models.Config) {
 	log.Print("Initializing Publishers")
+	var chans = make(map[string]chan models.Message)
+	for _, connector := range config.Connectors {
+		if connector.Active {
+			chans[connector.ID] = make(chan models.Message)
+			c := connectors.MakeConnector(connector.Type).(connectors.Connector)
+			go c.Publish(chans[connector.ID], connector)
+		}
+	}
 	for {
 		message := <-publishMsgs
 		for _, route := range config.Routes {
@@ -23,21 +31,9 @@ func Publishers(publishMsgs <-chan models.Message, config *models.Config) {
 				matchRoute(&match, message.In.User, m.User)
 				if match {
 					for _, connector := range config.Connectors {
-						if connector.Active {
-							if sendToConnector(connector.ID, route.Connectors) {
-								if connector.Debug {
-									log.Print("Broadcasting to " + connector.ID + " (type:" + connector.Type + ") for route " + route.Connectors)
-									log.Printf("Message: %+v", message)
-									log.Print("")
-								}
-								for _, target := range strings.Split(route.Targets, ",") {
-									if target == "*" {
-										target = message.In.Target
-									}
-									c := connectors.MakeConnector(connector.Type).(connectors.Connector)
-									c.Publish(connector, message, target)
-								}
-							}
+						if connector.Active && sendToConnector(connector.ID, route.Connectors) {
+							message.Out.Target = m.Target
+							chans[connector.ID] <- message
 						}
 					}
 				}

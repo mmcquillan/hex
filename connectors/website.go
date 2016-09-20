@@ -72,7 +72,7 @@ func (x Website) Command(message models.Message, publishMsgs chan<- models.Messa
 	return
 }
 
-func (x Website) Publish(connector models.Connector, message models.Message, target string) {
+func (x Website) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 

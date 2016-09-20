@@ -34,7 +34,7 @@ func (x Response) Command(message models.Message, publishMsgs chan<- models.Mess
 	}
 }
 
-func (x Response) Publish(connector models.Connector, message models.Message, target string) {
+func (x Response) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 

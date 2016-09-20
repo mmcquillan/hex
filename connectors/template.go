@@ -16,7 +16,7 @@ func (x Template) Command(message models.Message, publishMsgs chan<- models.Mess
 	return
 }
 
-func (x Template) Publish(connector models.Connector, message models.Message, target string) {
+func (x Template) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 

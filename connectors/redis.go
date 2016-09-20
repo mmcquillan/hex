@@ -41,7 +41,7 @@ func (x Redis) Command(message models.Message, publishMsgs chan<- models.Message
 	}
 }
 
-func (x Redis) Publish(connector models.Connector, message models.Message, target string) {
+func (x Redis) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 

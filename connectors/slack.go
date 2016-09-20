@@ -3,6 +3,7 @@ package connectors
 import (
 	"html"
 	"log"
+	"strings"
 
 	"github.com/nlopes/slack"
 	"github.com/projectjane/jane/models"
@@ -52,29 +53,37 @@ func (x Slack) Command(message models.Message, publishMsgs chan<- models.Message
 	return
 }
 
-func (x Slack) Publish(connector models.Connector, message models.Message, target string) {
+func (x Slack) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
 	api := slack.New(connector.Key)
-	msg := ""
-	params := slack.NewPostMessageParameters()
-	params.Username = "jane"
-	params.IconEmoji = connector.Image
-	if target == "" {
-		target = "#general"
-	}
-	if message.Out.Detail != "" {
-		color := slackColorMe(message.Out.Status)
-		attachment := slack.Attachment{
-			Title:      message.Out.Text,
-			TitleLink:  message.Out.Link,
-			Text:       message.Out.Detail,
-			Color:      color,
-			MarkdownIn: []string{"text"},
+	for {
+		message := <-publishMsgs
+		msg := ""
+		params := slack.NewPostMessageParameters()
+		params.Username = "jane"
+		params.IconEmoji = connector.Image
+		if message.Out.Detail != "" {
+			color := slackColorMe(message.Out.Status)
+			attachment := slack.Attachment{
+				Title:      message.Out.Text,
+				TitleLink:  message.Out.Link,
+				Text:       message.Out.Detail,
+				Color:      color,
+				MarkdownIn: []string{"text"},
+			}
+			params.Attachments = []slack.Attachment{attachment}
+		} else {
+			msg = message.Out.Text
 		}
-		params.Attachments = []slack.Attachment{attachment}
-	} else {
-		msg = message.Out.Text
+		for _, target := range strings.Split(message.Out.Target, ",") {
+			if target == "" {
+				target = "#general"
+			}
+			if target == "*" {
+				target = message.In.Target
+			}
+			api.PostMessage(target, msg, params)
+		}
 	}
-	api.PostMessage(target, msg, params)
 }
 
 func (x Slack) Help(connector models.Connector) (help string) {
