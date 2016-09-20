@@ -13,7 +13,7 @@ func TagMatch(findTags string, matchTags string) (match bool) {
 		mTags := strings.Split(matchTags, ",")
 		for _, f := range fTags {
 			for _, m := range mTags {
-				if f == m {
+				if strings.TrimSpace(f) == strings.TrimSpace(m) {
 					match = true
 				}
 			}

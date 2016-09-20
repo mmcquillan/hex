@@ -32,7 +32,7 @@ func Publishers(publishMsgs <-chan models.Message, config *models.Config) {
 				if match {
 					for _, connector := range config.Connectors {
 						if connector.Active && sendToConnector(connector.ID, route.Connectors) {
-							message.Out.Target = m.Target
+							message.Out.Target = route.Targets
 							chans[connector.ID] <- message
 						}
 					}
