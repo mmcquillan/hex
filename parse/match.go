@@ -51,5 +51,5 @@ func CIReplace(str string, val string, rep string) (ret string) {
 		l := len(val)
 		ret = strings.TrimSpace(str[:f]) + " " + strings.TrimSpace(str[(f+l):])
 	}
-	return ret
+	return strings.TrimSpace(ret)
 }
