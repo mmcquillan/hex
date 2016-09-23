@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/user"
+	"strings"
 )
 
 type Cli struct {
@@ -27,25 +28,29 @@ func (x Cli) Listen(commandMsgs chan<- models.Message, connector models.Connecto
 		if connector.Debug {
 			log.Print("CLI Incoming message: " + req)
 		}
-		var m models.Message
-		m.In.ConnectorType = connector.Type
-		m.In.ConnectorID = connector.ID
-		m.In.Tags = connector.Tags
-		m.In.User = u.Username
-		m.In.Text = req
-		m.In.Process = true
-		commandMsgs <- m
+		if strings.TrimSpace(req) != "" {
+			var m models.Message
+			m.In.ConnectorType = connector.Type
+			m.In.ConnectorID = connector.ID
+			m.In.Tags = connector.Tags
+			m.In.User = u.Username
+			m.In.Text = req
+			m.In.Process = true
+			commandMsgs <- m
+		} else {
+			fmt.Print("\njane> ")
+		}
 	}
 }
 
 func (x Cli) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
-	fmt.Println("")
-	fmt.Print("\njane> ")
+	return
 }
 
 func (x Cli) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
 	for {
 		message := <-publishMsgs
+		fmt.Print("\n")
 		switch message.Out.Status {
 		case "SUCCESS":
 			color.Set(color.FgGreen)
@@ -59,6 +64,7 @@ func (x Cli) Publish(publishMsgs <-chan models.Message, connector models.Connect
 		if message.Out.Detail != "" {
 			fmt.Println(message.Out.Detail)
 		}
+		fmt.Print("\njane> ")
 	}
 }
 
