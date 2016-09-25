@@ -57,6 +57,7 @@ Connectors are what Jane uses to pull in information, interpret it, and issue ou
 Supported connectors:
 * [bamboo](#bamboo-connector) - Atlassian Bamboo integration
 * [cli](#cli-connector) - Command line interface
+* [client](#client-connector) - The client side of the client/server
 * [email](#email-connector) - Email
 * [exec](#exec-connector) - Execution of commands with monitoring capability
 * [file](#file-connector) - File watcher
@@ -65,6 +66,7 @@ Supported connectors:
 * [log](#log-connector) - Log connector to audit Jane calls
 * [response](#response-connector) - Text Responses
 * [rss](#rss-connector) - RSS Feed
+* [server](#server-connector) - The server side of the client/server
 * [slack](#slack-connector) - Slack chat
 * [twilio](#twilio-connector) - send SMS alerts
 * [website](#website-connector) - Monitor return code of websites
@@ -117,6 +119,28 @@ This connector runs Jane via the command line interface instead of as a daemon a
 
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'exec2'
+* _ID_ - This should be a unique identifier for this connector
+* _Tags_ - Comma seperated list of tags that can be used to match against routes
+* _Active_ - This is a boolean value to set this connector to be activated
+* _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+
+
+### Client Connector
+
+Client description... 
+
+#### Example:
+
+```
+{"Type": "client", "ID": "client-jane", "Active": true,
+        "Server": "<server name or ip>", "Port": "6000", "Key": "<key token of at least 32 bytes>"}
+```
+
+#### Usage:
+* TBD..
+
+#### Fields:
+* _Type_ - This specifies the type of connector, in this case, 'client'
 * _ID_ - This should be a unique identifier for this connector
 * _Tags_ - Comma seperated list of tags that can be used to match against routes
 * _Active_ - This is a boolean value to set this connector to be activated
@@ -369,6 +393,28 @@ Pull in RSS feeds directly into your bot and see what's going on around the web.
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 * _Server_ - The server address or IP to connect to
+
+
+### Server Connector
+
+Server description...
+
+#### Example:
+
+```
+{"Type": "server", "ID": "server-jane", "Active": true, "Debug": true,
+        "Port": "6000", "Key": "<key token of at least 32 bytes>"},
+```
+
+#### Usage:
+* TBD..
+
+#### Fields:
+* _Type_ - This specifies the type of connector, in this case, 'client'
+* _ID_ - This should be a unique identifier for this connector
+* _Tags_ - Comma seperated list of tags that can be used to match against routes
+* _Active_ - This is a boolean value to set this connector to be activated
+* _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 
 
 ### Slack Connector

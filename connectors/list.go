@@ -9,6 +9,7 @@ var List = make(map[string]reflect.Type)
 
 func init() {
 	List["cli"] = reflect.TypeOf(Cli{})
+	List["client"] = reflect.TypeOf(Client{})
 	List["bamboo"] = reflect.TypeOf(Bamboo{})
 	List["email"] = reflect.TypeOf(Email{})
 	List["exec"] = reflect.TypeOf(Exec{})
@@ -22,6 +23,7 @@ func init() {
 	List["website"] = reflect.TypeOf(Website{})
 	List["wolfram"] = reflect.TypeOf(Wolfram{})
 	List["redis"] = reflect.TypeOf(Redis{})
+	List["server"] = reflect.TypeOf(Server{})
 	List["webhook"] = reflect.TypeOf(Webhook{})
 	List["winrm"] = reflect.TypeOf(WinRM{})
 	List["twilio"] = reflect.TypeOf(Twilio{})
