@@ -70,6 +70,7 @@ Supported connectors:
 * [twilio](#twilio-connector) - send SMS alerts
 * [website](#website-connector) - Monitor return code of websites
 * [webhook](#webhook-connector) - Listener for webhooks
+* [winrm](#winrm-connector) - Execution of commands on Windows with monitoring capability
 * [wolfram](#wolfram-connector) - Execute queries against Wolfram Alpha
 
 
@@ -535,6 +536,7 @@ This connector provides a single means of making local and remote calls to Windo
 
 #### Usage:
 * To make local calls to the system, leave out the Server, Port, Login, Pass values.
+* Does NOT work with Active Directory authentication
 
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'winrm'
