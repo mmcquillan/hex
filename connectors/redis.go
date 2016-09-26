@@ -46,7 +46,7 @@ func (x Redis) Publish(publishMsgs <-chan models.Message, connector models.Conne
 }
 
 func (x Redis) Help(connector models.Connector) (help string) {
-	help += "jane flushdb <environment> - flushes the environments redis db\n"
+	help += connector.BotName + " flushdb <environment> - flushes the environments redis db\n"
 	return help
 }
 

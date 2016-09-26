@@ -21,7 +21,7 @@ func (x Cli) Listen(commandMsgs chan<- models.Message, connector models.Connecto
 		log.Print(err)
 	}
 	fmt.Println("Starting in cli mode...\n")
-	fmt.Print("jane> ")
+	fmt.Print(connector.BotName, "> ")
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		req := scanner.Text()
@@ -38,7 +38,7 @@ func (x Cli) Listen(commandMsgs chan<- models.Message, connector models.Connecto
 			m.In.Process = true
 			commandMsgs <- m
 		} else {
-			fmt.Print("\njane> ")
+			fmt.Print("\n", connector.BotName, "> ")
 		}
 	}
 }
@@ -64,7 +64,7 @@ func (x Cli) Publish(publishMsgs <-chan models.Message, connector models.Connect
 		if message.Out.Detail != "" {
 			fmt.Println(message.Out.Detail)
 		}
-		fmt.Print("\njane> ")
+		fmt.Print("\n", connector.BotName, "> ")
 	}
 }
 

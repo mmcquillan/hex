@@ -49,6 +49,7 @@ Jane has these builtin environment variables:
 * JANE_CONFIG - The path to the configuraiton file
 * JANE_LOGFILE - The path to the logfile
 * JANE_DEBUG - Set as true/false to globally turn on logging
+* JANE_BOT_NAME - If you want to set your own bot name
 
 
 ## Connectors

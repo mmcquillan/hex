@@ -8,7 +8,7 @@ import (
 )
 
 func Help(message models.Message, publishMsgs chan<- models.Message, config *models.Config) {
-	message.Out.Text = "Help for jane..."
+	message.Out.Text = "Help for " + config.BotName + "..."
 	help := ""
 	for _, alias := range config.Aliases {
 		if !alias.HideHelp {

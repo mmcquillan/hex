@@ -59,7 +59,7 @@ func (x Slack) Publish(publishMsgs <-chan models.Message, connector models.Conne
 		message := <-publishMsgs
 		msg := ""
 		params := slack.NewPostMessageParameters()
-		params.Username = "jane"
+		params.Username = connector.BotName
 		params.IconEmoji = connector.Image
 		if message.Out.Detail != "" {
 			color := slackColorMe(message.Out.Status)

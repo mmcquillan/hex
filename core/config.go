@@ -82,12 +82,18 @@ func readConfig(location string) (config models.Config) {
 }
 
 func subConfig(config *models.Config) {
+	if os.Getenv("JANE_BOT_NAME") != "" {
+		config.BotName = os.Getenv("JANE_BOT_NAME")
+	} else if config.BotName == "" {
+		config.BotName = "jane"
+	}
 	for i := 0; i < len(config.Connectors); i++ {
 		config.Connectors[i].Server = parse.SubstituteInputs(config.Connectors[i].Server)
 		config.Connectors[i].Port = parse.SubstituteInputs(config.Connectors[i].Port)
 		config.Connectors[i].Login = parse.SubstituteInputs(config.Connectors[i].Login)
 		config.Connectors[i].Pass = parse.SubstituteInputs(config.Connectors[i].Pass)
 		config.Connectors[i].Key = parse.SubstituteInputs(config.Connectors[i].Key)
+		config.Connectors[i].BotName = config.BotName
 		if os.Getenv("JANE_DEBUG") != "" {
 			if strings.ToLower(os.Getenv("JANE_DEBUG")) == "true" {
 				config.Connectors[i].Debug = true
