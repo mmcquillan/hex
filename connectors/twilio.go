@@ -58,7 +58,7 @@ func (x Twilio) Publish(publishMsgs <-chan models.Message, connector models.Conn
 }
 
 // Help Twilio help information
-func (x Twilio) Help(connector models.Connector) (help string) {
+func (x Twilio) Help(connector models.Connector) (help []string) {
 	return help
 }
 

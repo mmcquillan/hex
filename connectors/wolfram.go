@@ -20,7 +20,7 @@ func (x Wolfram) Listen(commandMsgs chan<- models.Message, connector models.Conn
 
 func (x Wolfram) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	if match, tokens := parse.Match("wolfram*", message.In.Text); match {
-		message.In.Tags += "," + connector.Tags
+		message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
 		message.Out.Text = callWolfram(tokens["*"], connector.Key)
 		publishMsgs <- message
 	}
@@ -30,8 +30,9 @@ func (x Wolfram) Publish(publishMsgs <-chan models.Message, connector models.Con
 	return
 }
 
-func (x Wolfram) Help(connector models.Connector) (help string) {
-	help += "wolfram <query> - returns the wolfram alpha results from an api\n"
+func (x Wolfram) Help(connector models.Connector) (help []string) {
+	help = make([]string, 0)
+	help = append(help, "wolfram <query> - returns the wolfram alpha results from an api")
 	return help
 }
 

@@ -49,7 +49,7 @@ func (x WinRM) Command(message models.Message, publishMsgs chan<- models.Message
 			if match, _ = parse.Match(command.Red, tokens["STDOUT"]); match {
 				color = "FAIL"
 			}
-			message.In.Tags += "," + connector.Tags
+			message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
 			message.Out.Text = connector.ID + " " + command.Name
 			message.Out.Detail = parse.Substitute(command.Output, tokens)
 			message.Out.Status = color
@@ -64,13 +64,14 @@ func (x WinRM) Publish(publishMsgs <-chan models.Message, connector models.Conne
 }
 
 //Help Returns help information for the connector
-func (x WinRM) Help(connector models.Connector) (help string) {
+func (x WinRM) Help(connector models.Connector) (help []string) {
+	help = make([]string, 0)
 	for _, command := range connector.Commands {
 		if !command.HideHelp {
 			if command.Help != "" {
-				help += command.Help + "\n"
+				help = append(help, command.Help)
 			} else {
-				help += command.Match + "\n"
+				help = append(help, command.Match)
 			}
 		}
 	}

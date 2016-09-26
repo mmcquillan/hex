@@ -22,12 +22,12 @@ func (x ImageMe) Listen(commandMsgs chan<- models.Message, connector models.Conn
 
 func (x ImageMe) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	if match, tokens := parse.Match("image me*", message.In.Text); match {
-		message.In.Tags += "," + connector.Tags
+		message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
 		message.Out.Text = callImageMe(tokens["*"], connector.Key, connector.Pass, false)
 		publishMsgs <- message
 	}
 	if match, tokens := parse.Match("animate me*", message.In.Text); match {
-		message.In.Tags += "," + connector.Tags
+		message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
 		message.Out.Text = callImageMe(tokens["*"], connector.Key, connector.Pass, true)
 		publishMsgs <- message
 	}
@@ -37,9 +37,10 @@ func (x ImageMe) Publish(publishMsgs <-chan models.Message, connector models.Con
 	return
 }
 
-func (x ImageMe) Help(connector models.Connector) (help string) {
-	help += "image me <image keywords> - pulls back an image url\n"
-	help += "animate me <image keywords> - pulls back an animated gif url\n"
+func (x ImageMe) Help(connector models.Connector) (help []string) {
+	help = make([]string, 0)
+	help = append(help, "image me <image keywords> - pulls back an image url")
+	help = append(help, "animate me <image keywords> - pulls back an animated gif url")
 	return help
 }
 

@@ -68,6 +68,6 @@ func (x Cli) Publish(publishMsgs <-chan models.Message, connector models.Connect
 	}
 }
 
-func (x Cli) Help(connector models.Connector) (help string) {
+func (x Cli) Help(connector models.Connector) (help []string) {
 	return
 }

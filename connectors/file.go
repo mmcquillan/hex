@@ -42,6 +42,6 @@ func (x File) Publish(publishMsgs <-chan models.Message, connector models.Connec
 	return
 }
 
-func (x File) Help(connector models.Connector) (help string) {
+func (x File) Help(connector models.Connector) (help []string) {
 	return
 }

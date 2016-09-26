@@ -86,7 +86,7 @@ func (x Slack) Publish(publishMsgs <-chan models.Message, connector models.Conne
 	}
 }
 
-func (x Slack) Help(connector models.Connector) (help string) {
+func (x Slack) Help(connector models.Connector) (help []string) {
 	return
 }
 

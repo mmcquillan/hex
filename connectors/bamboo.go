@@ -42,9 +42,10 @@ func (x Bamboo) Publish(publishMsgs <-chan models.Message, connector models.Conn
 	return
 }
 
-func (x Bamboo) Help(connector models.Connector) (help string) {
-	help += "bamboo build <build key>\n"
-	help += "bamboo status <environment or build key>\n"
+func (x Bamboo) Help(connector models.Connector) (help []string) {
+	help = make([]string, 0)
+	help = append(help, "bamboo build <build key>")
+	help = append(help, "bamboo status <environment or build key>")
 	return help
 }
 
@@ -83,7 +84,7 @@ func commandBuild(message models.Message, publishMsgs chan<- models.Message, con
 	tokens := strings.Split(message.In.Text, " ")
 	queue := bambooapi.Queue(connector.Server, connector.Login, connector.Pass, tokens[2])
 	log.Printf("%+v", queue)
-	message.In.Tags += "," + connector.Tags
+	message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
 	if queue.StatusCode > 0 {
 		message.Out.Text = "Problem queueing build: " + tokens[2]
 	} else {
@@ -101,7 +102,7 @@ func commandDeployStatus(message models.Message, publishMsgs chan<- models.Messa
 		for _, e := range de.Environmentstatuses {
 			detail := e.Deploymentresult.Deploymentversion.Name + " to " + e.Environment.Name
 			if strings.Contains(strings.ToLower(detail), strings.ToLower(tokens[2])) {
-				message.In.Tags += "," + connector.Tags
+				message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
 				message.Out.Text = "Bamboo Deploy " + detail + " " + e.Deploymentresult.Deploymentstate
 				message.Out.Detail = html.UnescapeString(sanitize.HTML(e.Deploymentresult.Reasonsummary))
 				message.Out.Link = "https://" + connector.Server + "/builds/deploy/viewDeploymentResult.action?deploymentResultId=" + strconv.Itoa(e.Deploymentresult.ID)
@@ -121,7 +122,7 @@ func commandBuildStatus(message models.Message, publishMsgs chan<- models.Messag
 	b := bambooapi.BuildResults(connector.Server, connector.Login, connector.Pass)
 	for _, be := range b.Results.Result {
 		if strings.Contains(strings.ToLower(be.Plan.Shortname), strings.ToLower(tokens[2])) {
-			message.In.Tags += "," + connector.Tags
+			message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
 			message.Out.Text = "Bamboo Build " + be.Plan.Shortname
 			message.Out.Detail = be.Plan.Name + " #" + strconv.Itoa(be.Buildnumber)
 			message.Out.Link = be.Link.Href

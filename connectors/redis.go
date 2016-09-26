@@ -33,7 +33,7 @@ func (x Redis) Command(message models.Message, publishMsgs chan<- models.Message
 
 			status := FlushDb(environment)
 			log.Println(status.String())
-			message.In.Tags += "," + connector.Tags
+			message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
 			message.Out.Text = fmt.Sprintf("Redis Server: %s\nStatus:%s", connector.Server, status.String())
 			publishMsgs <- message
 			return
@@ -45,8 +45,9 @@ func (x Redis) Publish(publishMsgs <-chan models.Message, connector models.Conne
 	return
 }
 
-func (x Redis) Help(connector models.Connector) (help string) {
-	help += connector.BotName + " flushdb <environment> - flushes the environments redis db\n"
+func (x Redis) Help(connector models.Connector) (help []string) {
+	help = make([]string, 0)
+	help = append(help, connector.BotName+" flushdb <environment> - flushes the environments redis db")
 	return help
 }
 

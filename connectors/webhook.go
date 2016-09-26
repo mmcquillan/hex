@@ -53,7 +53,7 @@ func (x Webhook) Publish(publishMsgs <-chan models.Message, connector models.Con
 	return
 }
 
-func (x Webhook) Help(connector models.Connector) (help string) {
+func (x Webhook) Help(connector models.Connector) (help []string) {
 	return
 }
 

@@ -76,6 +76,6 @@ func (x Website) Publish(publishMsgs <-chan models.Message, connector models.Con
 	return
 }
 
-func (x Website) Help(connector models.Connector) (help string) {
+func (x Website) Help(connector models.Connector) (help []string) {
 	return
 }
