@@ -31,7 +31,7 @@ func (x Rss) Publish(publishMsgs <-chan models.Message, connector models.Connect
 	return
 }
 
-func (x Rss) Help(connector models.Connector) (help string) {
+func (x Rss) Help(connector models.Connector) (help []string) {
 	return
 }
 

@@ -43,7 +43,7 @@ func (x Exec) Command(message models.Message, publishMsgs chan<- models.Message,
 			if match, _ = parse.Match(command.Red, tokens["STDOUT"]); match {
 				color = "FAIL"
 			}
-			message.In.Tags += "," + connector.Tags
+			message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
 			message.Out.Text = connector.ID + " " + command.Name
 			message.Out.Detail = parse.Substitute(command.Output, tokens)
 			message.Out.Status = color
@@ -56,13 +56,14 @@ func (x Exec) Publish(publishMsgs <-chan models.Message, connector models.Connec
 	return
 }
 
-func (x Exec) Help(connector models.Connector) (help string) {
+func (x Exec) Help(connector models.Connector) (help []string) {
+	help = make([]string, 0)
 	for _, command := range connector.Commands {
 		if !command.HideHelp {
 			if command.Help != "" {
-				help += command.Help + "\n"
+				help = append(help, command.Help)
 			} else {
-				help += command.Match + "\n"
+				help = append(help, command.Match)
 			}
 		}
 	}

@@ -40,6 +40,6 @@ func (x Email) Publish(publishMsgs <-chan models.Message, connector models.Conne
 	}
 }
 
-func (x Email) Help(connector models.Connector) (help string) {
+func (x Email) Help(connector models.Connector) (help []string) {
 	return
 }

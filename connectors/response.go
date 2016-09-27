@@ -28,7 +28,7 @@ func (x Response) Command(message models.Message, publishMsgs chan<- models.Mess
 				i := rand.Intn(len(c.Outputs))
 				message.Out.Text = parse.Substitute(c.Outputs[i], tokens)
 			}
-			message.In.Tags += "," + connector.Tags
+			message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
 			publishMsgs <- message
 		}
 	}
@@ -38,13 +38,14 @@ func (x Response) Publish(publishMsgs <-chan models.Message, connector models.Co
 	return
 }
 
-func (x Response) Help(connector models.Connector) (help string) {
+func (x Response) Help(connector models.Connector) (help []string) {
+	help = make([]string, 0)
 	for _, c := range connector.Commands {
 		if !c.HideHelp {
 			if c.Help != "" {
-				help += c.Help + "\n"
+				help = append(help, c.Help)
 			} else {
-				help += strings.Replace(c.Match, "*", "", -1) + "\n"
+				help = append(help, strings.Replace(c.Match, "*", "", -1))
 			}
 		}
 	}

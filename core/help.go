@@ -8,14 +8,14 @@ import (
 )
 
 func Help(message models.Message, publishMsgs chan<- models.Message, config *models.Config) {
-	message.Out.Text = "Help for jane..."
-	help := ""
+	message.Out.Text = "Help for " + config.BotName + "..."
+	help := make([]string, 0)
 	for _, alias := range config.Aliases {
 		if !alias.HideHelp {
 			if alias.Help != "" {
-				help += alias.Help + "\n"
+				help = append(help, alias.Help)
 			} else {
-				help += alias.Match + "\n"
+				help = append(help, alias.Match)
 			}
 		}
 	}
@@ -34,20 +34,19 @@ func Help(message models.Message, publishMsgs chan<- models.Message, config *mod
 			}
 			if canRun {
 				c := connectors.MakeConnector(connector.Type).(connectors.Connector)
-				help += c.Help(connector)
+				help = append(help, c.Help(connector)...)
 			}
 		}
 	}
-	helps := strings.Split(help, "\n")
-	sort.Strings(helps)
+	sort.Strings(help)
 	var lasthelp = ""
-	var newhelps = []string{}
-	for _, help := range helps {
-		if help != lasthelp && help != "-" {
-			newhelps = append(newhelps, help)
+	var newhelp = make([]string, 0)
+	for _, h := range help {
+		if h != lasthelp {
+			newhelp = append(newhelp, h)
 		}
-		lasthelp = help
+		lasthelp = h
 	}
-	message.Out.Detail = strings.Join(newhelps, "\n")
+	message.Out.Detail = strings.Join(newhelp, "\n")
 	publishMsgs <- message
 }

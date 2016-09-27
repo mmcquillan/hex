@@ -52,16 +52,16 @@ func aliasCommands(message *models.Message, config *models.Config) {
 }
 
 func staticCommands(message models.Message, publishMsgs chan<- models.Message, config *models.Config) {
-	if strings.ToLower(strings.TrimSpace(message.In.Text)) == "jane help" {
+	if strings.ToLower(strings.TrimSpace(message.In.Text)) == config.BotName+" help" {
 		Help(message, publishMsgs, config)
 	}
-	if strings.ToLower(strings.TrimSpace(message.In.Text)) == "jane whoami" {
+	if strings.ToLower(strings.TrimSpace(message.In.Text)) == config.BotName+" whoami" {
 		WhoAmI(message, publishMsgs)
 	}
-	if strings.ToLower(strings.TrimSpace(message.In.Text)) == "jane passwd" {
+	if strings.ToLower(strings.TrimSpace(message.In.Text)) == config.BotName+" passwd" {
 		Passwd(message, publishMsgs)
 	}
-	if strings.ToLower(strings.TrimSpace(message.In.Text)) == "jane version" {
+	if strings.ToLower(strings.TrimSpace(message.In.Text)) == config.BotName+" version" {
 		Version(message, publishMsgs, config)
 	}
 }

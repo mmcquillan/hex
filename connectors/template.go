@@ -20,6 +20,6 @@ func (x Template) Publish(publishMsgs <-chan models.Message, connector models.Co
 	return
 }
 
-func (x Template) Help(connector models.Connector) (help string) {
+func (x Template) Help(connector models.Connector) (help []string) {
 	return
 }

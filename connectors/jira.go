@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/projectjane/jane/models"
+	"github.com/projectjane/jane/parse"
 )
 
 type Jira struct {
@@ -33,8 +34,9 @@ func (x Jira) Publish(publishMsgs <-chan models.Message, connector models.Connec
 	return
 }
 
-func (x Jira) Help(connector models.Connector) (help string) {
-	help += "jira create <issueType> <project key> <summary>\n"
+func (x Jira) Help(connector models.Connector) (help []string) {
+	help = make([]string, 0)
+	help = append(help, "jira create <issueType> <project key> <summary>")
 	return help
 }
 
@@ -148,7 +150,7 @@ func createJiraIssue(message models.Message, publishMsgs chan<- models.Message, 
 		return
 	}
 
-	message.In.Tags += "," + connector.Tags
+	message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
 	message.Out.Text = created.Key
 	publishMsgs <- message
 }
@@ -190,7 +192,7 @@ func parseJiraIssue(message models.Message, publishMsgs chan<- models.Message, c
 		if ticket.Fields.Status.Name == "" {
 			return
 		}
-		message.In.Tags += "," + connector.Tags
+		message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
 		message.Out.Link = "https://" + connector.Server + "/browse/" + issue
 		message.Out.Text = strings.ToUpper(issue) + " - " + ticket.Fields.Summary
 		message.Out.Detail = fmt.Sprintf("Status: %s\nPriority: %s\nAssignee: %s\n",
