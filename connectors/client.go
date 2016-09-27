@@ -80,6 +80,6 @@ func (x Client) Publish(publishMsgs <-chan models.Message, connector models.Conn
 	return
 }
 
-func (x Client) Help(connector models.Connector) (help string) {
+func (x Client) Help(connector models.Connector) (help []string) {
 	return
 }

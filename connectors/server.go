@@ -93,10 +93,8 @@ func (x Server) Listen(commandMsgs chan<- models.Message, connector models.Conne
 				if err != nil {
 					log.Print(err)
 				}
-				//message.In.ConnectorType = connector.Type
-				//message.In.ConnectorID = connector.ID
-				//message.In.Target = conn.RemoteAddr().String()
-				message.In.Tags = message.In.Tags + "," + connector.Tags
+				message.In.ConnectorID = "[" + conn.RemoteAddr().String() + "]" + message.In.ConnectorID
+				message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
 				if connector.Debug {
 					log.Printf("Message from %s: %+v", conn.RemoteAddr().String(), message)
 				}
@@ -119,6 +117,6 @@ func (x Server) Publish(publishMsgs <-chan models.Message, connector models.Conn
 	return
 }
 
-func (x Server) Help(connector models.Connector) (help string) {
+func (x Server) Help(connector models.Connector) (help []string) {
 	return
 }
