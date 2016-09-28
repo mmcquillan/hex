@@ -247,7 +247,7 @@ The File watch connector will monitor a local file and throw an alert anytime a 
 {"Type": "file", "ID": "jane log", "Active": true,
   "File": "/home/matt/test.log",
   "Commands": [
-    {"Name": "Starting Jane", "Match": "*stopping*"},
+    {"Name": "Stopping Jane", "Match": "*stopping*"},
     {"Name": "Starting Jane", "Match": "*starting*"}
   ]
 }

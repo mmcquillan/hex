@@ -5,8 +5,11 @@ import (
 	"encoding/json"
 	"github.com/projectjane/jane/models"
 	"github.com/projectjane/jane/parse"
+	"io"
 	"log"
 	"net"
+	"strings"
+	"time"
 )
 
 type Server struct {
@@ -16,6 +19,7 @@ func (x Server) Listen(commandMsgs chan<- models.Message, connector models.Conne
 	defer Recovery(connector)
 
 	// estsablish connection
+	clients := make(map[string]int)
 	listener, err := net.Listen("tcp", ":"+connector.Port)
 	if err != nil {
 		log.Print(err)
@@ -29,6 +33,29 @@ func (x Server) Listen(commandMsgs chan<- models.Message, connector models.Conne
 		log.Print(err)
 	}
 
+	// watch for stopped connections
+	go func(commandMsgs chan<- models.Message, connector models.Connector, clients map[string]int) {
+		for {
+			time.Sleep(15 * time.Second)
+			for client, _ := range clients {
+				clients[client] -= 1
+				if clients[client] < 0 {
+					var m models.Message
+					m.In.ConnectorType = connector.Type
+					m.In.ConnectorID = connector.ID
+					m.In.Tags = connector.Tags
+					m.In.Process = false
+					m.Out.Text = "Disconnect from " + client
+					commandMsgs <- m
+					if connector.Debug {
+						log.Print("Disconnect: ", client)
+					}
+					delete(clients, client)
+				}
+			}
+		}
+	}(commandMsgs, connector, clients)
+
 	for {
 
 		// respond to connections
@@ -40,31 +67,20 @@ func (x Server) Listen(commandMsgs chan<- models.Message, connector models.Conne
 			log.Print("New Client Connection by ", conn.RemoteAddr())
 		}
 
-		go func(commandMsgs chan<- models.Message, connector models.Connector, conn net.Conn, key []byte) {
+		// thread out process
+		go func(commandMsgs chan<- models.Message, connector models.Connector, conn net.Conn, key []byte, clients map[string]int) {
 			defer conn.Close()
 
-			// first message should be key to validate
-			handshake, err := bufio.NewReader(conn).ReadString('\n')
-			if err != nil {
-				log.Print(err)
-			}
-			handshakeBytes, err := parse.StrBytesToBytes(handshake)
-			if err != nil {
-				log.Print(err)
-			}
-			handshakeDecrypt, err := parse.Decrypt(key, handshakeBytes)
-			if err != nil {
-				log.Print(err)
-
-			}
-			if string(handshakeDecrypt) != string(key) {
-				log.Printf("Handshake: %+v", handshakeDecrypt)
-				log.Printf("Key: %+v", key)
-				log.Print("Key is invalid from client")
-				return
-			} else {
-				log.Print("Handshake success")
-			}
+			// establish client counter
+			client := strings.Split(conn.RemoteAddr().String(), ":")[0]
+			clients[client] = 3
+			var m models.Message
+			m.In.ConnectorType = connector.Type
+			m.In.ConnectorID = connector.ID
+			m.In.Tags = connector.Tags
+			m.In.Process = false
+			m.Out.Text = "Connect: " + client
+			commandMsgs <- m
 
 			// loop
 			for {
@@ -72,7 +88,12 @@ func (x Server) Listen(commandMsgs chan<- models.Message, connector models.Conne
 				// read in messages
 				messageEvent, err := bufio.NewReader(conn).ReadString('\n')
 				if err != nil {
-					log.Print(err)
+					if err == io.EOF {
+						clients[client] = 0
+						break
+					} else {
+						log.Print(err)
+					}
 				}
 
 				// convert to bytes
@@ -87,25 +108,35 @@ func (x Server) Listen(commandMsgs chan<- models.Message, connector models.Conne
 					log.Print(err)
 				}
 
-				// deserialize message
-				var message models.Message
-				err = json.Unmarshal(messageDecrypt, &message)
-				if err != nil {
-					log.Print(err)
-				}
-				message.In.ConnectorID = "[" + conn.RemoteAddr().String() + "]" + message.In.ConnectorID
-				message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
-				if connector.Debug {
-					log.Printf("Message from %s: %+v", conn.RemoteAddr().String(), message)
-				}
+				// interpret message
+				if string(messageDecrypt) == "ping" {
+					clients[client] += 1
+				} else if len(messageDecrypt) > 0 && string(messageDecrypt)[0:1] == "{" {
 
-				// send message
-				//commandMsgs <- message
+					// deserialize message
+					var message models.Message
+					err = json.Unmarshal(messageDecrypt, &message)
+					if err != nil {
+						log.Print(err)
+					}
+					message.In.ConnectorID = "[" + client + "]" + message.In.ConnectorID
+					message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
+					if connector.Debug {
+						log.Printf("Message from %s: %+v", client, message)
+					}
+
+					// send message
+					commandMsgs <- message
+
+				} else {
+					log.Print("Client Connection illegal key from ", client)
+					clients[client] = 0
+					break
+				}
 
 			}
-		}(commandMsgs, connector, conn, key)
+		}(commandMsgs, connector, conn, key, clients)
 	}
-
 	return
 }
 

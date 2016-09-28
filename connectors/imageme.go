@@ -52,7 +52,7 @@ type Items struct {
 	Link string `json:"link"`
 }
 
-var client = &http.Client{}
+var imageClient = &http.Client{}
 
 var baseUrl = "https://www.googleapis.com/customsearch/v1?key="
 var errorMessage = "Error retrieving image"
@@ -74,7 +74,7 @@ func callImageMe(msg string, apiKey string, cx string, animated bool) string {
 
 	url := baseUrl + apiKey + cx + returnFields + query + fields
 
-	resp, err := client.Get(url)
+	resp, err := imageClient.Get(url)
 	if err != nil {
 		log.Print(err)
 		return errorMessage
@@ -131,7 +131,7 @@ func FindDeprecatedImage(query string, animated bool) string {
 		searchUrl += url.QueryEscape(" animated")
 	}
 
-	resp, err := client.Get(searchUrl)
+	resp, err := imageClient.Get(searchUrl)
 	if err != nil {
 		log.Print(err)
 		return errorMessage
