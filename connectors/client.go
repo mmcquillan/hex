@@ -7,6 +7,7 @@ import (
 	"github.com/projectjane/jane/parse"
 	"log"
 	"net"
+	"sync"
 	"time"
 )
 
@@ -14,6 +15,8 @@ type Client struct {
 	Conn      net.Conn
 	Connected bool
 	Connector models.Connector
+	Messages  [][]byte
+	Mutex     sync.Mutex
 }
 
 var client Client
@@ -33,7 +36,8 @@ func (x Client) Publish(publishMsgs <-chan models.Message, connector models.Conn
 	client = x
 	client.Connector = connector
 	client.Connected = false
-	//defer client.Conn.Close()
+	client.Messages = make([][]byte, 0)
+	client.Mutex = sync.Mutex{}
 
 	// listen for messages
 	go func(publishMsgs <-chan models.Message) {
@@ -50,20 +54,42 @@ func (x Client) Publish(publishMsgs <-chan models.Message, connector models.Conn
 			}
 
 			// publish
-			sendMessage(messageJson)
+			sendMessage(messageJson, true)
 
 		}
 
 	}(publishMsgs)
 
+	// run a catchup
+	go func() {
+		for {
+
+			// wait
+			time.Sleep(20 * time.Second)
+
+			// send any queued messages
+			if client.Connected && len(client.Messages) > 0 {
+				client.Mutex.Lock()
+				messages := make([][]byte, len(client.Messages))
+				copy(messages, client.Messages)
+				client.Messages = make([][]byte, 0)
+				client.Mutex.Unlock()
+				for _, m := range messages {
+					sendMessage(m, true)
+				}
+			}
+
+		}
+	}()
+
 	// ping
 	for {
 
-		// send ping
-		sendMessage([]byte("ping"))
-
 		// wait
 		time.Sleep(15 * time.Second)
+
+		// send ping
+		sendMessage([]byte("ping"), false)
 
 	}
 
@@ -74,7 +100,7 @@ func (x Client) Help(connector models.Connector) (help []string) {
 	return
 }
 
-func sendMessage(messageBytes []byte) {
+func sendMessage(messageBytes []byte, retry bool) {
 
 	// retry
 	defer func() {
@@ -82,12 +108,13 @@ func sendMessage(messageBytes []byte) {
 			client.Connected = false
 			log.Print("Retrying Client Connector - ", client.Connector.ID, " ", r)
 			time.Sleep(8 * time.Second)
-			sendMessage(messageBytes)
+			if retry {
+				client.Messages = append(client.Messages, messageBytes)
+			}
 		}
 	}()
 
 	// connect
-	log.Print("Connected: ", client.Connected)
 	if !client.Connected {
 		if client.Connector.Debug {
 			log.Print("Connecting to: " + client.Connector.Server + ":" + client.Connector.Port)
