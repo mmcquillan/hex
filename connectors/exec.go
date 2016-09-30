@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"log"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 
@@ -165,36 +166,46 @@ func callRemote(cmd string, args string, connector models.Connector) (out string
 	if connector.Debug {
 		log.Print("Starting ssh connection for " + connector.Server + ":" + port)
 	}
-	client, err := ssh.Dial("tcp", connector.Server+":"+port, clientconn)
-	if err != nil {
-		log.Print(err)
-	}
-	if client == nil {
-		serverconn = false
-	} else {
-		defer client.Close()
-		session, err := client.NewSession()
+	retries := 3
+	retryCounter := retries
+	for retryCounter > 0 {
+		client, err := ssh.Dial("tcp", connector.Server+":"+port, clientconn)
 		if err != nil {
 			log.Print(err)
 		}
-		if session == nil {
+		if client == nil {
 			serverconn = false
 		} else {
-			defer session.Close()
-			b, err := session.CombinedOutput(cmd + " " + args)
-			if err != nil && connector.Debug {
+			defer client.Close()
+			session, err := client.NewSession()
+			if err != nil {
 				log.Print(err)
 			}
-			out = string(b[:])
-			if connector.Debug {
-				log.Print("Exec results for " + connector.Server + " " + cmd + " " + args + ": " + out)
+			if session == nil {
+				serverconn = false
+			} else {
+				defer session.Close()
+				b, err := session.CombinedOutput(cmd + " " + args)
+				if err != nil && connector.Debug {
+					log.Print(err)
+				}
+				out = string(b[:])
+				if connector.Debug {
+					log.Print("Exec results for " + connector.Server + " " + cmd + " " + args + ": " + out)
+				}
 			}
+		}
+		if serverconn {
+			retryCounter = 0
+		} else {
+			if connector.Debug {
+				log.Print("Cannot connect to server " + connector.Server + " (try #" + strconv.Itoa(retries-retryCounter) + ")")
+			}
+			retryCounter -= 1
+			time.Sleep(3 * time.Second)
 		}
 	}
 	if !serverconn {
-		if connector.Debug {
-			log.Print("Cannot connect to server " + connector.Server)
-		}
 		out = "ERROR - Cannot connect to server " + connector.Server
 	}
 	return out
