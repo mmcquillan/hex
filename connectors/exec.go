@@ -166,9 +166,8 @@ func callRemote(cmd string, args string, connector models.Connector) (out string
 	if connector.Debug {
 		log.Print("Starting ssh connection for " + connector.Server + ":" + port)
 	}
-	retries := 3
-	retryCounter := retries
-	for retryCounter > 0 {
+	retryCounter := 1
+	for retryCounter <= 3 {
 		client, err := ssh.Dial("tcp", connector.Server+":"+port, clientconn)
 		if err != nil {
 			log.Print(err)
@@ -196,13 +195,13 @@ func callRemote(cmd string, args string, connector models.Connector) (out string
 			}
 		}
 		if serverconn {
-			retryCounter = 0
+			retryCounter = 999
 		} else {
 			if connector.Debug {
-				log.Print("Cannot connect to server " + connector.Server + " (try #" + strconv.Itoa(retries-retryCounter) + ")")
+				log.Print("Cannot connect to server " + connector.Server + " (try #" + strconv.Itoa(retryCounter) + ")")
 			}
-			retryCounter -= 1
-			time.Sleep(3 * time.Second)
+			time.Sleep(time.Duration(3*retryCounter) * time.Second)
+			retryCounter += 1
 		}
 	}
 	if !serverconn {
