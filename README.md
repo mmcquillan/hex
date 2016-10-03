@@ -94,7 +94,7 @@ This connector was written to integrate bamboo builds. It was written against th
 * Make sure to sepecify where you want the build and deploy messages to end up in the routes
 
 #### Fields:
-* _Type_ - This specifies the type of connector, in this case, 'exec2'
+* _Type_ - This specifies the type of connector, in this case, 'bamboo'
 * _ID_ - This should be a unique identifier for this connector
 * _Tags_ - Comma seperated list of tags that can be used to match against routes
 * _Active_ - This is a boolean value to set this connector to be activated
@@ -120,7 +120,7 @@ This connector runs Jane via the command line interface instead of as a daemon a
 * Use the command prompt to type your command and enter to send it.
 
 #### Fields:
-* _Type_ - This specifies the type of connector, in this case, 'exec2'
+* _Type_ - This specifies the type of connector, in this case, 'cli'
 * _ID_ - This should be a unique identifier for this connector
 * _Tags_ - Comma seperated list of tags that can be used to match against routes
 * _Active_ - This is a boolean value to set this connector to be activated
@@ -168,7 +168,7 @@ This connector allows for the sending of emails. Point the connector to a valid 
 * Make sure to sepecify the to address in the target for routes to send emails
 
 #### Fields:
-* _Type_ - This specifies the type of connector, in this case, 'exec2'
+* _Type_ - This specifies the type of connector, in this case, 'email'
 * _ID_ - This should be a unique identifier for this connector
 * _Tags_ - Comma seperated list of tags that can be used to match against routes
 * _Active_ - This is a boolean value to set this connector to be activated
@@ -198,6 +198,7 @@ This connector provides a single means of making local and remote calls to Linux
         "HideHelp": false,
         "Help": "jane elasticsearch1 aptcheck - To check our elasticsearch!",
         "RunCheck": true,
+        "Sampling": 2,
         "Interval": 1,
         "Remind": 15,
         "Green": "*OK*",
@@ -231,6 +232,7 @@ This connector provides a single means of making local and remote calls to Linux
   * _HideHelp_ - A boolean to show or hide the help when displaying help (Default: false)
   * _Help_ - Optional help text, otherwise it'll show the Match value
   * _RunCheck_ - A boolean that will have Jane periodically run this (Default: false)
+  * _Sampling_ - How many times to check prior to throwing an alert
   * _Interval_ - An integer that is the number of minutes between checks when RunCheck is true (Default: 1)
   * _Remind_ - An integer which is the number of units of Interval to wait before reminding of a non-Green status, with Zero being no reminders (Default: 0)
   * _Green_ - A [match](#matching) to identify what is in a green state
@@ -534,7 +536,7 @@ This connector opens a port for Jane to receive webhook calls. Webhooks calls ar
 * For this connector, the `${?}` represents everything in the URL after the ?
 
 #### Fields:
-* _Type_ - This specifies the type of connector, in this case, 'exec2'
+* _Type_ - This specifies the type of connector, in this case, 'webhook'
 * _ID_ - This should be a unique identifier for this connector
 * _Tags_ - Comma seperated list of tags that can be used to match against routes
 * _Active_ - This is a boolean value to set this connector to be activated

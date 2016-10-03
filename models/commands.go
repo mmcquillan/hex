@@ -12,6 +12,7 @@ type Command struct {
 	HideHelp bool
 	RunCheck bool
 	Interval int
+	Sampling int
 	Remind   int
 	Green    string
 	Yellow   string
