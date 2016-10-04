@@ -8,7 +8,6 @@ import (
 	"io"
 	"log"
 	"net"
-	"strings"
 	"time"
 )
 
@@ -74,7 +73,7 @@ func (x Server) Listen(commandMsgs chan<- models.Message, connector models.Conne
 			defer conn.Close()
 
 			// establish client counter
-			client := strings.Split(conn.RemoteAddr().String(), ":")[0]
+			client := conn.RemoteAddr().String()
 			clients[client] = 3
 			var m models.Message
 			m.In.ConnectorType = connector.Type
