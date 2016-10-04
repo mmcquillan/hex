@@ -123,7 +123,6 @@ func (x Server) Listen(commandMsgs chan<- models.Message, connector models.Conne
 						log.Print(err)
 					}
 					message.In.ConnectorID = "[" + client + "]" + message.In.ConnectorID
-					message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
 					if connector.Debug {
 						log.Printf("Message from %s: %+v", client, message)
 					}
