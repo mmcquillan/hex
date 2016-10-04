@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 type Webhook struct {
@@ -75,6 +76,21 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 	if webhook.Connector.Debug {
 		log.Print("Webhook Incoming Body: " + body)
 	}
+
+	// for new relic (lame)
+	if strings.HasPrefix(body, "deployment=%7B") {
+		body, err = url.QueryUnescape(strings.Replace(body, "deployment=", "", 1))
+		if err != nil {
+			log.Print(err)
+		}
+	}
+	if strings.HasPrefix(body, "alert=%7B") {
+		body, err = url.QueryUnescape(strings.Replace(body, "alert=", "", 1))
+		if err != nil {
+			log.Print(err)
+		}
+	}
+
 	bodyParsed, err := gabs.ParseJSON([]byte(body))
 	isJson := true
 	if err != nil {
