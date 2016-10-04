@@ -127,7 +127,7 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 				var m models.Message
 				m.In.ConnectorType = webhook.Connector.Type
 				m.In.ConnectorID = webhook.Connector.ID
-				m.In.Tags = webhook.Connector.Tags
+				m.In.Tags = parse.TagAppend(webhook.Connector.Tags, c.Tags)
 				m.In.Text = out
 				m.In.Process = true
 				webhook.CommandMsgs <- m
@@ -146,7 +146,7 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 				var m models.Message
 				m.In.ConnectorType = webhook.Connector.Type
 				m.In.ConnectorID = webhook.Connector.ID
-				m.In.Tags = webhook.Connector.Tags
+				m.In.Tags = parse.TagAppend(webhook.Connector.Tags, c.Tags)
 				m.In.Text = reqUrl
 				m.In.Process = false
 				if c.Name != "" {

@@ -28,7 +28,7 @@ func (x Response) Command(message models.Message, publishMsgs chan<- models.Mess
 				i := rand.Intn(len(c.Outputs))
 				message.Out.Text = parse.Substitute(c.Outputs[i], tokens)
 			}
-			message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
+			message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags+","+c.Tags)
 			publishMsgs <- message
 		}
 	}

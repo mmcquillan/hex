@@ -23,7 +23,7 @@ func (x File) Listen(commandMsgs chan<- models.Message, connector models.Connect
 				var m models.Message
 				m.In.ConnectorType = connector.Type
 				m.In.ConnectorID = connector.ID
-				m.In.Tags = connector.Tags
+				m.In.Tags = parse.TagAppend(connector.Tags, c.Tags)
 				m.In.Process = false
 				m.Out.Text = connector.File + ": " + c.Name
 				m.Out.Detail = line.Text

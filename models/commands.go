@@ -17,4 +17,5 @@ type Command struct {
 	Green    string
 	Yellow   string
 	Red      string
+	Tags     string
 }

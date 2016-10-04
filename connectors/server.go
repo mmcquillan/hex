@@ -45,8 +45,8 @@ func (x Server) Listen(commandMsgs chan<- models.Message, connector models.Conne
 					m.In.ConnectorID = connector.ID
 					m.In.Tags = connector.Tags
 					m.In.Process = false
-					m.Out.Text = "Client Alert"
-					m.Out.Detail = "Disconnect from " + client
+					m.Out.Text = "Jane Alert"
+					m.Out.Detail = "Client Disconnect from " + client
 					m.Out.Status = "FAIL"
 					commandMsgs <- m
 					if connector.Debug {
@@ -81,8 +81,8 @@ func (x Server) Listen(commandMsgs chan<- models.Message, connector models.Conne
 			m.In.ConnectorID = connector.ID
 			m.In.Tags = connector.Tags
 			m.In.Process = false
-			m.Out.Text = "Client Alert"
-			m.Out.Detail = "Connect from " + client
+			m.Out.Text = "Jane Alert"
+			m.Out.Detail = "Client Connect from " + client
 			m.Out.Status = "SUCCESS"
 			commandMsgs <- m
 

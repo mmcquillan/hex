@@ -44,7 +44,7 @@ func (x Exec) Command(message models.Message, publishMsgs chan<- models.Message,
 			if match, _ = parse.Match(command.Red, tokens["STDOUT"]); match {
 				color = "FAIL"
 			}
-			message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
+			message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags+","+command.Tags)
 			message.Out.Text = connector.ID + " " + command.Name
 			message.Out.Detail = parse.Substitute(command.Output, tokens)
 			message.Out.Status = color
@@ -147,7 +147,7 @@ func check(commandMsgs chan<- models.Message, command models.Command, connector 
 			var message models.Message
 			message.In.ConnectorType = connector.Type
 			message.In.ConnectorID = connector.ID
-			message.In.Tags = connector.Tags
+			message.In.Tags = parse.TagAppend(connector.Tags, command.Tags)
 			message.In.Process = false
 			message.Out.Text = connector.ID + " " + command.Name
 			message.Out.Detail = strings.Replace(command.Output, "${STDOUT}", out, -1)
