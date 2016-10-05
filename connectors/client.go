@@ -46,6 +46,7 @@ func (x Client) Publish(publishMsgs <-chan models.Message, connector models.Conn
 
 			// incoming message
 			message := <-publishMsgs
+			message.In.Timestamp = time.Now().Unix()
 
 			// serialize message
 			messageJson, err := json.Marshal(message)

@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"strconv"
 	"time"
 )
 
@@ -122,7 +123,14 @@ func (x Server) Listen(commandMsgs chan<- models.Message, connector models.Conne
 					if err != nil {
 						log.Print(err)
 					}
+
+					// alter message
 					message.In.ConnectorID = "[" + client + "]" + message.In.ConnectorID
+					timestamp := time.Now().Unix()
+					if timestamp > message.In.Timestamp+120 {
+						delay := strconv.FormatInt(timestamp-message.In.Timestamp, 10)
+						message.Out.Text = message.Out.Text + " [Delayed: " + delay + "s]"
+					}
 					if connector.Debug {
 						log.Printf("Message from %s: %+v", client, message)
 					}

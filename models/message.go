@@ -9,6 +9,7 @@ type Message struct {
 		User          string
 		Text          string
 		Process       bool
+		Timestamp     int64
 	}
 	Out struct {
 		Target string
