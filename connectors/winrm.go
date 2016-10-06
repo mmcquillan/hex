@@ -79,25 +79,37 @@ func (x WinRM) Help(connector models.Connector) (help []string) {
 }
 
 func checkRM(commandMsgs chan<- models.Message, command models.Command, connector models.Connector) {
+
+	// command vars
 	var state = command.Green
+	var stateReset = true
+	var counter = 1
 	var interval = 1
+	var sampling = 1
 	var remind = 0
 	if command.Interval > 0 {
 		interval = command.Interval
 	}
+	if command.Sampling > 0 {
+		sampling = command.Sampling
+	}
 	if command.Remind > 0 {
 		remind = command.Remind
 	}
-	var counter = 0
+
+	// loop commands
 	for {
+
+		// reset vars
 		var color = "NONE"
 		var match = false
 		var newstate = ""
-		counter++
-		var out string
+		var sendAlert = false
 
-		out = sendCommand(command.Cmd, command.Args, connector)
+		// make the call
+		out := sendCommand(command.Cmd, command.Args, connector)
 
+		// interpret results
 		if match, _ = parse.Match(command.Green, out); match {
 			newstate = command.Green
 			color = "SUCCESS"
@@ -110,7 +122,35 @@ func checkRM(commandMsgs chan<- models.Message, command models.Command, connecto
 			newstate = command.Red
 			color = "FAIL"
 		}
-		if newstate != state || (newstate != command.Green && counter == remind && remind != 0) {
+
+		// handle state change
+		if newstate != state {
+
+			if stateReset {
+				counter = 1
+				stateReset = false
+			}
+
+			// sampling
+			if counter == sampling {
+				sendAlert = true
+			}
+
+			// change to green
+			if newstate == command.Green {
+				sendAlert = true
+			}
+
+		}
+
+		// handle non-green state
+		if newstate != command.Green && counter == remind && remind > 1 {
+			sendAlert = true
+
+		}
+
+		// send message
+		if sendAlert {
 			var message models.Message
 			message.In.ConnectorType = connector.Type
 			message.In.ConnectorID = connector.ID
@@ -121,12 +161,16 @@ func checkRM(commandMsgs chan<- models.Message, command models.Command, connecto
 			message.Out.Status = color
 			commandMsgs <- message
 			state = newstate
-		}
-		if counter >= remind {
 			counter = 0
+			stateReset = true
 		}
+
+		// wait
+		counter += 1
 		time.Sleep(time.Duration(interval) * time.Minute)
+
 	}
+
 }
 
 func sendCommand(command, args string, connector models.Connector) string {
