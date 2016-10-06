@@ -71,7 +71,7 @@ func (x WinRM) Help(connector models.Connector) (help []string) {
 			if command.Help != "" {
 				help = append(help, command.Help)
 			} else {
-				help = append(help, command.Match)
+				help = append(help, strings.Replace(command.Match, "*", "", -1))
 			}
 		}
 	}
