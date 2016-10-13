@@ -3,7 +3,9 @@ package parse
 import (
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
+	"time"
 )
 
 //Substitute Function for substituting a string with tokens
@@ -13,6 +15,7 @@ func Substitute(value string, tokens map[string]string) string {
 			if _, ok := tokens[Strip(hit)]; ok {
 				value = strings.Replace(value, hit, tokens[Strip(hit)], -1)
 			} else {
+				value = SubstituteBuiltIns(hit, value)
 				value = strings.Replace(value, hit, os.Getenv(Strip(hit)), -1)
 			}
 		}
@@ -37,6 +40,14 @@ func SubstitutionVars(value string) (match bool, tokens []string) {
 		match = true
 	}
 	return match, tokens
+}
+
+func SubstituteBuiltIns(hit string, value string) string {
+	if Strip(hit) == "JANE_TIMESTAMP" {
+		var timestamp = strconv.FormatInt(time.Now().Unix(), 10)
+		value = strings.Replace(value, hit, timestamp, -1)
+	}
+	return value
 }
 
 func Strip(value string) (stripped string) {

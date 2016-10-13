@@ -730,6 +730,8 @@ Jane uses a format for substitutions which is implemented in most areas. Each co
 
 `${*}` - This is all tokens after the matched command
 
+`${JANE_TIMESTAMP}` - This will place the epoch time (useful for needing unique id's)
+
 
 ### Security
 
