@@ -129,7 +129,7 @@ This connector runs Jane via the command line interface instead of as a daemon a
 
 ### Client Connector
 
-Client description... 
+The client connector is part of the client/server capability of the Jane bot. When enabled, this will connect the Jane bot to the server, so all messages can be relayed to the server.
 
 #### Example:
 
@@ -139,7 +139,7 @@ Client description...
 ```
 
 #### Usage:
-* TBD..
+* Make sure to pick a token of at least 32 characters, which can be alpha numeric
 
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'client'
@@ -147,6 +147,9 @@ Client description...
 * _Tags_ - Comma seperated list of tags that can be used to match against routes
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+* _Server_ - The server dns or ip name
+* _Port_ - The port for the server
+* _Key_ The token, which must match between the client and server
 
 
 ### Email Connector
@@ -401,7 +404,7 @@ Pull in RSS feeds directly into your bot and see what's going on around the web.
 
 ### Server Connector
 
-Server description...
+The server connector is part of the client/server capability of the Jane bot. When enabled, this will listen for clients and respond to messages from them.
 
 #### Example:
 
@@ -411,7 +414,7 @@ Server description...
 ```
 
 #### Usage:
-* TBD..
+* Make sure to pick a token of at least 32 characters, which can be alpha numeric
 
 #### Fields:
 * _Type_ - This specifies the type of connector, in this case, 'client'
@@ -419,6 +422,8 @@ Server description...
 * _Tags_ - Comma seperated list of tags that can be used to match against routes
 * _Active_ - This is a boolean value to set this connector to be activated
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+* _Port_ - The port to listen on
+* _Key_ - The token which clients will use to connect
 
 
 ### Slack Connector
