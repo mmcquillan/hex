@@ -16,6 +16,7 @@ type Twitter struct {
 	StreamClient    *twitter.Client
 	TweetClient     *twitter.Client
 	CommandMessages chan<- models.Message
+	Connector       models.Connector
 }
 
 // Listen Listen to the Twitter stream api
@@ -41,7 +42,15 @@ func (x Twitter) Command(message models.Message, publishMsgs chan<- models.Messa
 			message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags+","+c.Tags)
 			message.Out.Text = parse.Substitute(c.Output, tokens)
 
+			if x.TweetClient == nil {
+				client := setupTweetClient(connector)
+				x.TweetClient = client
+			}
+
+			x.postTweet(message.Out.Text)
+
 			publishMsgs <- message
+
 			return
 		}
 	}
@@ -51,29 +60,18 @@ func (x Twitter) Command(message models.Message, publishMsgs chan<- models.Messa
 
 // Publish Twitter publishes out tweets
 func (x Twitter) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
-	// for {
-	// 	message := <-publishMsgs
-	//
-	// 	msg := message.Out.Text
-	//
-	// 	if x.TweetClient == nil {
-	// 		client := setupTweetClient(connector)
-	// 		x.TweetClient = client
-	// 	}
-	//
-	// 	if x.TweetClient != nil {
-	// 		tweet, resp, err := x.TweetClient.Statuses.Update(msg, nil)
-	// 		if err != nil {
-	// 			log.Println("Error posting Twitter status:", err)
-	// 			return
-	// 		}
-	//
-	// 		log.Println("Tweet:", tweet)
-	// 		log.Println("Resp:", resp)
-	// 	} else {
-	// 		log.Println("TweetClient null")
-	// 	}
-	// }
+	for {
+		message := <-publishMsgs
+
+		msg := message.Out.Text
+
+		if x.TweetClient == nil {
+			client := setupTweetClient(connector)
+			x.TweetClient = client
+		}
+
+		x.postTweet(msg)
+	}
 }
 
 // Help Twitter help information
@@ -159,4 +157,21 @@ func (x Twitter) listenToStream(connector models.Connector) {
 	}
 
 	go demux.HandleChan(stream.Messages)
+}
+
+func (x Twitter) postTweet(message string) error {
+	if x.TweetClient != nil {
+		tweet, resp, err := x.TweetClient.Statuses.Update(message, nil)
+		if err != nil {
+			log.Println("Error posting Twitter status:", err)
+			return err
+		}
+
+		log.Println("Tweet:", tweet)
+		log.Println("Resp:", resp)
+	} else {
+		log.Println("TweetClient null")
+	}
+
+	return nil
 }
