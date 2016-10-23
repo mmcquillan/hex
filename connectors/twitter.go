@@ -3,8 +3,6 @@ package connectors
 import (
 	"log"
 
-	"golang.org/x/oauth2"
-
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
 	"github.com/projectjane/jane/models"
@@ -24,7 +22,7 @@ func (x Twitter) Listen(commandMsgs chan<- models.Message, connector models.Conn
 	defer Recovery(connector)
 
 	if x.StreamClient == nil {
-		client := setupStreamClient(connector)
+		client := newTwitterClient(connector)
 		x.StreamClient = client
 		x.CommandMessages = commandMsgs
 
@@ -40,14 +38,20 @@ func (x Twitter) Command(message models.Message, publishMsgs chan<- models.Messa
 		if match, tokens := parse.Match(c.Match, message.In.Text); match {
 
 			message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags+","+c.Tags)
-			message.Out.Text = parse.Substitute(c.Output, tokens)
+
+			tweet := parse.Substitute(c.Output, tokens)
 
 			if x.TweetClient == nil {
-				client := setupTweetClient(connector)
+				client := newTwitterClient(connector)
 				x.TweetClient = client
 			}
 
-			x.postTweet(message.Out.Text)
+			err := x.postTweet(tweet)
+			if err != nil {
+				message.Out.Text = "Failed to post tweet."
+			} else {
+				message.Out.Text = "Successfully posted tweet."
+			}
 
 			publishMsgs <- message
 
@@ -66,7 +70,7 @@ func (x Twitter) Publish(publishMsgs <-chan models.Message, connector models.Con
 		msg := message.Out.Text
 
 		if x.TweetClient == nil {
-			client := setupTweetClient(connector)
+			client := newTwitterClient(connector)
 			x.TweetClient = client
 		}
 
@@ -79,28 +83,12 @@ func (x Twitter) Help(connector models.Connector) (help []string) {
 	return help
 }
 
-func setupStreamClient(connector models.Connector) *twitter.Client {
+func newTwitterClient(connector models.Connector) *twitter.Client {
 	config := oauth1.NewConfig(connector.Key, connector.Secret)
 	token := oauth1.NewToken(connector.AccessToken, connector.AccessTokenSecret)
 
 	// OAuth1 http.Client will automatically authorize Requests
 	httpClient := config.Client(oauth1.NoContext, token)
-
-	// Twitter Client
-	client := twitter.NewClient(httpClient)
-
-	return client
-}
-
-func setupTweetClient(connector models.Connector) *twitter.Client {
-	// config := &oauth2.Config{}
-	// token := &oauth2.Token{AccessToken: connector.AccessToken}
-
-	config := oauth1.NewConfig(connector.Key, connector.Secret)
-	token := oauth1.NewToken(connector.AccessToken, connector.AccessTokenSecret)
-
-	// OAuth2 http.Client will automatically authorize Requests
-	httpClient := config.Client(oauth2.NoContext, token)
 
 	// Twitter Client
 	client := twitter.NewClient(httpClient)
