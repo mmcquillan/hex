@@ -2,12 +2,16 @@ package connectors
 
 import (
 	"log"
+	"regexp"
 
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
 	"github.com/projectjane/jane/models"
 	"github.com/projectjane/jane/parse"
 )
+
+var hrefPattern = "href=\"([^ ]+)\""
+var hrefRegx = regexp.MustCompile(hrefPattern)
 
 // Twitter Empty struct
 type Twitter struct {
@@ -102,6 +106,9 @@ func (x Twitter) listenToStream(connector models.Connector) {
 
 	demux.Tweet = func(tweet *twitter.Tweet) {
 
+		link := hrefRegx.FindString(tweet.Source)
+		link = link[6 : len(link)-1]
+
 		if tweet.Lang == "en" {
 			var m models.Message
 			m.In.ConnectorType = webhook.Connector.Type
@@ -110,7 +117,7 @@ func (x Twitter) listenToStream(connector models.Connector) {
 			m.In.Text = tweet.Text
 			m.Out.Text = tweet.User.ScreenName
 			m.Out.Detail = tweet.Text
-			m.Out.Link = tweet.Source
+			m.Out.Link = link
 			m.In.Process = false
 
 			x.CommandMessages <- m
