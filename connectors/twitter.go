@@ -101,20 +101,20 @@ func (x Twitter) listenToStream(connector models.Connector) {
 	demux := twitter.NewSwitchDemux()
 
 	demux.Tweet = func(tweet *twitter.Tweet) {
-		if connector.Debug {
-			log.Println(tweet.Text)
+
+		if tweet.Lang == "en" {
+			var m models.Message
+			m.In.ConnectorType = webhook.Connector.Type
+			m.In.ConnectorID = webhook.Connector.ID
+			m.In.Tags = parse.TagAppend("", connector.Tags)
+			m.In.Text = tweet.Text
+			m.Out.Text = tweet.User.ScreenName
+			m.Out.Detail = tweet.Text
+			m.Out.Link = tweet.Source
+			m.In.Process = false
+
+			x.CommandMessages <- m
 		}
-
-		var m models.Message
-		m.In.ConnectorType = webhook.Connector.Type
-		m.In.ConnectorID = webhook.Connector.ID
-		m.In.Tags = parse.TagAppend("", connector.Tags)
-		m.In.Text = tweet.Text
-		m.Out.Text = tweet.User.ScreenName
-		m.Out.Detail = tweet.Text
-		m.In.Process = false
-
-		x.CommandMessages <- m
 	}
 
 	demux.DM = func(dm *twitter.DirectMessage) {
