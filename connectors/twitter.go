@@ -1,6 +1,7 @@
 package connectors
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/dghubble/go-twitter/twitter"
@@ -109,7 +110,7 @@ func (x Twitter) listenToStream(connector models.Connector) {
 			m.In.Tags = parse.TagAppend("", connector.Tags)
 			m.In.Text = tweet.Text
 			m.Out.Text = tweet.User.ScreenName
-			m.Out.Detail = tweet.Text
+			m.Out.Detail = fmt.Sprintf("```%s ```", tweet.Text)
 			m.In.Process = false
 
 			x.CommandMessages <- m
