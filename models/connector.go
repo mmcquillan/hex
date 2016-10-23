@@ -21,4 +21,5 @@ type Connector struct {
 	Commands          []Command
 	Debug             bool
 	BotName           string
+	Filter            []string
 }

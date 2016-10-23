@@ -498,6 +498,9 @@ Twitter provides a twitter stream listener and the ability to tweet. To setup yo
   "Secret": "<CONSUMER_SECRET>",
   "AccessToken": "<APP_ACCESS_TOKEN>",
   "AccessTokenSecret": "<APP_ACCESS_TOKEN_SECRET>",
+  "Filter": [
+    "ProjectJane", "DevOps", "AWS", "Azure", "ChatBot"
+  ]
   "Commands": [
     {
       "Match": "jane tweet*",
@@ -520,6 +523,7 @@ Twitter provides a twitter stream listener and the ability to tweet. To setup yo
 * _Secret_ - The Twitter Consumer Secret Key
 * _AccessToken_ - The Twitter App Access Token
 * _AccessTokenSecret_ - The Twitter App Access Token Secret
+* _Filter_ - The array of strings to filter the Twitter Stream API
 
 
 ### Website Connector

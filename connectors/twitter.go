@@ -113,8 +113,6 @@ func (x Twitter) listenToStream(connector models.Connector) {
 		m.Out.Text = tweet.Text
 		m.In.Process = false
 
-		log.Println("Tags:", m.In.Tags)
-
 		x.CommandMessages <- m
 	}
 
@@ -134,7 +132,7 @@ func (x Twitter) listenToStream(connector models.Connector) {
 
 	// FILTER
 	filterParams := &twitter.StreamFilterParams{
-		Track:         []string{"DevOps", "Docker", "Azure"},
+		Track:         connector.Filter,
 		StallWarnings: twitter.Bool(true),
 	}
 
@@ -149,14 +147,11 @@ func (x Twitter) listenToStream(connector models.Connector) {
 
 func (x Twitter) postTweet(message string) error {
 	if x.TweetClient != nil {
-		tweet, resp, err := x.TweetClient.Statuses.Update(message, nil)
+		_, _, err := x.TweetClient.Statuses.Update(message, nil)
 		if err != nil {
 			log.Println("Error posting Twitter status:", err)
 			return err
 		}
-
-		log.Println("Tweet:", tweet)
-		log.Println("Resp:", resp)
 	} else {
 		log.Println("TweetClient null")
 	}
