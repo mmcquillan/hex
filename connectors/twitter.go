@@ -110,7 +110,8 @@ func (x Twitter) listenToStream(connector models.Connector) {
 		m.In.ConnectorID = webhook.Connector.ID
 		m.In.Tags = parse.TagAppend("", connector.Tags)
 		m.In.Text = tweet.Text
-		m.Out.Text = tweet.Text
+		m.Out.Text = tweet.User.ScreenName
+		m.Out.Detail = tweet.Text
 		m.In.Process = false
 
 		x.CommandMessages <- m
