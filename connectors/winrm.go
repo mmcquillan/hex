@@ -11,6 +11,7 @@ import (
 	"github.com/projectjane/jane/models"
 	"github.com/projectjane/jane/parse"
 	"github.com/projectjane/winrm"
+	"github.com/robfig/cron"
 )
 
 //WinRM Struct representing a WinRM Connector
@@ -76,6 +77,10 @@ func (x WinRM) Help(connector models.Connector) (help []string) {
 		}
 	}
 	return help
+}
+
+func scheduleRM(commandMsgs chan<- models.Message, command models.Command, connector models.Connector) {
+
 }
 
 func checkRM(commandMsgs chan<- models.Message, command models.Command, connector models.Connector) {
@@ -151,13 +156,15 @@ func checkRM(commandMsgs chan<- models.Message, command models.Command, connecto
 
 		// send message
 		if sendAlert {
+			var tokens = parse.Tokens()
+			tokens["STDOUT"] = out
 			var message models.Message
 			message.In.ConnectorType = connector.Type
 			message.In.ConnectorID = connector.ID
 			message.In.Tags = parse.TagAppend(connector.Tags, command.Tags)
 			message.In.Process = false
 			message.Out.Text = connector.ID + " " + command.Name
-			message.Out.Detail = strings.Replace(command.Output, "${STDOUT}", out, -1)
+			message.Out.Detail = parse.Substitute(command.Output, tokens)
 			message.Out.Status = color
 			commandMsgs <- message
 			state = newstate
