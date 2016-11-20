@@ -43,7 +43,7 @@ func GetConnectors(w http.ResponseWriter, r *http.Request) {
 	w.Write(connectorsJSON)
 }
 
-// GetConnectorByID Returns all contacts for an agent, HTTP GET - /api/v1/connectors/{id}
+// GetConnectorByID Returns a connector by id, HTTP GET - /api/v1/connectors/{id}
 // swagger:route GET /api/v1/connectors/{connectorId} connectors getConnectorByID
 //		 Returns a connector by id
 //
