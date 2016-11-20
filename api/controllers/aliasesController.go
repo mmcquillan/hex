@@ -125,7 +125,7 @@ func CreateAlias(w http.ResponseWriter, r *http.Request) {
 
 // UpdateAliasByID Updates an alias, HTTP GET - /api/v1/aliases/{id}
 // swagger:route PUT /api/v1/aliases/{aliasId} aliases updateAliasByID
-//		 Updates a connector
+//		 Updates an alias
 //
 //     Consumes:
 //     - application/json
