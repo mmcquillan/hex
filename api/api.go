@@ -5,8 +5,8 @@ import (
 	"github.com/rs/cors"
 )
 
-// StartAPI Starts the api
-func StartAPI() {
+// Start Starts the api
+func Start() {
 	router := routers.InitRoutes()
 
 	c := cors.New(cors.Options{
