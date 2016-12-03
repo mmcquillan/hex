@@ -494,10 +494,12 @@ Twitter provides a twitter stream listener and the ability to tweet. To setup yo
 
 ```
 {"Type": "twitter", "ID": "twitter", "Active": true,
-  "Key": "<CONSUMER_KEY>",
-  "Secret": "<CONSUMER_SECRET>",
-  "AccessToken": "<APP_ACCESS_TOKEN>",
-  "AccessTokenSecret": "<APP_ACCESS_TOKEN_SECRET>",
+  "KeyValues": {
+    "Key": "<CONSUMER_KEY>",
+    "Secret": "<CONSUMER_SECRET>",
+    "AccessToken": "<APP_ACCESS_TOKEN>",
+    "AccessTokenSecret": "<APP_ACCESS_TOKEN_SECRET>"
+  },
   "Filter": [
     "ProjectJane", "DevOps", "AWS", "Azure", "ChatBot"
   ]

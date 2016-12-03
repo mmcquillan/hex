@@ -58,7 +58,7 @@ func (x Slack) Command(message models.Message, publishMsgs chan<- models.Message
 
 // Publish Publishes messages to slack
 func (x Slack) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
-	api := slack.New(connector.KeyValues["Key"])
+	api := slack.New(connector.Key)
 	for {
 		message := <-publishMsgs
 		msg := ""
