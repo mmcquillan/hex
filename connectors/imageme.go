@@ -12,31 +12,36 @@ import (
 	"net/url"
 )
 
+// ImageMe Struct representing the image me connector
 type ImageMe struct {
 }
 
+//Listen Not implemented
 func (x ImageMe) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 	return
 }
 
+// Command Takes in animateme or imageme command
 func (x ImageMe) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	if match, tokens := parse.Match("image me*", message.In.Text); match {
 		message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
-		message.Out.Text = callImageMe(tokens["*"], connector.Key, connector.Pass, false)
+		message.Out.Text = callImageMe(tokens["*"], connector.KeyValues["Key"], connector.Pass, false)
 		publishMsgs <- message
 	}
 	if match, tokens := parse.Match("animate me*", message.In.Text); match {
 		message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
-		message.Out.Text = callImageMe(tokens["*"], connector.Key, connector.Pass, true)
+		message.Out.Text = callImageMe(tokens["*"], connector.KeyValues["Key"], connector.Pass, true)
 		publishMsgs <- message
 	}
 }
 
+// Publish Not implemented
 func (x ImageMe) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 
+// Help Returns help data
 func (x ImageMe) Help(connector models.Connector) (help []string) {
 	help = make([]string, 0)
 	help = append(help, "image me <image keywords> - pulls back an image url")
@@ -44,17 +49,17 @@ func (x ImageMe) Help(connector models.Connector) (help []string) {
 	return help
 }
 
-type SearchResult struct {
-	Items []Items `json:"items"`
+type searchResult struct {
+	Items []items `json:"items"`
 }
 
-type Items struct {
+type items struct {
 	Link string `json:"link"`
 }
 
 var imageClient = &http.Client{}
 
-var baseUrl = "https://www.googleapis.com/customsearch/v1?key="
+var baseURL = "https://www.googleapis.com/customsearch/v1?key="
 var errorMessage = "Error retrieving image"
 var animated bool
 
@@ -72,7 +77,7 @@ func callImageMe(msg string, apiKey string, cx string, animated bool) string {
 		fields += "&fileType=gif&hq=animated&tbs=itp:animated"
 	}
 
-	url := baseUrl + apiKey + cx + returnFields + query + fields
+	url := baseURL + apiKey + cx + returnFields + query + fields
 
 	resp, err := imageClient.Get(url)
 	if err != nil {
@@ -82,7 +87,7 @@ func callImageMe(msg string, apiKey string, cx string, animated bool) string {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		FindDeprecatedImage(msg, animated)
+		return findDeprecatedImage(msg, animated)
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
@@ -91,7 +96,7 @@ func callImageMe(msg string, apiKey string, cx string, animated bool) string {
 		return errorMessage
 	}
 
-	var result SearchResult
+	var result searchResult
 	err = json.Unmarshal(body, &result)
 	if err != nil {
 		log.Print(err)
@@ -101,37 +106,37 @@ func callImageMe(msg string, apiKey string, cx string, animated bool) string {
 	if len(result.Items) > 0 {
 		randomLink := result.Items[rand.Intn(len(result.Items))]
 		return randomLink.Link
-	} else {
-		return FindDeprecatedImage(msg, animated)
 	}
+
+	return findDeprecatedImage(msg, animated)
 }
 
-type DeprecatedResult struct {
-	ResponseData ResponseData `json:"responseData"`
+type deprecatedResult struct {
+	ResponseData responseData `json:"responseData"`
 }
 
-type ResponseData struct {
-	Results []Result `json:"results"`
+type responseData struct {
+	Results []result `json:"results"`
 }
 
-type Result struct {
-	Url string `json:"url"`
+type result struct {
+	URL string `json:"url"`
 }
 
-func FindDeprecatedImage(query string, animated bool) string {
-	baseUrl := "https://ajax.googleapis.com/ajax/services/search/images?v=1.0&rsz=8"
+func findDeprecatedImage(query string, animated bool) string {
+	baseURL := "https://ajax.googleapis.com/ajax/services/search/images?v=1.0&rsz=8"
 	if animated {
-		baseUrl += "&as_filetype=gif"
+		baseURL += "&as_filetype=gif"
 	}
 
-	baseUrl += "&q="
-	searchUrl := baseUrl + url.QueryEscape(query)
+	baseURL += "&q="
+	searchURL := baseURL + url.QueryEscape(query)
 
 	if animated {
-		searchUrl += url.QueryEscape(" animated")
+		searchURL += url.QueryEscape(" animated")
 	}
 
-	resp, err := imageClient.Get(searchUrl)
+	resp, err := imageClient.Get(searchURL)
 	if err != nil {
 		log.Print(err)
 		return errorMessage
@@ -144,7 +149,7 @@ func FindDeprecatedImage(query string, animated bool) string {
 		return errorMessage
 	}
 
-	var result DeprecatedResult
+	var result deprecatedResult
 	err = json.Unmarshal(body, &result)
 	if err != nil {
 		log.Print(err)
@@ -154,7 +159,7 @@ func FindDeprecatedImage(query string, animated bool) string {
 	index := rand.Intn(len(result.ResponseData.Results))
 
 	if len(result.ResponseData.Results) > 0 {
-		return result.ResponseData.Results[index].Url
+		return result.ResponseData.Results[index].URL
 	}
 
 	return "No results found"

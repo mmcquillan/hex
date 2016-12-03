@@ -11,13 +11,16 @@ import (
 	"net/url"
 )
 
+// Wolfram Empty struct
 type Wolfram struct {
 }
 
+// Listen Not Implemented
 func (x Wolfram) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 }
 
+// Command Matches wolfram command and queries the wolfram api
 func (x Wolfram) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	if match, tokens := parse.Match("wolfram*", message.In.Text); match {
 		message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
@@ -26,34 +29,36 @@ func (x Wolfram) Command(message models.Message, publishMsgs chan<- models.Messa
 	}
 }
 
+// Publish Not Implemented
 func (x Wolfram) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 
+// Help Returns help information
 func (x Wolfram) Help(connector models.Connector) (help []string) {
 	help = make([]string, 0)
 	help = append(help, "wolfram <query> - returns the wolfram alpha results from an api")
 	return help
 }
 
-type Query struct {
+type query struct {
 	QueryResult string `xml:"success,attr"`
-	PodList     []Pod  `xml:"pod"`
+	PodList     []pod  `xml:"pod"`
 	Datatypes   string `xml:"datatypes,attr"`
 }
 
-type Pod struct {
+type pod struct {
 	Title      string   `xml:"title,attr"`
-	SubpodList []Subpod `xml:"subpod"`
+	SubpodList []subpod `xml:"subpod"`
 }
 
-type Subpod struct {
+type subpod struct {
 	Title     string `xml:"title,attr"`
 	Plaintext string `xml:"plaintext"`
-	Image     Image  `xml:"img"`
+	Image     image  `xml:"img"`
 }
 
-type Image struct {
+type image struct {
 	Source string `xml:"src,attr"`
 }
 
@@ -81,31 +86,31 @@ func callWolfram(msg string, api string) (results string) {
 		return errorResult
 	}
 
-	var query Query
-	err = xml.Unmarshal(body, &query)
+	var wolfQuery query
+	err = xml.Unmarshal(body, &wolfQuery)
 	if err != nil {
 		log.Print(err)
 		return errorResult
 	}
 
-	if query.QueryResult == "false" {
+	if wolfQuery.QueryResult == "false" {
 		return "Failed to return a result"
 	}
 
 	var result string
-	if query.Datatypes == "Math" {
-		result = ParseWolframAlphaMathQuery(query)
+	if wolfQuery.Datatypes == "Math" {
+		result = parseWolframAlphaMathQuery(wolfQuery)
 	} else {
-		result = ParseWolframAlphaQuery(query)
+		result = parseWolframAlphaQuery(wolfQuery)
 	}
 
 	return result
 }
 
-func ParseWolframAlphaMathQuery(query Query) string {
+func parseWolframAlphaMathQuery(wolfQuery query) string {
 	result := ""
 
-	for _, pod := range query.PodList {
+	for _, pod := range wolfQuery.PodList {
 		if len(pod.SubpodList) == 0 {
 			continue
 		}
@@ -123,10 +128,10 @@ func ParseWolframAlphaMathQuery(query Query) string {
 	return result
 }
 
-func ParseWolframAlphaQuery(query Query) string {
+func parseWolframAlphaQuery(wolfQuery query) string {
 	result := ""
 
-	for _, pod := range query.PodList {
+	for _, pod := range wolfQuery.PodList {
 		if len(pod.SubpodList) == 0 {
 			continue
 		}
@@ -138,7 +143,6 @@ func ParseWolframAlphaQuery(query Query) string {
 				continue
 			}
 			result += fmt.Sprintf("     %s\n", subpod.Plaintext)
-			// result += fmt.Sprintf("     Image: %s\n\n", subpod.Image.Source)
 		}
 	}
 

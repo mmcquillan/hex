@@ -10,7 +10,7 @@ import (
 	"github.com/projectjane/jane/parse"
 )
 
-// Twitter Empty struct
+// Twitter Struct representing the
 type Twitter struct {
 	StreamClient    *twitter.Client
 	TweetClient     *twitter.Client
@@ -85,8 +85,8 @@ func (x Twitter) Help(connector models.Connector) (help []string) {
 }
 
 func newTwitterClient(connector models.Connector) *twitter.Client {
-	config := oauth1.NewConfig(connector.Key, connector.Secret)
-	token := oauth1.NewToken(connector.AccessToken, connector.AccessTokenSecret)
+	config := oauth1.NewConfig(connector.KeyValues["Key"], connector.KeyValues["Secret"])
+	token := oauth1.NewToken(connector.KeyValues["AccessToken"], connector.KeyValues["AccessTokenSecret"])
 
 	// OAuth1 http.Client will automatically authorize Requests
 	httpClient := config.Client(oauth1.NoContext, token)

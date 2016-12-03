@@ -9,10 +9,12 @@ import (
 	"github.com/projectjane/jane/models"
 )
 
+// Slack Represents Slack connector
 type Slack struct {
 	Connector models.Connector
 }
 
+// Listen Listens to slack messages in channels Jane is present in
 func (x Slack) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 	api := slack.New(connector.Key)
@@ -49,12 +51,14 @@ func (x Slack) Listen(commandMsgs chan<- models.Message, connector models.Connec
 	}
 }
 
+// Command Not implemented
 func (x Slack) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 
+// Publish Publishes messages to slack
 func (x Slack) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
-	api := slack.New(connector.Key)
+	api := slack.New(connector.KeyValues["Key"])
 	for {
 		message := <-publishMsgs
 		msg := ""
@@ -86,6 +90,7 @@ func (x Slack) Publish(publishMsgs <-chan models.Message, connector models.Conne
 	}
 }
 
+// Help Not Implemented
 func (x Slack) Help(connector models.Connector) (help []string) {
 	return
 }
