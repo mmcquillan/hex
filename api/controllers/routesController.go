@@ -27,25 +27,25 @@ import (
 func GetRoutes(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	aliases, err := data.GetAliases()
+	routes, err := data.GetRoutes()
 	if err != nil {
-		sendError(w, err, http.StatusInternalServerError, "Failed to get aliases.")
+		sendError(w, err, http.StatusInternalServerError, "Failed to get routes.")
 		return
 	}
 
-	aliasesJSON, err := json.Marshal(aliases)
+	routesJSON, err := json.Marshal(routes)
 	if err != nil {
 		sendError(w, err, http.StatusInternalServerError, "Failed to marshal object.")
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write(aliasesJSON)
+	w.Write(routesJSON)
 }
 
 // GetRouteByID Returns a route by id, HTTP GET - /api/v1/routes/{id}
 // swagger:route GET /api/v1/routes/{routeId} routes getRouteByID
-//		 Returns a connector by id
+//		 Returns a route by id
 //
 //     Consumes:
 //     - application/json
@@ -63,27 +63,27 @@ func GetRouteByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	vars := mux.Vars(r)
-	id := vars["id"]
+	routeID := vars["id"]
 
-	alias, err := data.GetAliasByID(id)
+	route, err := data.GetRouteByID(routeID)
 	if err != nil {
-		sendError(w, err, http.StatusInternalServerError, "Failed to get alias.")
+		sendError(w, err, http.StatusInternalServerError, "Failed to get route.")
 		return
 	}
 
-	aliasJSON, err := json.Marshal(alias)
+	routeJSON, err := json.Marshal(route)
 	if err != nil {
 		sendError(w, err, http.StatusInternalServerError, "Failed to marshal object.")
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write(aliasJSON)
+	w.Write(routeJSON)
 }
 
 // CreateRoute Creates a command alias, HTTP GET - /api/v1/routes
 // swagger:route POST /api/v1/routes routes createRoute
-//		 Creates a command alias
+//		 Creates a route
 //
 //     Consumes:
 //     - application/json
@@ -100,32 +100,32 @@ func GetRouteByID(w http.ResponseWriter, r *http.Request) {
 func CreateRoute(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var alias models.Alias
-	err := json.NewDecoder(r.Body).Decode(&alias)
+	var route models.Route
+	err := json.NewDecoder(r.Body).Decode(&route)
 	if err != nil {
-		sendError(w, err, http.StatusInternalServerError, "Invalid alias format.")
+		sendError(w, err, http.StatusInternalServerError, "Invalid route format.")
 		return
 	}
 
-	alias, err := data.CreateAlias(alias)
+	route, err := data.CreateRoute(route)
 	if err != nil {
-		sendError(w, err, http.StatusInternalServerError, "Failed to create alias.")
+		sendError(w, err, http.StatusInternalServerError, "Failed to create route.")
 		return
 	}
 
-	aliasJSON, err := json.Marshal(alias)
+	routeJSON, err := json.Marshal(route)
 	if err != nil {
 		sendError(w, err, http.StatusInternalServerError, "Failed to marshal object.")
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write(aliasJSON)
+	w.Write(routeJSON)
 }
 
-// UpdateRouteByID Updates an alias, HTTP GET - /api/v1/routes/{id}
+// UpdateRouteByID Updates a route, HTTP GET - /api/v1/routes/{id}
 // swagger:route PUT /api/v1/routes/{routeId} routes updateRouteByID
-//		 Updates an alias
+//		 Updates a route
 //
 //     Consumes:
 //     - application/json
@@ -142,31 +142,69 @@ func CreateRoute(w http.ResponseWriter, r *http.Request) {
 func UpdateRouteByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var alias models.Alias
-	err := json.NewDecoder(r.Body).Decode(&alias)
+	var route models.Route
+	err := json.NewDecoder(r.Body).Decode(&route)
 	if err != nil {
-		sendError(w, err, http.StatusInternalServerError, "Invalid connector format.")
+		sendError(w, err, http.StatusInternalServerError, "Invalid route format.")
 		return
 	}
 
-	alias, err = data.UpdateAliasByID(alias)
+	route, err = data.UpdateAliasByID(route)
 	if err != nil {
-		sendError(w, err, http.StatusInternalServerError, "Failed to update alias.")
+		sendError(w, err, http.StatusInternalServerError, "Failed to update route.")
 		return
 	}
 
-	aliasJSON, err := json.Marshal(alias)
+	routeJSON, err := json.Marshal(route)
 	if err != nil {
 		sendError(w, err, http.StatusInternalServerError, "Failed to marshal object.")
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write(aliasJSON)
+	w.Write(routeJSON)
+}
+
+// DeleteRouteByID Deletes a route, HTTP DELETE - /api/v1/routes/{id}
+// swagger:route DELETE /api/v1/routes/{routeId} routes deleteRouteByID
+//		 Deletes a route
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Responses:
+//       200:
+//       401:
+//			 500:
+func DeleteRouteByID(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	vars := mux.Vars(r)
+	routeID := vars["id"]
+
+	err := data.DeleteRouteByID(routeID)
+	if err != nil {
+		sendError(w, err, http.StatusInternalServerError, "Failed to delete route.")
+		return
+	}
+
+	respJSON, err := json.Marshal("Successfully deleted route")
+	if err != nil {
+		sendError(w, err, http.StatusInternalServerError, "Failed to marshal object.")
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(respJSON)
 }
 
 //RouteID Struct for routeID parameter
-//swagger:parameters getRouteByID updateRouteByID
+//swagger:parameters getRouteByID updateRouteByID deleteRouteByID
 type RouteID struct {
 
 	// in: path
