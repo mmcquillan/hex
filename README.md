@@ -494,9 +494,9 @@ Twitter provides a twitter stream listener and the ability to tweet. To setup yo
 
 ```
 {"Type": "twitter", "ID": "twitter", "Active": true,
+  "Key": "<APP_TWITTER_KEY>"
+  "Secret": "<APP_TWITTER_SECRET>"
   "KeyValues": {
-    "Key": "<CONSUMER_KEY>",
-    "Secret": "<CONSUMER_SECRET>",
     "AccessToken": "<APP_ACCESS_TOKEN>",
     "AccessTokenSecret": "<APP_ACCESS_TOKEN_SECRET>"
   },
@@ -523,6 +523,7 @@ Twitter provides a twitter stream listener and the ability to tweet. To setup yo
 * _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
 * _Key_ - The Twitter Consumer Key
 * _Secret_ - The Twitter Consumer Secret Key
+* _KeyValues_ - Key Value map. Place the AccessToken and AccessTokenSecret here as shown above
 * _AccessToken_ - The Twitter App Access Token
 * _AccessTokenSecret_ - The Twitter App Access Token Secret
 * _Filter_ - The array of strings to filter the Twitter Stream API

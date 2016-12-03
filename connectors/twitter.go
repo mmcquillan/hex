@@ -85,7 +85,7 @@ func (x Twitter) Help(connector models.Connector) (help []string) {
 }
 
 func newTwitterClient(connector models.Connector) *twitter.Client {
-	config := oauth1.NewConfig(connector.KeyValues["Key"], connector.KeyValues["Secret"])
+	config := oauth1.NewConfig(connector.Key, connector.Secret)
 	token := oauth1.NewToken(connector.KeyValues["AccessToken"], connector.KeyValues["AccessTokenSecret"])
 
 	// OAuth1 http.Client will automatically authorize Requests
