@@ -8,6 +8,7 @@ func InitRoutes() *mux.Router {
 
 	router := setAliasesRoutes(router)
 	router := setConnectorsRoutes(router)
+	router := setRoutesRoutes(router)
 
 	return router
 }
