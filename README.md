@@ -2,7 +2,7 @@
 
 Jane is a chatops bot written in Go and is completely configuration driven. Contributions are welcome via pull requests. Jane was started as a way of getting DevOps tasks and feedback into Slack. There are a billion other bots, but we wanted to learn Go, so this was a fun way to learn it and meet our needs. The name "Jane" was chosen by @kcwinner because he is a big fan of the [_Ender's Game_ books](https://en.wikipedia.org/wiki/Jane_(Ender%27s_Game)). The name is not meant to be gender specific and can be effectively changed when you set your bot up.
 
-* [Running](#running) 
+* [Running](#running)
 * [Connectors](#connectors)
 * [Core Concepts](#core-concepts)
 * [Architecture](#architecture)
@@ -76,6 +76,7 @@ Supported connectors:
 * [server](#server-connector) - The server side of the client/server
 * [slack](#slack-connector) - Slack chat
 * [twilio](#twilio-connector) - send SMS alerts
+* [twitter](#twitter-connector) - Listen to Twitter Stream API and post tweets
 * [website](#website-connector) - Monitor return code of websites
 * [webhook](#webhook-connector) - Listener for webhooks
 * [winrm](#winrm-connector) - Execution of commands on Windows with monitoring capability
@@ -485,6 +486,48 @@ Twilio provides SMS and Phone integration.
 * _Key_ - The Twilio API Key
 * _Pass_ - The Twilio Authorization Token
 * _From_ - The Number to send from
+
+
+### Twitter Connector
+Twitter provides a twitter stream listener and the ability to tweet. To setup your app visit https://apps.twitter.com
+
+#### Example:
+
+```
+{"Type": "twitter", "ID": "twitter", "Active": true,
+  "Key": "<APP_TWITTER_KEY>"
+  "Secret": "<APP_TWITTER_SECRET>"
+  "KeyValues": {
+    "AccessToken": "<APP_ACCESS_TOKEN>",
+    "AccessTokenSecret": "<APP_ACCESS_TOKEN_SECRET>"
+  },
+  "Filter": [
+    "ProjectJane", "DevOps", "AWS", "Azure", "ChatBot"
+  ]
+  "Commands": [
+    {
+      "Match": "jane tweet*",
+      "Output": "${\*}"
+    }
+  ]
+}
+```
+
+#### Usage:
+* For the target in other connector's routes, you can set the target phone number
+
+#### Fields:
+* _Type_ - This specifies the type of connector, in this case, 'twilio'
+* _ID_ - This should be a unique identifier for this connector
+* _Tags_ - Comma seperated list of tags that can be used to match against routes
+* _Active_ - This is a boolean value to set this connector to be activated
+* _Debug_ - This is a boolean value to set if the connector shows debug information in the logs
+* _Key_ - The Twitter Consumer Key
+* _Secret_ - The Twitter Consumer Secret Key
+* _KeyValues_ - Key Value map. Place the AccessToken and AccessTokenSecret here as shown above
+* _AccessToken_ - The Twitter App Access Token
+* _AccessTokenSecret_ - The Twitter App Access Token Secret
+* _Filter_ - The array of strings to filter the Twitter Stream API
 
 
 ### Website Connector

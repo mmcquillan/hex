@@ -27,6 +27,7 @@ func init() {
 	List["webhook"] = reflect.TypeOf(Webhook{})
 	List["winrm"] = reflect.TypeOf(WinRM{})
 	List["twilio"] = reflect.TypeOf(Twilio{})
+	List["twitter"] = reflect.TypeOf(Twitter{})
 
 	// depricated
 	List["exec2"] = reflect.TypeOf(Exec{})

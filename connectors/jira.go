@@ -15,13 +15,16 @@ import (
 	"github.com/projectjane/jane/parse"
 )
 
+// Jira Empty struct
 type Jira struct {
 }
 
+// Listen Not Implemented
 func (x Jira) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 
+// Command Acts on jira commands
 func (x Jira) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	if strings.HasPrefix(strings.ToLower(message.In.Text), strings.ToLower("jira create")) {
 		createJiraIssue(message, publishMsgs, connector)
@@ -30,10 +33,12 @@ func (x Jira) Command(message models.Message, publishMsgs chan<- models.Message,
 	}
 }
 
+// Publish Not Implemented
 func (x Jira) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 
+// Help Returns help information
 func (x Jira) Help(connector models.Connector) (help []string) {
 	help = make([]string, 0)
 	help = append(help, "jira create <issueType> <project key> <summary>")
@@ -85,7 +90,7 @@ type issueType struct {
 }
 
 type createdIssue struct {
-	Id   string `json:"id"`
+	ID   string `json:"id"`
 	Key  string `json:"key"`
 	Self string `json:"self"`
 }
@@ -115,13 +120,13 @@ func createJiraIssue(message models.Message, publishMsgs chan<- models.Message, 
 		Fields: issueFields,
 	}
 
-	issueJson, err := json.Marshal(issue)
+	issueJSON, err := json.Marshal(issue)
 	if err != nil {
 		log.Printf("Error marshaling jira json: %s", err)
 		return
 	}
 
-	req, err := http.NewRequest("POST", "https://"+connector.Server+"/rest/api/2/issue", bytes.NewBuffer(issueJson))
+	req, err := http.NewRequest("POST", "https://"+connector.Server+"/rest/api/2/issue", bytes.NewBuffer(issueJSON))
 	if err != nil {
 		log.Printf("Jira Create Error: %s", err)
 		message.Out.Text = "Failed to create issue"
