@@ -241,6 +241,7 @@ This connector provides a single means of making local and remote calls to Linux
   * _HideHelp_ - A boolean to show or hide the help when displaying help (Default: false)
   * _Help_ - Optional help text, otherwise it'll show the Match value
   * _RunCheck_ - A boolean that will have Jane periodically run this (Default: false)
+  * _Schedule_ - A cron-like scheduling to run the command at a certain time
   * _Sampling_ - How many times to check prior to throwing an alert
   * _Interval_ - An integer that is the number of minutes between checks when RunCheck is true (Default: 1)
   * _Remind_ - An integer which is the number of units of Interval to wait before reminding of a non-Green status, with Zero being no reminders (Default: 0)

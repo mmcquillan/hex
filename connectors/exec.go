@@ -28,6 +28,12 @@ func (x Exec) Listen(commandMsgs chan<- models.Message, connector models.Connect
 			}
 			go check(commandMsgs, command, connector)
 		}
+		if command.Schedule != "" {
+			if connector.Debug {
+				log.Print("Scheduling Listener for " + connector.ID + " " + command.Name + " @ " + command.Schedule)
+			}
+			schedule(commandMsgs, command, connector)
+		}
 	}
 }
 
@@ -80,11 +86,30 @@ func (x Exec) Help(connector models.Connector) (help []string) {
 func schedule(commandMsgs chan<- models.Message, command models.Command, connector models.Connector) {
 
 	cron := cron.New()
-	if JobsDebug {
-		fmt.Println("Scheduling", name, "job at", schedule, "[", image, command, "]")
-	}
-	cron.AddFunc(schedule, func() {
-		runContainer(name, image, command)
+	cron.AddFunc(command.Schedule, func() {
+		var tokens = parse.Tokens()
+		args := parse.Substitute(command.Args, tokens)
+		tokens["STDOUT"] = callCmd(command.Cmd, args, connector)
+		var color = "NONE"
+		var match = false
+		if match, _ = parse.Match(command.Green, tokens["STDOUT"]); match {
+			color = "SUCCESS"
+		}
+		if match, _ = parse.Match(command.Yellow, tokens["STDOUT"]); match {
+			color = "WARN"
+		}
+		if match, _ = parse.Match(command.Red, tokens["STDOUT"]); match {
+			color = "FAIL"
+		}
+		var message models.Message
+		message.In.ConnectorType = connector.Type
+		message.In.ConnectorID = connector.ID
+		message.In.Tags = parse.TagAppend(connector.Tags, command.Tags)
+		message.In.Process = false
+		message.Out.Text = connector.ID + " " + command.Name
+		message.Out.Detail = parse.Substitute(command.Output, tokens)
+		message.Out.Status = color
+		commandMsgs <- message
 	})
 	cron.Start()
 

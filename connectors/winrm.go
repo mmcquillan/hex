@@ -11,7 +11,6 @@ import (
 	"github.com/projectjane/jane/models"
 	"github.com/projectjane/jane/parse"
 	"github.com/projectjane/winrm"
-	"github.com/robfig/cron"
 )
 
 //WinRM Struct representing a WinRM Connector
@@ -77,10 +76,6 @@ func (x WinRM) Help(connector models.Connector) (help []string) {
 		}
 	}
 	return help
-}
-
-func scheduleRM(commandMsgs chan<- models.Message, command models.Command, connector models.Connector) {
-
 }
 
 func checkRM(commandMsgs chan<- models.Message, command models.Command, connector models.Connector) {
