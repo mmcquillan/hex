@@ -79,13 +79,12 @@ func (x Slack) Publish(publishMsgs <-chan models.Message, connector models.Conne
 			msg = message.Out.Text
 		}
 		for _, target := range strings.Split(message.Out.Target, ",") {
-			if target == "" {
-				target = "#general"
-			}
 			if target == "*" {
 				target = message.In.Target
 			}
-			api.PostMessage(target, msg, params)
+			if strings.HasPrefix(target, "#") {
+				api.PostMessage(target, msg, params)
+			}
 		}
 	}
 }
