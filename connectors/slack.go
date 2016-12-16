@@ -82,7 +82,7 @@ func (x Slack) Publish(publishMsgs <-chan models.Message, connector models.Conne
 			if target == "*" {
 				target = message.In.Target
 			}
-			if strings.HasPrefix(target, "#") {
+			if target != "" && target != "*" {
 				api.PostMessage(target, msg, params)
 			}
 		}
