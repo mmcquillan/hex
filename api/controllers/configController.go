@@ -7,9 +7,9 @@ import (
 	"github.com/projectjane/jane/data"
 )
 
-// GetConfig Returns the config for the user's account, HTTP GET - /api/v1/config
+// GetConfig Returns the config, HTTP GET - /api/v1/config
 // swagger:route GET /api/v1/config config getConfig
-//		 Returns all aliases
+//		 Returns the config
 //
 //     Consumes:
 //     - application/json
@@ -64,13 +64,13 @@ func CreateConfig(w http.ResponseWriter, r *http.Request) {
 	var config data.Config
 	err := json.NewDecoder(r.Body).Decode(&config)
 	if err != nil {
-		sendError(w, err, http.StatusInternalServerError, "Invalid alias format.")
+		sendError(w, err, http.StatusInternalServerError, "Invalid config format.")
 		return
 	}
 
-	config, err := data.CreateConfig(config)
+	config, err = data.CreateConfig(config)
 	if err != nil {
-		sendError(w, err, http.StatusInternalServerError, "Failed to create alias.")
+		sendError(w, err, http.StatusInternalServerError, "Failed to create config.")
 		return
 	}
 
@@ -84,9 +84,9 @@ func CreateConfig(w http.ResponseWriter, r *http.Request) {
 	w.Write(configJSON)
 }
 
-// UpdateConfig Updates an alias, HTTP GET - /api/v1/aliases/{id}
-// swagger:route PUT /api/v1/aliases/{aliasId} aliases updateAliasByID
-//		 Updates an alias
+// UpdateConfig Updates an alias, HTTP GET - /api/v1/config
+// swagger:route PUT /api/v1/config aliases updateConfig
+//		 Updates a config
 //
 //     Consumes:
 //     - application/json
@@ -99,20 +99,20 @@ func CreateConfig(w http.ResponseWriter, r *http.Request) {
 //     Responses:
 //       200:
 //       401:
-//			 500:
+//       500:
 func UpdateConfig(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	var config data.Config
 	err := json.NewDecoder(r.Body).Decode(&config)
 	if err != nil {
-		sendError(w, err, http.StatusInternalServerError, "Invalid connector format.")
+		sendError(w, err, http.StatusInternalServerError, "Invalid config format.")
 		return
 	}
 
 	config, err = data.UpdateConfig(config)
 	if err != nil {
-		sendError(w, err, http.StatusInternalServerError, "Failed to update alias.")
+		sendError(w, err, http.StatusInternalServerError, "Failed to update config.")
 		return
 	}
 
@@ -124,12 +124,4 @@ func UpdateConfig(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(configJSON)
-}
-
-//ConfigID Struct for configId parameter
-//swagger:parameters getConfigByID updateConfigByID
-type ConfigID struct {
-
-	// in: path
-	ConfigID string `json:"configId"`
 }
