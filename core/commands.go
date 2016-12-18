@@ -55,6 +55,9 @@ func staticCommands(message models.Message, publishMsgs chan<- models.Message, c
 	if strings.ToLower(strings.TrimSpace(message.In.Text)) == config.BotName+" help" {
 		Help(message, publishMsgs, config)
 	}
+	if strings.ToLower(strings.TrimSpace(message.In.Text)) == config.BotName+" ping" {
+		Ping(message, publishMsgs)
+	}
 	if strings.ToLower(strings.TrimSpace(message.In.Text)) == config.BotName+" whoami" {
 		WhoAmI(message, publishMsgs)
 	}

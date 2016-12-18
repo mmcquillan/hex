@@ -11,6 +11,7 @@ type Command struct {
 	Process  bool
 	HideHelp bool
 	RunCheck bool
+	Schedule string
 	Interval int
 	Sampling int
 	Remind   int

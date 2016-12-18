@@ -10,12 +10,15 @@ import (
 
 	"github.com/projectjane/jane/models"
 	"github.com/projectjane/jane/parse"
+	"github.com/robfig/cron"
 	"golang.org/x/crypto/ssh"
 )
 
+//Exec struct
 type Exec struct {
 }
 
+//Listen function
 func (x Exec) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 	for _, command := range connector.Commands {
@@ -25,9 +28,16 @@ func (x Exec) Listen(commandMsgs chan<- models.Message, connector models.Connect
 			}
 			go check(commandMsgs, command, connector)
 		}
+		if command.Schedule != "" {
+			if connector.Debug {
+				log.Print("Scheduling Listener for " + connector.ID + " " + command.Name + " @ " + command.Schedule)
+			}
+			schedule(commandMsgs, command, connector)
+		}
 	}
 }
 
+//Command function
 func (x Exec) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
 	for _, command := range connector.Commands {
 		if match, tokens := parse.Match(command.Match, message.In.Text); match {
@@ -53,10 +63,12 @@ func (x Exec) Command(message models.Message, publishMsgs chan<- models.Message,
 	}
 }
 
+//Publish fucntion
 func (x Exec) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 
+//Help function
 func (x Exec) Help(connector models.Connector) (help []string) {
 	help = make([]string, 0)
 	for _, command := range connector.Commands {
@@ -69,6 +81,38 @@ func (x Exec) Help(connector models.Connector) (help []string) {
 		}
 	}
 	return help
+}
+
+func schedule(commandMsgs chan<- models.Message, command models.Command, connector models.Connector) {
+
+	cron := cron.New()
+	cron.AddFunc(command.Schedule, func() {
+		var tokens = parse.Tokens()
+		args := parse.Substitute(command.Args, tokens)
+		tokens["STDOUT"] = callCmd(command.Cmd, args, connector)
+		var color = "NONE"
+		var match = false
+		if match, _ = parse.Match(command.Green, tokens["STDOUT"]); match {
+			color = "SUCCESS"
+		}
+		if match, _ = parse.Match(command.Yellow, tokens["STDOUT"]); match {
+			color = "WARN"
+		}
+		if match, _ = parse.Match(command.Red, tokens["STDOUT"]); match {
+			color = "FAIL"
+		}
+		var message models.Message
+		message.In.ConnectorType = connector.Type
+		message.In.ConnectorID = connector.ID
+		message.In.Tags = parse.TagAppend(connector.Tags, command.Tags)
+		message.In.Process = false
+		message.Out.Text = connector.ID + " " + command.Name
+		message.Out.Detail = parse.Substitute(command.Output, tokens)
+		message.Out.Status = color
+		commandMsgs <- message
+	})
+	cron.Start()
+
 }
 
 func check(commandMsgs chan<- models.Message, command models.Command, connector models.Connector) {
@@ -144,13 +188,15 @@ func check(commandMsgs chan<- models.Message, command models.Command, connector 
 
 		// send message
 		if sendAlert {
+			var tokens = parse.Tokens()
+			tokens["STDOUT"] = out
 			var message models.Message
 			message.In.ConnectorType = connector.Type
 			message.In.ConnectorID = connector.ID
 			message.In.Tags = parse.TagAppend(connector.Tags, command.Tags)
 			message.In.Process = false
 			message.Out.Text = connector.ID + " " + command.Name
-			message.Out.Detail = strings.Replace(command.Output, "${STDOUT}", out, -1)
+			message.Out.Detail = parse.Substitute(command.Output, tokens)
 			message.Out.Status = color
 			commandMsgs <- message
 			state = newstate
