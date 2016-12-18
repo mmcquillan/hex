@@ -1,28 +1,30 @@
 package data
 
-import ()
+import (
+	"errors"
+)
 
 //Config struct
 type Config struct {
+	KeyValues map[string]string
 }
 
 // Get function
-func (x Config) Get(key string) (value string) {
-	values := Config.List()
-	value = values[key]
-	return value
+func (x Config) Get(key string) (string, error) {
+	if val, ok := x.KeyValues[key]; ok {
+		return val, nil
+	}
+
+	err := errors.New("Key does not exist.")
+	return "", err
 }
 
 // Set function
 func (x Config) Set(key string, value string) {
-	values := Config.List()
-	values[key] = value
+	x.KeyValues[key] = value
 }
 
 // List function
-func (x Config) List() (values map[string]string) {
-	values = make(map[string]string)
-	values["Name"] = "jane"
-	values["LogFile"] = "/home/matt/jane.log"
-	return values
+func (x Config) List() map[string]string {
+	return x.KeyValues
 }

@@ -43,7 +43,7 @@ func GetAliases(w http.ResponseWriter, r *http.Request) {
 	w.Write(aliasesJSON)
 }
 
-// GetAliasByID Returns an alias by id, HTTP GET - /api/v1/connectors/{id}
+// GetAliasByID Returns an alias by id, HTTP GET - /api/v1/aliases/{id}
 // swagger:route GET /api/v1/aliases/{aliasId} aliases getAliasByID
 //		 Returns a connector by id
 //
