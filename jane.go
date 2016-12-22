@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/projectjane/jane/api"
 	"github.com/projectjane/jane/core"
 	"github.com/projectjane/jane/models"
 	"sync"
@@ -21,6 +22,7 @@ func main() {
 	go core.Listeners(commandMsgs, &config)
 	go core.Commands(commandMsgs, publishMsgs, &config)
 	go core.Publishers(publishMsgs, &config)
+	api.Start()
 	defer wg.Done()
 	wg.Wait()
 }
