@@ -19,6 +19,28 @@ func (x Slack) Listen(commandMsgs chan<- models.Message, connector models.Connec
 	defer Recovery(connector)
 	api := slack.New(connector.Key)
 	api.SetDebug(connector.Debug)
+
+	// get channel array
+	channels := make(map[string]string)
+	channelList, err := api.GetChannels(true)
+	if err != nil {
+		log.Printf("%s\n", err)
+	}
+	for _, channel := range channelList {
+		channels[channel.ID] = "#" + channel.Name
+	}
+
+	// get user array
+	users := make(map[string]string)
+	userList, err := api.GetUsers()
+	if err != nil {
+		log.Printf("%s\n", err)
+	}
+	for _, user := range userList {
+		users[user.ID] = user.Name
+	}
+
+	// listen to messages
 	rtm := api.NewRTM()
 	if connector.Debug {
 		log.Print("Starting slack websocket api for " + connector.ID)
@@ -39,8 +61,8 @@ func (x Slack) Listen(commandMsgs chan<- models.Message, connector models.Connec
 					m.In.ConnectorType = connector.Type
 					m.In.ConnectorID = connector.ID
 					m.In.Tags = connector.Tags
-					m.In.Target = ev.Channel
-					m.In.User = ev.User
+					m.In.Target = channels[ev.Channel]
+					m.In.User = users[ev.User]
 					m.In.Text = html.UnescapeString(ev.Text)
 					m.In.Process = true
 					commandMsgs <- m
