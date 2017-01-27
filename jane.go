@@ -11,8 +11,8 @@ var version string
 
 func main() {
 	core.CatchExit()
-	params := core.LoadParams()
-	config := core.LoadConfig(params, version)
+	params := core.Params()
+	config := core.Config(params, version)
 	core.Logging(&config)
 	commandMsgs := make(chan models.Message, 1)
 	publishMsgs := make(chan models.Message, 1)

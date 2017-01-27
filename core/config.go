@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-func LoadConfig(params models.Params, version string) (config models.Config) {
+func Config(params models.Params, version string) (config models.Config) {
 	configFile := locateConfig(params)
 	if checkConfig(configFile) {
 		config = readConfig(configFile)
