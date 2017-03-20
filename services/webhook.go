@@ -1,4 +1,4 @@
-package connectors
+package services
 
 import (
 	"fmt"
@@ -20,11 +20,11 @@ type Webhook struct {
 
 var webhook Webhook
 
-func (x Webhook) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+func (x Webhook) Input(inputMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 
 	webhook = x
-	webhook.CommandMsgs = commandMsgs
+	webhook.CommandMsgs = inputMsgs
 	webhook.Connector = connector
 
 	port, _ := strconv.Atoi(connector.Port)
@@ -46,11 +46,11 @@ func (x Webhook) Listen(commandMsgs chan<- models.Message, connector models.Conn
 	}
 }
 
-func (x Webhook) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func (x Webhook) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 
-func (x Webhook) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
+func (x Webhook) Output(outputMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 

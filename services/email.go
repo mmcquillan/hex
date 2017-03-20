@@ -1,4 +1,4 @@
-package connectors
+package services
 
 import (
 	"github.com/projectjane/jane/models"
@@ -11,17 +11,17 @@ type Email struct {
 	Connector models.Connector
 }
 
-func (x Email) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+func (x Email) Input(inputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 
-func (x Email) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func (x Email) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 
-func (x Email) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
+func (x Email) Output(outputMsgs <-chan models.Message, connector models.Connector) {
 	for {
-		message := <-publishMsgs
+		message := <-outputMsgs
 		for _, target := range strings.Split(message.Out.Target, ",") {
 			if target == "" {
 				log.Print("No email provided to the email connector")

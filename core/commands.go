@@ -3,20 +3,20 @@ package core
 import (
 	"strings"
 
-	"github.com/projectjane/jane/connectors"
 	"github.com/projectjane/jane/models"
 	"github.com/projectjane/jane/parse"
+	"github.com/projectjane/jane/services"
 )
 
-func Commands(commandMsgs <-chan models.Message, publishMsgs chan<- models.Message, config *models.Config) {
+func Commands(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, config *models.Config) {
 	for {
-		message := <-commandMsgs
+		message := <-inputMsgs
 		aliasCommands(&message, config)
 		messages := splitCommands(message)
 		for _, m := range messages {
 			if m.In.Process {
 				aliasCommands(&m, config)
-				staticCommands(m, publishMsgs, config)
+				staticCommands(m, outputMsgs, config)
 				for _, connector := range config.Connectors {
 					if connector.Active {
 						canRun := false
@@ -31,13 +31,13 @@ func Commands(commandMsgs <-chan models.Message, publishMsgs chan<- models.Messa
 							}
 						}
 						if canRun {
-							c := connectors.MakeConnector(connector.Type).(connectors.Connector)
-							go c.Command(m, publishMsgs, connector)
+							c := services.MakeService(connector.Type).(services.Service)
+							go c.Command(m, outputMsgs, connector)
 						}
 					}
 				}
 			} else {
-				publishMsgs <- m
+				outputMsgs <- m
 			}
 		}
 	}
@@ -51,21 +51,21 @@ func aliasCommands(message *models.Message, config *models.Config) {
 	}
 }
 
-func staticCommands(message models.Message, publishMsgs chan<- models.Message, config *models.Config) {
+func staticCommands(message models.Message, outputMsgs chan<- models.Message, config *models.Config) {
 	if strings.ToLower(strings.TrimSpace(message.In.Text)) == config.BotName+" help" {
-		Help(message, publishMsgs, config)
+		Help(message, outputMsgs, config)
 	}
 	if strings.ToLower(strings.TrimSpace(message.In.Text)) == config.BotName+" ping" {
-		Ping(message, publishMsgs)
+		Ping(message, outputMsgs)
 	}
 	if strings.ToLower(strings.TrimSpace(message.In.Text)) == config.BotName+" whoami" {
-		WhoAmI(message, publishMsgs)
+		WhoAmI(message, outputMsgs)
 	}
 	if strings.ToLower(strings.TrimSpace(message.In.Text)) == config.BotName+" passwd" {
-		Passwd(message, publishMsgs)
+		Passwd(message, outputMsgs)
 	}
 	if strings.ToLower(strings.TrimSpace(message.In.Text)) == config.BotName+" version" {
-		Version(message, publishMsgs, config)
+		Version(message, outputMsgs, config)
 	}
 }
 

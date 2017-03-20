@@ -1,4 +1,4 @@
-package connectors
+package services
 
 import (
 	"encoding/json"
@@ -21,16 +21,16 @@ type Client struct {
 
 var client Client
 
-func (x Client) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+func (x Client) Input(inputMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 	return
 }
 
-func (x Client) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func (x Client) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 
-func (x Client) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
+func (x Client) Output(outputMsgs <-chan models.Message, connector models.Connector) {
 
 	// init
 	client = x
@@ -40,12 +40,12 @@ func (x Client) Publish(publishMsgs <-chan models.Message, connector models.Conn
 	client.Mutex = sync.Mutex{}
 
 	// listen for messages
-	go func(publishMsgs <-chan models.Message) {
+	go func(outputMsgs <-chan models.Message) {
 
 		for {
 
 			// incoming message
-			message := <-publishMsgs
+			message := <-outputMsgs
 			message.In.Timestamp = time.Now().Unix()
 
 			// serialize message
@@ -59,7 +59,7 @@ func (x Client) Publish(publishMsgs <-chan models.Message, connector models.Conn
 
 		}
 
-	}(publishMsgs)
+	}(outputMsgs)
 
 	// run a catchup
 	go func() {

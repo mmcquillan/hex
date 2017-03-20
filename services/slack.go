@@ -1,4 +1,4 @@
-package connectors
+package services
 
 import (
 	"html"
@@ -14,8 +14,8 @@ type Slack struct {
 	Connector models.Connector
 }
 
-// Listen Listens to slack messages in channels Jane is present in
-func (x Slack) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+// Input Inputs to slack messages in channels Jane is present in
+func (x Slack) Input(inputMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 	api := slack.New(connector.Key)
 	api.SetDebug(connector.Debug)
@@ -65,7 +65,7 @@ func (x Slack) Listen(commandMsgs chan<- models.Message, connector models.Connec
 					m.In.User = users[ev.User]
 					m.In.Text = html.UnescapeString(ev.Text)
 					m.In.Process = true
-					commandMsgs <- m
+					inputMsgs <- m
 
 				}
 			}
@@ -74,15 +74,15 @@ func (x Slack) Listen(commandMsgs chan<- models.Message, connector models.Connec
 }
 
 // Command Not implemented
-func (x Slack) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func (x Slack) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 
-// Publish Publishes messages to slack
-func (x Slack) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
+// Output Outputes messages to slack
+func (x Slack) Output(outputMsgs <-chan models.Message, connector models.Connector) {
 	api := slack.New(connector.Key)
 	for {
-		message := <-publishMsgs
+		message := <-outputMsgs
 		msg := ""
 		params := slack.NewPostMessageParameters()
 		params.Username = connector.BotName

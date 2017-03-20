@@ -1,4 +1,4 @@
-package connectors
+package services
 
 import (
 	"encoding/json"
@@ -16,28 +16,28 @@ import (
 type ImageMe struct {
 }
 
-//Listen Not implemented
-func (x ImageMe) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+//Input Not implemented
+func (x ImageMe) Input(inputMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 	return
 }
 
 // Command Takes in animateme or imageme command
-func (x ImageMe) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func (x ImageMe) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	if match, tokens := parse.Match("image me*", message.In.Text); match {
 		message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
 		message.Out.Text = callImageMe(tokens["*"], connector.Key, connector.Pass, false)
-		publishMsgs <- message
+		outputMsgs <- message
 	}
 	if match, tokens := parse.Match("animate me*", message.In.Text); match {
 		message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
 		message.Out.Text = callImageMe(tokens["*"], connector.Key, connector.Pass, true)
-		publishMsgs <- message
+		outputMsgs <- message
 	}
 }
 
-// Publish Not implemented
-func (x ImageMe) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
+// Output Not implemented
+func (x ImageMe) Output(outputMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 

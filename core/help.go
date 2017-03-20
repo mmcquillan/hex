@@ -1,13 +1,13 @@
 package core
 
 import (
-	"github.com/projectjane/jane/connectors"
 	"github.com/projectjane/jane/models"
+	"github.com/projectjane/jane/services"
 	"sort"
 	"strings"
 )
 
-func Help(message models.Message, publishMsgs chan<- models.Message, config *models.Config) {
+func Help(message models.Message, outputMsgs chan<- models.Message, config *models.Config) {
 	help := make([]string, 0)
 	for _, alias := range config.Aliases {
 		if !alias.HideHelp {
@@ -32,7 +32,7 @@ func Help(message models.Message, publishMsgs chan<- models.Message, config *mod
 				}
 			}
 			if canRun {
-				c := connectors.MakeConnector(connector.Type).(connectors.Connector)
+				c := services.MakeService(connector.Type).(services.Service)
 				help = append(help, c.Help(connector)...)
 			}
 		}
@@ -49,7 +49,7 @@ func Help(message models.Message, publishMsgs chan<- models.Message, config *mod
 	if len(newhelp) > 0 {
 		message.Out.Text = "Help for " + config.BotName + "..."
 		message.Out.Detail = strings.Join(newhelp, "\n")
-		publishMsgs <- message
+		outputMsgs <- message
 
 	}
 }

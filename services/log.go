@@ -1,4 +1,4 @@
-package connectors
+package services
 
 import (
 	"fmt"
@@ -11,16 +11,16 @@ import (
 type Log struct {
 }
 
-func (x Log) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+func (x Log) Input(inputMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 	return
 }
 
-func (x Log) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func (x Log) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 
-func (x Log) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
+func (x Log) Output(outputMsgs <-chan models.Message, connector models.Connector) {
 	file, err := os.OpenFile(connector.File, os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		log.Print(err)
@@ -28,7 +28,7 @@ func (x Log) Publish(publishMsgs <-chan models.Message, connector models.Connect
 	}
 	defer file.Close()
 	for {
-		message := <-publishMsgs
+		message := <-outputMsgs
 		if _, err = file.WriteString(time.Now().Format(time.RFC3339) + " " + fmt.Sprintf("%+v", message) + "\n"); err != nil {
 			log.Print(err)
 

@@ -1,4 +1,4 @@
-package connectors
+package services
 
 import (
 	"bufio"
@@ -17,21 +17,21 @@ import (
 type WinRM struct {
 }
 
-//Listen Listen not implemented for WinRM
-func (x WinRM) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+//Input Input not implemented for WinRM
+func (x WinRM) Input(inputMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 	for _, command := range connector.Commands {
 		if command.RunCheck {
 			if connector.Debug {
-				log.Print("Starting Listener for " + connector.ID + " " + command.Name)
+				log.Print("Starting Inputer for " + connector.ID + " " + command.Name)
 			}
-			go checkRM(commandMsgs, command, connector)
+			go checkRM(inputMsgs, command, connector)
 		}
 	}
 }
 
 //Command Standard command parser
-func (x WinRM) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func (x WinRM) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	for _, command := range connector.Commands {
 		if match, tokens := parse.Match(command.Match, message.In.Text); match {
 			args := parse.Substitute(command.Args, tokens)
@@ -53,13 +53,13 @@ func (x WinRM) Command(message models.Message, publishMsgs chan<- models.Message
 			message.Out.Text = connector.ID + " " + command.Name
 			message.Out.Detail = parse.Substitute(command.Output, tokens)
 			message.Out.Status = color
-			publishMsgs <- message
+			outputMsgs <- message
 		}
 	}
 }
 
-//Publish Not implemented for WinRM
-func (x WinRM) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
+//Output Not implemented for WinRM
+func (x WinRM) Output(outputMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 
@@ -78,7 +78,7 @@ func (x WinRM) Help(connector models.Connector) (help []string) {
 	return help
 }
 
-func checkRM(commandMsgs chan<- models.Message, command models.Command, connector models.Connector) {
+func checkRM(inputMsgs chan<- models.Message, command models.Command, connector models.Connector) {
 
 	// command vars
 	var state = command.Green
@@ -161,7 +161,7 @@ func checkRM(commandMsgs chan<- models.Message, command models.Command, connecto
 			message.Out.Text = connector.ID + " " + command.Name
 			message.Out.Detail = parse.Substitute(command.Output, tokens)
 			message.Out.Status = color
-			commandMsgs <- message
+			inputMsgs <- message
 			state = newstate
 			counter = 0
 			stateReset = true

@@ -9,7 +9,7 @@ import (
 )
 
 //Passwd Generates a random password from aes-256 key
-func Passwd(message models.Message, publishMsgs chan<- models.Message) {
+func Passwd(message models.Message, outputMsgs chan<- models.Message) {
 	key := make([]byte, 32)
 
 	_, err := rand.Read(key)
@@ -21,5 +21,5 @@ func Passwd(message models.Message, publishMsgs chan<- models.Message) {
 		message.Out.Text = pass
 	}
 
-	publishMsgs <- message
+	outputMsgs <- message
 }

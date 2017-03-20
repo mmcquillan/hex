@@ -1,4 +1,4 @@
-package connectors
+package services
 
 import (
 	"github.com/SlyMarbo/rss"
@@ -16,29 +16,29 @@ import (
 type Bamboo struct {
 }
 
-func (x Bamboo) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+func (x Bamboo) Input(inputMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 	now := time.Now()
 	buildMarker := ""
 	deployMarker := strconv.FormatInt(now.Unix(), 10) + "000"
 	for {
-		buildMarker = listenBuilds(buildMarker, commandMsgs, connector)
-		deployMarker = listenDeploys(deployMarker, commandMsgs, connector)
+		buildMarker = listenBuilds(buildMarker, inputMsgs, connector)
+		deployMarker = listenDeploys(deployMarker, inputMsgs, connector)
 		time.Sleep(120 * time.Second)
 	}
 }
 
-func (x Bamboo) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func (x Bamboo) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	if match, _ := parse.Match("bamboo status*", message.In.Text); match {
-		commandDeployStatus(message, publishMsgs, connector)
-		commandBuildStatus(message, publishMsgs, connector)
+		commandDeployStatus(message, outputMsgs, connector)
+		commandBuildStatus(message, outputMsgs, connector)
 	}
 	if match, _ := parse.Match("bamboo build*", message.In.Text); match {
-		commandBuild(message, publishMsgs, connector)
+		commandBuild(message, outputMsgs, connector)
 	}
 }
 
-func (x Bamboo) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
+func (x Bamboo) Output(outputMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 
@@ -49,7 +49,7 @@ func (x Bamboo) Help(connector models.Connector) (help []string) {
 	return help
 }
 
-func listenDeploys(lastMarker string, commandMsgs chan<- models.Message, connector models.Connector) (nextMarker string) {
+func listenDeploys(lastMarker string, inputMsgs chan<- models.Message, connector models.Connector) (nextMarker string) {
 	now := time.Now()
 	nextMarker = strconv.FormatInt(now.Unix(), 10) + "000"
 	if connector.Debug {
@@ -73,14 +73,14 @@ func listenDeploys(lastMarker string, commandMsgs chan<- models.Message, connect
 				} else {
 					m.Out.Status = "FAIL"
 				}
-				commandMsgs <- m
+				inputMsgs <- m
 			}
 		}
 	}
 	return nextMarker
 }
 
-func commandBuild(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func commandBuild(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	tokens := strings.Split(message.In.Text, " ")
 	queue := bambooapi.Queue(connector.Server, connector.Login, connector.Pass, tokens[2])
 	log.Printf("%+v", queue)
@@ -92,10 +92,10 @@ func commandBuild(message models.Message, publishMsgs chan<- models.Message, con
 		message.Out.Detail = "Build #" + strconv.Itoa(queue.Buildnumber)
 		message.Out.Link = "https://" + connector.Server + "/builds/browse/" + queue.Plankey + "-" + strconv.Itoa(queue.Buildnumber)
 	}
-	publishMsgs <- message
+	outputMsgs <- message
 }
 
-func commandDeployStatus(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func commandDeployStatus(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	tokens := strings.Split(message.In.Text, " ")
 	d := bambooapi.DeployResults(connector.Server, connector.Login, connector.Pass)
 	for _, de := range d {
@@ -111,13 +111,13 @@ func commandDeployStatus(message models.Message, publishMsgs chan<- models.Messa
 				} else {
 					message.Out.Status = "FAIL"
 				}
-				publishMsgs <- message
+				outputMsgs <- message
 			}
 		}
 	}
 }
 
-func commandBuildStatus(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func commandBuildStatus(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	tokens := strings.Split(message.In.Text, " ")
 	b := bambooapi.BuildResults(connector.Server, connector.Login, connector.Pass)
 	for _, be := range b.Results.Result {
@@ -131,12 +131,12 @@ func commandBuildStatus(message models.Message, publishMsgs chan<- models.Messag
 			} else {
 				message.Out.Status = "FAIL"
 			}
-			publishMsgs <- message
+			outputMsgs <- message
 		}
 	}
 }
 
-func listenBuilds(lastMarker string, commandMsgs chan<- models.Message, connector models.Connector) (nextMarker string) {
+func listenBuilds(lastMarker string, inputMsgs chan<- models.Message, connector models.Connector) (nextMarker string) {
 	var displayOnStart = 0
 	url := "https://" + connector.Login + ":" + connector.Pass + "@"
 	url += connector.Server + "/builds/plugins/servlet/streams?local=true"
@@ -170,7 +170,7 @@ func listenBuilds(lastMarker string, commandMsgs chan<- models.Message, connecto
 			m.Out.Detail = html.UnescapeString(sanitize.HTML(item.Content))
 			m.Out.Link = item.Link
 			m.Out.Status = status
-			commandMsgs <- m
+			inputMsgs <- m
 			if i == 0 {
 				lastMarker = item.Date.String()
 			}

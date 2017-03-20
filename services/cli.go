@@ -1,4 +1,4 @@
-package connectors
+package services
 
 import (
 	"bufio"
@@ -14,7 +14,7 @@ import (
 type Cli struct {
 }
 
-func (x Cli) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+func (x Cli) Input(inputMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 	u, err := user.Current()
 	if err != nil {
@@ -36,20 +36,20 @@ func (x Cli) Listen(commandMsgs chan<- models.Message, connector models.Connecto
 			m.In.User = u.Username
 			m.In.Text = req
 			m.In.Process = true
-			commandMsgs <- m
+			inputMsgs <- m
 		} else {
 			fmt.Print("\n", connector.BotName, "> ")
 		}
 	}
 }
 
-func (x Cli) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func (x Cli) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 
-func (x Cli) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
+func (x Cli) Output(outputMsgs <-chan models.Message, connector models.Connector) {
 	for {
-		message := <-publishMsgs
+		message := <-outputMsgs
 		fmt.Print("\n")
 		switch message.Out.Status {
 		case "SUCCESS":

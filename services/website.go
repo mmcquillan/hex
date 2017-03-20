@@ -1,4 +1,4 @@
-package connectors
+package services
 
 import (
 	"crypto/tls"
@@ -12,7 +12,7 @@ import (
 type Website struct {
 }
 
-func (x Website) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+func (x Website) Input(inputMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 	var state = "OK"
 	for {
@@ -61,18 +61,18 @@ func (x Website) Listen(commandMsgs chan<- models.Message, connector models.Conn
 			m.Out.Text = connector.ID
 			m.Out.Detail = out
 			m.Out.Status = color
-			commandMsgs <- m
+			inputMsgs <- m
 		}
 		state = out
 		time.Sleep(60 * time.Second)
 	}
 }
 
-func (x Website) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func (x Website) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 
-func (x Website) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
+func (x Website) Output(outputMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 

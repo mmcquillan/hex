@@ -1,4 +1,4 @@
-package connectors
+package services
 
 import (
 	"fmt"
@@ -17,12 +17,12 @@ type Environment struct {
 	DB       int64
 }
 
-func (x Redis) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+func (x Redis) Input(inputMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 	return
 }
 
-func (x Redis) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func (x Redis) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	for _, c := range connector.Commands {
 		if match, _ := parse.Match(c.Match, message.In.Text); match {
 			environment := Environment{
@@ -35,13 +35,13 @@ func (x Redis) Command(message models.Message, publishMsgs chan<- models.Message
 			log.Println(status.String())
 			message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags+","+c.Tags)
 			message.Out.Text = fmt.Sprintf("Redis Server: %s\nStatus:%s", connector.Server, status.String())
-			publishMsgs <- message
+			outputMsgs <- message
 			return
 		}
 	}
 }
 
-func (x Redis) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
+func (x Redis) Output(outputMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 

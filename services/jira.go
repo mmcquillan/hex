@@ -1,4 +1,4 @@
-package connectors
+package services
 
 import (
 	"bytes"
@@ -19,22 +19,22 @@ import (
 type Jira struct {
 }
 
-// Listen Not Implemented
-func (x Jira) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+// Input Not Implemented
+func (x Jira) Input(inputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 
 // Command Acts on jira commands
-func (x Jira) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func (x Jira) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	if strings.HasPrefix(strings.ToLower(message.In.Text), strings.ToLower("jira create")) {
-		createJiraIssue(message, publishMsgs, connector)
+		createJiraIssue(message, outputMsgs, connector)
 	} else {
-		parseJiraIssue(message, publishMsgs, connector)
+		parseJiraIssue(message, outputMsgs, connector)
 	}
 }
 
-// Publish Not Implemented
-func (x Jira) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
+// Output Not Implemented
+func (x Jira) Output(outputMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 
@@ -95,7 +95,7 @@ type createdIssue struct {
 	Self string `json:"self"`
 }
 
-func createJiraIssue(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func createJiraIssue(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	msg := strings.TrimSpace(strings.Replace(message.In.Text, "jira create", "", 1))
 	fields := strings.Fields(msg)
 	summary := strings.Join(fields[2:], " ")
@@ -130,7 +130,7 @@ func createJiraIssue(message models.Message, publishMsgs chan<- models.Message, 
 	if err != nil {
 		log.Printf("Jira Create Error: %s", err)
 		message.Out.Text = "Failed to create issue"
-		publishMsgs <- message
+		outputMsgs <- message
 		return
 	}
 
@@ -151,16 +151,16 @@ func createJiraIssue(message models.Message, publishMsgs chan<- models.Message, 
 	err = json.Unmarshal(body, &created)
 	if err != nil {
 		message.Out.Text = "Error creating ticket"
-		publishMsgs <- message
+		outputMsgs <- message
 		return
 	}
 
 	message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
 	message.Out.Text = created.Key
-	publishMsgs <- message
+	outputMsgs <- message
 }
 
-func parseJiraIssue(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func parseJiraIssue(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	var jiraRegex = regexp.MustCompile("[a-zA-Z]{2,12}-[0-9]{1,10}")
 	issues := jiraRegex.FindAllString(message.In.Text, -1)
 	for _, issue := range issues {
@@ -202,7 +202,7 @@ func parseJiraIssue(message models.Message, publishMsgs chan<- models.Message, c
 		message.Out.Text = strings.ToUpper(issue) + " - " + ticket.Fields.Summary
 		message.Out.Detail = fmt.Sprintf("Status: %s\nPriority: %s\nAssignee: %s\n",
 			ticket.Fields.Status.Name, ticket.Fields.Priority.Name, ticket.Fields.Assignee.DisplayName)
-		publishMsgs <- message
+		outputMsgs <- message
 	}
 }
 

@@ -1,4 +1,4 @@
-package connectors
+package services
 
 import (
 	"github.com/hpcloud/tail"
@@ -10,7 +10,7 @@ import (
 type File struct {
 }
 
-func (x File) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+func (x File) Input(inputMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 	seek := tail.SeekInfo{Offset: 0, Whence: 2}
 	t, err := tail.TailFile(connector.File, tail.Config{Follow: true, Location: &seek})
@@ -27,18 +27,18 @@ func (x File) Listen(commandMsgs chan<- models.Message, connector models.Connect
 				m.In.Process = false
 				m.Out.Text = connector.File + ": " + c.Name
 				m.Out.Detail = line.Text
-				commandMsgs <- m
+				inputMsgs <- m
 			}
 
 		}
 	}
 }
 
-func (x File) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func (x File) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 
-func (x File) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
+func (x File) Output(outputMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 

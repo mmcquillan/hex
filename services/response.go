@@ -1,4 +1,4 @@
-package connectors
+package services
 
 import (
 	"github.com/projectjane/jane/models"
@@ -11,11 +11,11 @@ import (
 type Response struct {
 }
 
-func (x Response) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+func (x Response) Input(inputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 
-func (x Response) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func (x Response) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	if connector.Debug {
 		log.Print("Incoming command message for " + connector.ID + " (" + connector.Type + ")")
 		log.Printf("%+v", message)
@@ -29,12 +29,12 @@ func (x Response) Command(message models.Message, publishMsgs chan<- models.Mess
 				message.Out.Text = parse.Substitute(c.Outputs[i], tokens)
 			}
 			message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags+","+c.Tags)
-			publishMsgs <- message
+			outputMsgs <- message
 		}
 	}
 }
 
-func (x Response) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
+func (x Response) Output(outputMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 

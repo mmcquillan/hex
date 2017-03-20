@@ -1,4 +1,4 @@
-package connectors
+package services
 
 import (
 	"encoding/xml"
@@ -15,22 +15,22 @@ import (
 type Wolfram struct {
 }
 
-// Listen Not Implemented
-func (x Wolfram) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+// Input Not Implemented
+func (x Wolfram) Input(inputMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 }
 
 // Command Matches wolfram command and queries the wolfram api
-func (x Wolfram) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func (x Wolfram) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	if match, tokens := parse.Match("wolfram*", message.In.Text); match {
 		message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
 		message.Out.Text = callWolfram(tokens["*"], connector.Key)
-		publishMsgs <- message
+		outputMsgs <- message
 	}
 }
 
-// Publish Not Implemented
-func (x Wolfram) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
+// Output Not Implemented
+func (x Wolfram) Output(outputMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 

@@ -1,4 +1,4 @@
-package connectors
+package services
 
 import (
 	"log"
@@ -34,7 +34,7 @@ func init() {
 	List["logging"] = reflect.TypeOf(File{})
 }
 
-func MakeConnector(connType string) interface{} {
+func MakeService(connType string) interface{} {
 	if ct, ok := List[connType]; ok {
 		c := (reflect.New(ct).Elem().Interface())
 		return c

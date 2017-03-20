@@ -6,6 +6,7 @@ type Config struct {
 	Version    string
 	LogFile    string
 	Aliases    []Alias
+	Services   []Service
 	Connectors []Connector
 	Routes     []Route
 }

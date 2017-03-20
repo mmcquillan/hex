@@ -1,4 +1,4 @@
-package connectors
+package services
 
 import (
 	"bytes"
@@ -18,27 +18,27 @@ import (
 type Exec struct {
 }
 
-//Listen function
-func (x Exec) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+//Input function
+func (x Exec) Input(inputMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 	for _, command := range connector.Commands {
 		if command.RunCheck {
 			if connector.Debug {
-				log.Print("Starting Listener for " + connector.ID + " " + command.Name)
+				log.Print("Starting Inputer for " + connector.ID + " " + command.Name)
 			}
-			go check(commandMsgs, command, connector)
+			go check(inputMsgs, command, connector)
 		}
 		if command.Schedule != "" {
 			if connector.Debug {
-				log.Print("Scheduling Listener for " + connector.ID + " " + command.Name + " @ " + command.Schedule)
+				log.Print("Scheduling Inputer for " + connector.ID + " " + command.Name + " @ " + command.Schedule)
 			}
-			schedule(commandMsgs, command, connector)
+			schedule(inputMsgs, command, connector)
 		}
 	}
 }
 
 //Command function
-func (x Exec) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func (x Exec) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	for _, command := range connector.Commands {
 		if match, tokens := parse.Match(command.Match, message.In.Text); match {
 			args := parse.Substitute(command.Args, tokens)
@@ -58,13 +58,13 @@ func (x Exec) Command(message models.Message, publishMsgs chan<- models.Message,
 			message.Out.Text = connector.ID + " " + command.Name
 			message.Out.Detail = parse.Substitute(command.Output, tokens)
 			message.Out.Status = color
-			publishMsgs <- message
+			outputMsgs <- message
 		}
 	}
 }
 
-//Publish fucntion
-func (x Exec) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
+//Output fucntion
+func (x Exec) Output(outputMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 
@@ -83,7 +83,7 @@ func (x Exec) Help(connector models.Connector) (help []string) {
 	return help
 }
 
-func schedule(commandMsgs chan<- models.Message, command models.Command, connector models.Connector) {
+func schedule(inputMsgs chan<- models.Message, command models.Command, connector models.Connector) {
 
 	cron := cron.New()
 	cron.AddFunc(command.Schedule, func() {
@@ -109,13 +109,13 @@ func schedule(commandMsgs chan<- models.Message, command models.Command, connect
 		message.Out.Text = connector.ID + " " + command.Name
 		message.Out.Detail = parse.Substitute(command.Output, tokens)
 		message.Out.Status = color
-		commandMsgs <- message
+		inputMsgs <- message
 	})
 	cron.Start()
 
 }
 
-func check(commandMsgs chan<- models.Message, command models.Command, connector models.Connector) {
+func check(inputMsgs chan<- models.Message, command models.Command, connector models.Connector) {
 
 	// command vars
 	var state = command.Green
@@ -198,7 +198,7 @@ func check(commandMsgs chan<- models.Message, command models.Command, connector 
 			message.Out.Text = connector.ID + " " + command.Name
 			message.Out.Detail = parse.Substitute(command.Output, tokens)
 			message.Out.Status = color
-			commandMsgs <- message
+			inputMsgs <- message
 			state = newstate
 			counter = 0
 			stateReset = true

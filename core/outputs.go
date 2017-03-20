@@ -1,24 +1,24 @@
 package core
 
 import (
-	"github.com/projectjane/jane/connectors"
 	"github.com/projectjane/jane/models"
 	"github.com/projectjane/jane/parse"
+	"github.com/projectjane/jane/services"
 	"log"
 )
 
-func Publishers(publishMsgs <-chan models.Message, config *models.Config) {
-	log.Print("Initializing Publishers")
+func Outputs(outputMsgs <-chan models.Message, config *models.Config) {
+	log.Print("Initializing Outputs")
 	var chans = make(map[string]chan models.Message)
 	for _, connector := range config.Connectors {
 		if connector.Active {
 			chans[connector.ID] = make(chan models.Message)
-			c := connectors.MakeConnector(connector.Type).(connectors.Connector)
-			go c.Publish(chans[connector.ID], connector)
+			c := services.MakeService(connector.Type).(services.Service)
+			go c.Output(chans[connector.ID], connector)
 		}
 	}
 	for {
-		message := <-publishMsgs
+		message := <-outputMsgs
 		for _, route := range config.Routes {
 			match := true
 			if _, chk := chans[route.Publish.ConnectorID]; !chk {

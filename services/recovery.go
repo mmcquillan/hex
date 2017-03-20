@@ -1,4 +1,4 @@
-package connectors
+package services
 
 import (
 	"github.com/projectjane/jane/models"

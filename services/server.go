@@ -1,4 +1,4 @@
-package connectors
+package services
 
 import (
 	"bufio"
@@ -15,7 +15,7 @@ import (
 type Server struct {
 }
 
-func (x Server) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+func (x Server) Input(inputMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 
 	// estsablish connection
@@ -34,7 +34,7 @@ func (x Server) Listen(commandMsgs chan<- models.Message, connector models.Conne
 	}
 
 	// watch for stopped connections
-	go func(commandMsgs chan<- models.Message, connector models.Connector, clients map[string]int) {
+	go func(inputMsgs chan<- models.Message, connector models.Connector, clients map[string]int) {
 		for {
 			time.Sleep(15 * time.Second)
 			for client, _ := range clients {
@@ -48,7 +48,7 @@ func (x Server) Listen(commandMsgs chan<- models.Message, connector models.Conne
 					m.Out.Text = "Jane Alert"
 					m.Out.Detail = "Client Disconnect from " + client
 					m.Out.Status = "FAIL"
-					commandMsgs <- m
+					inputMsgs <- m
 					if connector.Debug {
 						log.Print("Disconnect: ", client)
 					}
@@ -56,7 +56,7 @@ func (x Server) Listen(commandMsgs chan<- models.Message, connector models.Conne
 				}
 			}
 		}
-	}(commandMsgs, connector, clients)
+	}(inputMsgs, connector, clients)
 
 	for {
 
@@ -70,7 +70,7 @@ func (x Server) Listen(commandMsgs chan<- models.Message, connector models.Conne
 		}
 
 		// thread out process
-		go func(commandMsgs chan<- models.Message, connector models.Connector, conn net.Conn, key []byte, clients map[string]int) {
+		go func(inputMsgs chan<- models.Message, connector models.Connector, conn net.Conn, key []byte, clients map[string]int) {
 			defer conn.Close()
 
 			// establish client counter
@@ -84,7 +84,7 @@ func (x Server) Listen(commandMsgs chan<- models.Message, connector models.Conne
 			m.Out.Text = "Jane Alert"
 			m.Out.Detail = "Client Connect from " + client
 			m.Out.Status = "SUCCESS"
-			commandMsgs <- m
+			inputMsgs <- m
 
 			// loop
 			for {
@@ -136,7 +136,7 @@ func (x Server) Listen(commandMsgs chan<- models.Message, connector models.Conne
 					}
 
 					// send message
-					commandMsgs <- message
+					inputMsgs <- message
 
 				} else {
 					log.Print("Client Connection illegal key from ", client)
@@ -145,16 +145,16 @@ func (x Server) Listen(commandMsgs chan<- models.Message, connector models.Conne
 				}
 
 			}
-		}(commandMsgs, connector, conn, key, clients)
+		}(inputMsgs, connector, conn, key, clients)
 	}
 	return
 }
 
-func (x Server) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func (x Server) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 
-func (x Server) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
+func (x Server) Output(outputMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 

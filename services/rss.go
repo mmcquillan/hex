@@ -1,4 +1,4 @@
-package connectors
+package services
 
 import (
 	"github.com/SlyMarbo/rss"
@@ -14,20 +14,20 @@ type Rss struct {
 	Connector models.Connector
 }
 
-func (x Rss) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+func (x Rss) Input(inputMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 	nextMarker := ""
 	for {
-		nextMarker = callRss(nextMarker, commandMsgs, connector)
+		nextMarker = callRss(nextMarker, inputMsgs, connector)
 		time.Sleep(120 * time.Second)
 	}
 }
 
-func (x Rss) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func (x Rss) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 
-func (x Rss) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
+func (x Rss) Output(outputMsgs <-chan models.Message, connector models.Connector) {
 	return
 }
 
@@ -35,7 +35,7 @@ func (x Rss) Help(connector models.Connector) (help []string) {
 	return
 }
 
-func callRss(lastMarker string, commandMsgs chan<- models.Message, connector models.Connector) (nextMarker string) {
+func callRss(lastMarker string, inputMsgs chan<- models.Message, connector models.Connector) (nextMarker string) {
 	var displayOnStart = 0
 	if connector.Debug {
 		log.Print("Starting rss feed fetch for " + connector.ID)
@@ -65,7 +65,7 @@ func callRss(lastMarker string, commandMsgs chan<- models.Message, connector mod
 			m.Out.Text = connector.ID + " " + html.UnescapeString(sanitize.HTML(item.Title))
 			m.Out.Detail = html.UnescapeString(sanitize.HTML(item.Content))
 			m.Out.Link = item.Link
-			commandMsgs <- m
+			inputMsgs <- m
 			if i == 0 {
 				lastMarker = item.Date.String()
 			}

@@ -1,4 +1,4 @@
-package connectors
+package services
 
 import (
 	"fmt"
@@ -18,14 +18,14 @@ type Twitter struct {
 	Connector       models.Connector
 }
 
-// Listen Listen to the Twitter stream api
-func (x Twitter) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+// Input Input to the Twitter stream api
+func (x Twitter) Input(inputMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 
 	if x.StreamClient == nil {
 		client := newTwitterClient(connector)
 		x.StreamClient = client
-		x.CommandMessages = commandMsgs
+		x.CommandMessages = inputMsgs
 
 		x.listenToStream(connector)
 	}
@@ -34,7 +34,7 @@ func (x Twitter) Listen(commandMsgs chan<- models.Message, connector models.Conn
 }
 
 // Command Twitter command to post a tweet from the app
-func (x Twitter) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func (x Twitter) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	for _, c := range connector.Commands {
 		if match, tokens := parse.Match(c.Match, message.In.Text); match {
 
@@ -54,7 +54,7 @@ func (x Twitter) Command(message models.Message, publishMsgs chan<- models.Messa
 				message.Out.Text = "Successfully posted tweet."
 			}
 
-			publishMsgs <- message
+			outputMsgs <- message
 
 			return
 		}
@@ -63,10 +63,10 @@ func (x Twitter) Command(message models.Message, publishMsgs chan<- models.Messa
 	return
 }
 
-// Publish Twitter publishes out tweets
-func (x Twitter) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
+// Output Twitter publishes out tweets
+func (x Twitter) Output(outputMsgs <-chan models.Message, connector models.Connector) {
 	for {
-		message := <-publishMsgs
+		message := <-outputMsgs
 
 		msg := message.Out.Text
 

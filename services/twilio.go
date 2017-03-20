@@ -1,4 +1,4 @@
-package connectors
+package services
 
 import (
 	"io/ioutil"
@@ -14,21 +14,21 @@ import (
 type Twilio struct {
 }
 
-// Listen Twilio does not listen for anything right now
-func (x Twilio) Listen(commandMsgs chan<- models.Message, connector models.Connector) {
+// Input Twilio does not listen for anything right now
+func (x Twilio) Input(inputMsgs chan<- models.Message, connector models.Connector) {
 	defer Recovery(connector)
 	return
 }
 
 // Command Twilio does not process any commands right now
-func (x Twilio) Command(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {
+func (x Twilio) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 
-// Publish Twilio publisher to push messages via Twilio REST Api
-func (x Twilio) Publish(publishMsgs <-chan models.Message, connector models.Connector) {
+// Output Twilio publisher to push messages via Twilio REST Api
+func (x Twilio) Output(outputMsgs <-chan models.Message, connector models.Connector) {
 	for {
-		message := <-publishMsgs
+		message := <-outputMsgs
 		if connector.Debug {
 			log.Print("Starting client connect to twilio: " + connector.ID)
 		}
