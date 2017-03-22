@@ -16,7 +16,7 @@ func (x Log) Input(inputMsgs chan<- models.Message, connector models.Connector) 
 	return
 }
 
-func (x Log) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
+func (x Log) Action(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 

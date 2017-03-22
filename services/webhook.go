@@ -46,7 +46,7 @@ func (x Webhook) Input(inputMsgs chan<- models.Message, connector models.Connect
 	}
 }
 
-func (x Webhook) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
+func (x Webhook) Action(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 

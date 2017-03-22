@@ -34,7 +34,7 @@ func (x File) Input(inputMsgs chan<- models.Message, connector models.Connector)
 	}
 }
 
-func (x File) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
+func (x File) Action(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 

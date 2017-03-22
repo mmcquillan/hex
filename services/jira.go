@@ -24,8 +24,8 @@ func (x Jira) Input(inputMsgs chan<- models.Message, connector models.Connector)
 	return
 }
 
-// Command Acts on jira commands
-func (x Jira) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
+// Action Acts on jira commands
+func (x Jira) Action(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	if strings.HasPrefix(strings.ToLower(message.In.Text), strings.ToLower("jira create")) {
 		createJiraIssue(message, outputMsgs, connector)
 	} else {

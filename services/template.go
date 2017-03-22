@@ -12,7 +12,7 @@ func (x Template) Input(inputMsgs chan<- models.Message, connector models.Connec
 	return
 }
 
-func (x Template) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
+func (x Template) Action(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 

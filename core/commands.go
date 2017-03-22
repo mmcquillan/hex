@@ -32,7 +32,7 @@ func Commands(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message,
 						}
 						if canRun {
 							c := services.MakeService(connector.Type).(services.Service)
-							go c.Command(m, outputMsgs, connector)
+							go c.Action(m, outputMsgs, connector)
 						}
 					}
 				}

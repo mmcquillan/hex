@@ -3,14 +3,14 @@ package services
 import (
 	"log"
 	"reflect"
+
+	"github.com/projectjane/jane/models"
 )
 
 var List = make(map[string]reflect.Type)
 
 func init() {
 	List["cli"] = reflect.TypeOf(Cli{})
-	List["client"] = reflect.TypeOf(Client{})
-	List["bamboo"] = reflect.TypeOf(Bamboo{})
 	List["email"] = reflect.TypeOf(Email{})
 	List["exec"] = reflect.TypeOf(Exec{})
 	List["file"] = reflect.TypeOf(File{})
@@ -20,18 +20,11 @@ func init() {
 	List["slack"] = reflect.TypeOf(Slack{})
 	List["response"] = reflect.TypeOf(Response{})
 	List["rss"] = reflect.TypeOf(Rss{})
-	List["website"] = reflect.TypeOf(Website{})
 	List["wolfram"] = reflect.TypeOf(Wolfram{})
-	List["redis"] = reflect.TypeOf(Redis{})
-	List["server"] = reflect.TypeOf(Server{})
 	List["webhook"] = reflect.TypeOf(Webhook{})
 	List["winrm"] = reflect.TypeOf(WinRM{})
 	List["twilio"] = reflect.TypeOf(Twilio{})
 	List["twitter"] = reflect.TypeOf(Twitter{})
-
-	// depricated
-	List["exec2"] = reflect.TypeOf(Exec{})
-	List["logging"] = reflect.TypeOf(File{})
 }
 
 func MakeService(connType string) interface{} {
@@ -42,5 +35,12 @@ func MakeService(connType string) interface{} {
 		log.Print("Error in configuration, connector type '" + connType + "' not supported")
 		log.Fatal("Exiting due to configuration error")
 		return nil
+	}
+}
+
+func Recovery(connector models.Connector) {
+	msg := "Panic - " + connector.ID + " " + connector.Type + " Connector"
+	if r := recover(); r != nil {
+		log.Print(msg, r)
 	}
 }

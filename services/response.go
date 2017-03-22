@@ -15,7 +15,7 @@ func (x Response) Input(inputMsgs chan<- models.Message, connector models.Connec
 	return
 }
 
-func (x Response) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
+func (x Response) Action(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	if connector.Debug {
 		log.Print("Incoming command message for " + connector.ID + " (" + connector.Type + ")")
 		log.Printf("%+v", message)

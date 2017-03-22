@@ -33,8 +33,8 @@ func (x Twitter) Input(inputMsgs chan<- models.Message, connector models.Connect
 	return
 }
 
-// Command Twitter command to post a tweet from the app
-func (x Twitter) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
+// Action Twitter command to post a tweet from the app
+func (x Twitter) Action(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	for _, c := range connector.Commands {
 		if match, tokens := parse.Match(c.Match, message.In.Text); match {
 

@@ -23,7 +23,7 @@ func (x Rss) Input(inputMsgs chan<- models.Message, connector models.Connector) 
 	}
 }
 
-func (x Rss) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
+func (x Rss) Action(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 

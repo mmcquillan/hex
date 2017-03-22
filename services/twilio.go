@@ -20,8 +20,8 @@ func (x Twilio) Input(inputMsgs chan<- models.Message, connector models.Connecto
 	return
 }
 
-// Command Twilio does not process any commands right now
-func (x Twilio) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
+// Action Twilio does not process any commands right now
+func (x Twilio) Action(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 

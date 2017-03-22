@@ -15,7 +15,7 @@ func (x Email) Input(inputMsgs chan<- models.Message, connector models.Connector
 	return
 }
 
-func (x Email) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
+func (x Email) Action(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 

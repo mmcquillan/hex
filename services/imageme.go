@@ -22,8 +22,8 @@ func (x ImageMe) Input(inputMsgs chan<- models.Message, connector models.Connect
 	return
 }
 
-// Command Takes in animateme or imageme command
-func (x ImageMe) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
+// Action Takes in animateme or imageme command
+func (x ImageMe) Action(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	if match, tokens := parse.Match("image me*", message.In.Text); match {
 		message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
 		message.Out.Text = callImageMe(tokens["*"], connector.Key, connector.Pass, false)

@@ -73,8 +73,8 @@ func (x Slack) Input(inputMsgs chan<- models.Message, connector models.Connector
 	}
 }
 
-// Command Not implemented
-func (x Slack) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
+// Action Not implemented
+func (x Slack) Action(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 

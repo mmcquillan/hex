@@ -30,8 +30,8 @@ func (x WinRM) Input(inputMsgs chan<- models.Message, connector models.Connector
 	}
 }
 
-//Command Standard command parser
-func (x WinRM) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
+//Action Standard command parser
+func (x WinRM) Action(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	for _, command := range connector.Commands {
 		if match, tokens := parse.Match(command.Match, message.In.Text); match {
 			args := parse.Substitute(command.Args, tokens)

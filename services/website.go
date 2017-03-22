@@ -68,7 +68,7 @@ func (x Website) Input(inputMsgs chan<- models.Message, connector models.Connect
 	}
 }
 
-func (x Website) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
+func (x Website) Action(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 

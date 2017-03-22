@@ -43,7 +43,7 @@ func (x Cli) Input(inputMsgs chan<- models.Message, connector models.Connector) 
 	}
 }
 
-func (x Cli) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
+func (x Cli) Action(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	return
 }
 

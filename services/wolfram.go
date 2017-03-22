@@ -20,8 +20,8 @@ func (x Wolfram) Input(inputMsgs chan<- models.Message, connector models.Connect
 	defer Recovery(connector)
 }
 
-// Command Matches wolfram command and queries the wolfram api
-func (x Wolfram) Command(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
+// Action Matches wolfram command and queries the wolfram api
+func (x Wolfram) Action(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	if match, tokens := parse.Match("wolfram*", message.In.Text); match {
 		message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
 		message.Out.Text = callWolfram(tokens["*"], connector.Key)
