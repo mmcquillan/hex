@@ -40,25 +40,27 @@ func (x Exec) Input(inputMsgs chan<- models.Message, connector models.Connector)
 //Action function
 func (x Exec) Action(message models.Message, outputMsgs chan<- models.Message, connector models.Connector) {
 	for _, command := range connector.Commands {
-		if match, tokens := parse.Match(command.Match, message.In.Text); match {
-			args := parse.Substitute(command.Args, tokens)
-			tokens["STDOUT"] = callCmd(command.Cmd, args, connector)
-			var color = "NONE"
-			var match = false
-			if match, _ = parse.Match(command.Green, tokens["STDOUT"]); match {
-				color = "SUCCESS"
+		if command.Match != "" {
+			if match, tokens := parse.Match(command.Match, message.In.Text); match {
+				args := parse.Substitute(command.Args, tokens)
+				tokens["STDOUT"] = callCmd(command.Cmd, args, connector)
+				var color = "NONE"
+				var match = false
+				if match, _ = parse.Match(command.Green, tokens["STDOUT"]); match {
+					color = "SUCCESS"
+				}
+				if match, _ = parse.Match(command.Yellow, tokens["STDOUT"]); match {
+					color = "WARN"
+				}
+				if match, _ = parse.Match(command.Red, tokens["STDOUT"]); match {
+					color = "FAIL"
+				}
+				message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags+","+command.Tags)
+				message.Out.Text = connector.ID + " " + command.Name
+				message.Out.Detail = parse.Substitute(command.Output, tokens)
+				message.Out.Status = color
+				outputMsgs <- message
 			}
-			if match, _ = parse.Match(command.Yellow, tokens["STDOUT"]); match {
-				color = "WARN"
-			}
-			if match, _ = parse.Match(command.Red, tokens["STDOUT"]); match {
-				color = "FAIL"
-			}
-			message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags+","+command.Tags)
-			message.Out.Text = connector.ID + " " + command.Name
-			message.Out.Detail = parse.Substitute(command.Output, tokens)
-			message.Out.Status = color
-			outputMsgs <- message
 		}
 	}
 }

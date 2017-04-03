@@ -101,13 +101,12 @@ func (x Slack) Output(outputMsgs <-chan models.Message, connector models.Connect
 			msg = message.Out.Text
 		}
 		for _, target := range strings.Split(message.Out.Target, ",") {
-			if target == "" {
-				target = "#general"
-			}
 			if target == "*" {
 				target = message.In.Target
 			}
-			api.PostMessage(target, msg, params)
+			if target != "" && target != "*" {
+				api.PostMessage(target, msg, params)
+			}
 		}
 	}
 }
