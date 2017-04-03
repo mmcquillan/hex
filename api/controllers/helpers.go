@@ -2,11 +2,11 @@ package controllers
 
 import (
 	"encoding/json"
-	"linksscoreapi/models"
+	"github.com/projectjane/jane/models"
 	"log"
 	"net/http"
 
-	"linksscoreapi/common"
+	"github.com/projectjane/jane/api/common"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/dgrijalva/jwt-go/request"
