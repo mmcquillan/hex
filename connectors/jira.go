@@ -156,8 +156,8 @@ func createJiraIssue(message models.Message, publishMsgs chan<- models.Message, 
 	}
 
 	message.In.Tags = parse.TagAppend(message.In.Tags, connector.Tags)
-	message.Out.Text = created.Key
-	publishMsgs <- message
+	message.In.Text = created.Key
+	parseJiraIssue(message, publishMsgs, connector)
 }
 
 func parseJiraIssue(message models.Message, publishMsgs chan<- models.Message, connector models.Connector) {

@@ -93,6 +93,7 @@ func subConfig(config *models.Config) {
 		config.Connectors[i].Login = parse.SubstituteInputs(config.Connectors[i].Login)
 		config.Connectors[i].Pass = parse.SubstituteInputs(config.Connectors[i].Pass)
 		config.Connectors[i].Key = parse.SubstituteInputs(config.Connectors[i].Key)
+		config.Connectors[i].Users = parse.SubstituteInputs(config.Connectors[i].Users)
 		config.Connectors[i].BotName = config.BotName
 		if os.Getenv("JANE_DEBUG") != "" {
 			if strings.ToLower(os.Getenv("JANE_DEBUG")) == "true" {
