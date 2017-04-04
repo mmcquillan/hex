@@ -252,6 +252,7 @@ func callRemote(cmd string, args string, connector models.Connector) (out string
 		Auth: []ssh.AuthMethod{
 			ssh.Password(connector.Pass),
 		},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 	port := "22"
 	if connector.Port != "" {
