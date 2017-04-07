@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"github.com/projectjane/jane/connectors"
 	"github.com/projectjane/jane/models"
 	"sort"
@@ -56,8 +55,6 @@ func Help(message models.Message, tokens map[string]string, publishMsgs chan<- m
 			lasthelp = h
 		}
 	}
-
-	fmt.Printf("%+v", tokens)
 
 	// output help
 	if len(newhelp) > 0 {
