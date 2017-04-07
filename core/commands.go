@@ -52,8 +52,8 @@ func aliasCommands(message *models.Message, config *models.Config) {
 }
 
 func staticCommands(message models.Message, publishMsgs chan<- models.Message, config *models.Config) {
-	if strings.ToLower(strings.TrimSpace(message.In.Text)) == config.BotName+" help" {
-		Help(message, publishMsgs, config)
+	if match, tokens := parse.Match(config.BotName+" help*", strings.ToLower(strings.TrimSpace(message.In.Text))); match {
+		Help(message, tokens, publishMsgs, config)
 	}
 	if strings.ToLower(strings.TrimSpace(message.In.Text)) == config.BotName+" ping" {
 		Ping(message, publishMsgs)
