@@ -58,10 +58,14 @@ func (x Slack) Listen(commandMsgs chan<- models.Message, connector models.Connec
 					}
 
 					var m models.Message
+					var found bool
 					m.In.ConnectorType = connector.Type
 					m.In.ConnectorID = connector.ID
 					m.In.Tags = connector.Tags
-					m.In.Target = channels[ev.Channel]
+					m.In.Target, found = channels[ev.Channel]
+					if !found {
+						m.In.Target = ev.Channel
+					}
 					m.In.User = users[ev.User]
 					m.In.Text = html.UnescapeString(ev.Text)
 					m.In.Process = true
