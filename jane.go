@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/projectjane/jane/api"
 	"github.com/projectjane/jane/core"
 	"github.com/projectjane/jane/models"
 	"sync"
@@ -22,7 +21,9 @@ func main() {
 	go core.Inputs(inputMsgs, &config)
 	go core.Commands(inputMsgs, outputMsgs, &config)
 	go core.Outputs(outputMsgs, &config)
-	api.Start()
+	go core.Listeners(commandMsgs, &config)
+	go core.Commands(commandMsgs, publishMsgs, &config)
+	go core.Publishers(publishMsgs, &config)
 	defer wg.Done()
 	wg.Wait()
 }

@@ -7,8 +7,11 @@ import (
 	"strings"
 )
 
-func Help(message models.Message, outputMsgs chan<- models.Message, config *models.Config) {
+func Help(message models.Message, tokens map[string]string, publishMsgs chan<- models.Message, config *models.Config) {
+
 	help := make([]string, 0)
+
+	// pull all help from the aliases
 	for _, alias := range config.Aliases {
 		if !alias.HideHelp {
 			if alias.Help != "" {
@@ -18,6 +21,8 @@ func Help(message models.Message, outputMsgs chan<- models.Message, config *mode
 			}
 		}
 	}
+
+	// pull all help from the connectors
 	for _, connector := range config.Connectors {
 		if connector.Active {
 			canRun := false
@@ -37,15 +42,21 @@ func Help(message models.Message, outputMsgs chan<- models.Message, config *mode
 			}
 		}
 	}
+
+	// sort, filter and de-dupe help
 	sort.Strings(help)
 	var lasthelp = ""
 	var newhelp = make([]string, 0)
 	for _, h := range help {
-		if h != lasthelp {
-			newhelp = append(newhelp, h)
+		if (tokens["1"] != "" && strings.Contains(h, tokens["1"])) || tokens["1"] == "" {
+			if h != lasthelp {
+				newhelp = append(newhelp, h)
+			}
+			lasthelp = h
 		}
-		lasthelp = h
 	}
+
+	// output help
 	if len(newhelp) > 0 {
 		message.Out.Text = "Help for " + config.BotName + "..."
 		message.Out.Detail = strings.Join(newhelp, "\n")
