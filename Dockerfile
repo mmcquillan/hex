@@ -1,5 +1,5 @@
 # jane docker file
-FROM golang:1.7.0
+FROM golang:1.8.1
 MAINTAINER Project Jane
 ENV GOBIN=/go/bin
 ADD . /go/src/github.com/projectjane/jane

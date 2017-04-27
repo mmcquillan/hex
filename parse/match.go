@@ -2,11 +2,10 @@ package parse
 
 import (
 	"regexp"
-	"strconv"
 	"strings"
 )
 
-func Match(pattern string, value string) (match bool, tokens map[string]string) {
+func Match(pattern string, value string) (match bool) {
 	ws := strings.HasPrefix(pattern, "*")
 	we := strings.HasSuffix(pattern, "*")
 	re := strings.HasPrefix(pattern, "/") && strings.HasSuffix(pattern, "/")
@@ -16,16 +15,9 @@ func Match(pattern string, value string) (match bool, tokens map[string]string) 
 		pattern = strings.Replace(pattern, "*", "", -1)
 	}
 	value = strings.TrimSpace(value)
-	tokens = make(map[string]string)
-	tokens["0"] = pattern
 	if !re {
 		pattern = strings.ToLower(pattern)
 	}
-	ta := strings.Split(CIReplace(value, pattern, ""), " ")
-	for i := 0; i < len(ta); i++ {
-		tokens[strconv.Itoa(i+1)] = strings.TrimSpace(ta[i])
-	}
-	tokens["*"] = strings.Join(ta, " ")
 	value = strings.ToLower(value)
 	match = false
 	if re {
@@ -40,16 +32,5 @@ func Match(pattern string, value string) (match bool, tokens map[string]string) 
 	} else if value == pattern {
 		match = true
 	}
-	return match, tokens
-}
-
-func CIReplace(str string, val string, rep string) (ret string) {
-	f := strings.Index(strings.ToLower(str), strings.ToLower(val))
-	if f == -1 {
-		ret = str
-	} else {
-		l := len(val)
-		ret = strings.TrimSpace(str[:f]) + " " + strings.TrimSpace(str[(f+l):])
-	}
-	return strings.TrimSpace(ret)
+	return match
 }

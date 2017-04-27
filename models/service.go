@@ -2,9 +2,9 @@ package models
 
 // Service Struct
 type Service struct {
-	Type   string
-	Name   string
-	Tags   string
-	Active bool
-	Config map[string]string
+	BotName string
+	Type    string
+	Name    string
+	Active  bool
+	Config  map[string]string
 }

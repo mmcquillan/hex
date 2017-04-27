@@ -3,14 +3,16 @@ package core
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/kardianos/osext"
-	"github.com/mitchellh/go-homedir"
-	"github.com/projectjane/jane/models"
-	"github.com/projectjane/jane/parse"
 	"io/ioutil"
 	"log"
 	"os"
 	"strings"
+	"time"
+
+	"github.com/kardianos/osext"
+	"github.com/mitchellh/go-homedir"
+	"github.com/projectjane/jane/models"
+	"github.com/projectjane/jane/parse"
 )
 
 func Config(params models.Params, version string) (config models.Config) {
@@ -26,6 +28,7 @@ func Config(params models.Params, version string) (config models.Config) {
 		os.Exit(1)
 	}
 	config.Version = version
+	config.StartTime = time.Now().Unix()
 	return config
 }
 
@@ -87,41 +90,18 @@ func subConfig(config *models.Config) {
 	} else if config.BotName == "" {
 		config.BotName = "jane"
 	}
-	for i := 0; i < len(config.Connectors); i++ {
-		config.Connectors[i].Server = parse.SubstituteInputs(config.Connectors[i].Server)
-		config.Connectors[i].Port = parse.SubstituteInputs(config.Connectors[i].Port)
-		config.Connectors[i].Login = parse.SubstituteInputs(config.Connectors[i].Login)
-		config.Connectors[i].Pass = parse.SubstituteInputs(config.Connectors[i].Pass)
-		config.Connectors[i].Key = parse.SubstituteInputs(config.Connectors[i].Key)
-		config.Connectors[i].Users = parse.SubstituteInputs(config.Connectors[i].Users)
-		config.Connectors[i].BotName = config.BotName
-		if os.Getenv("JANE_DEBUG") != "" {
-			if strings.ToLower(os.Getenv("JANE_DEBUG")) == "true" {
-				config.Connectors[i].Debug = true
-			} else {
-				config.Connectors[i].Debug = false
-			}
+	if os.Getenv("JANE_DEBUG") != "" {
+		if strings.ToLower(os.Getenv("JANE_DEBUG")) == "true" || config.Debug {
+			config.Debug = true
+		} else {
+			config.Debug = false
 		}
 	}
-	for i := 0; i < len(config.Routes); i++ {
-		if config.Routes[i].Match.ConnectorType == "" {
-			config.Routes[i].Match.ConnectorType = "*"
+	for i := 0; i < len(config.Services); i++ {
+		for k, v := range config.Services[i].Config {
+			config.Services[i].Config[k] = parse.SubstituteEnv(v)
 		}
-		if config.Routes[i].Match.ConnectorID == "" {
-			config.Routes[i].Match.ConnectorID = "*"
-		}
-		if config.Routes[i].Match.Tags == "" {
-			config.Routes[i].Match.Tags = "*"
-		}
-		if config.Routes[i].Match.Target == "" {
-			config.Routes[i].Match.Target = "*"
-		}
-		if config.Routes[i].Match.User == "" {
-			config.Routes[i].Match.User = "*"
-		}
-		if config.Routes[i].Match.Message == "" {
-			config.Routes[i].Match.Message = "*"
-		}
+		config.Services[i].BotName = config.BotName
 	}
 	if os.Getenv("JANE_LOGFILE") != "" {
 		config.LogFile = os.Getenv("JANE_LOGFILE")

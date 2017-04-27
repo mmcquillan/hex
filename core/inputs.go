@@ -1,17 +1,19 @@
 package core
 
 import (
+	"github.com/projectjane/jane/inputs"
 	"github.com/projectjane/jane/models"
-	"github.com/projectjane/jane/services"
 	"log"
 )
 
 func Inputs(inputMsgs chan<- models.Message, config *models.Config) {
-	for _, connector := range config.Connectors {
-		if connector.Active {
-			log.Print("Initializing " + connector.Type + " input: " + connector.ID)
-			c := services.MakeService(connector.Type).(services.Service)
-			go c.Input(inputMsgs, connector)
+	for _, service := range config.Services {
+		if service.Active && inputs.Exists(service.Type) {
+			inputService := inputs.Make(service.Type).(inputs.Input)
+			if inputService != nil {
+				log.Print("Initializing Input " + service.Type + ": " + service.Name)
+				go inputService.Read(inputMsgs, service)
+			}
 		}
 	}
 }
