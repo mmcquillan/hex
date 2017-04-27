@@ -1,8 +1,8 @@
 package actions
 
 import (
-	"github.com/projectjane/jane/models"
-	"github.com/projectjane/jane/parse"
+	"github.com/hexbotio/hex/models"
+	"github.com/hexbotio/hex/parse"
 )
 
 type Format struct {

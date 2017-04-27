@@ -6,9 +6,9 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/projectjane/jane/models"
-	"github.com/projectjane/jane/parse"
-	"github.com/projectjane/winrm"
+	"github.com/hexbotio/hex/models"
+	"github.com/hexbotio/hex/parse"
+	"github.com/hexbotio/winrm"
 )
 
 //WinRM Struct representing a WinRM Connector

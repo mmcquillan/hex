@@ -1,6 +1,6 @@
 package models
 
-// Config Represents the values for configuring a jane server
+// Config Represents the values for configuring a hex server
 type Config struct {
 	BotName   string
 	StartTime int64

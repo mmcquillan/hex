@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/nlopes/slack"
-	"github.com/projectjane/jane/models"
+	"github.com/hexbotio/hex/models"
 )
 
 // Slack struct

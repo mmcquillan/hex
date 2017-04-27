@@ -13,9 +13,9 @@ import (
 func Substitute(value string, tokens map[string]string) string {
 	if match, hits := findVars(value); match {
 		for _, hit := range hits {
-			if strings.HasPrefix(strip(hit), "jane.input.json:") {
-				value = strings.Replace(value, hit, subJson(strip(hit), tokens["jane.input"]), -1)
-			} else if strings.HasPrefix(strip(hit), "jane.input.") {
+			if strings.HasPrefix(strip(hit), "hex.input.json:") {
+				value = strings.Replace(value, hit, subJson(strip(hit), tokens["hex.input"]), -1)
+			} else if strings.HasPrefix(strip(hit), "hex.input.") {
 				value = strings.Replace(value, hit, subInput(strip(hit), tokens), -1)
 			} else if _, ok := tokens[strip(hit)]; ok {
 				value = strings.Replace(value, hit, tokens[strip(hit)], -1)
@@ -51,7 +51,7 @@ func subJson(token string, json string) (out string) {
 	if err != nil {
 		return out
 	}
-	token = strings.Replace(token, "jane.input.json:", "", -1)
+	token = strings.Replace(token, "hex.input.json:", "", -1)
 	value, ok := jsonParsed.Path(token).Data().(string)
 	if ok {
 		out = value
@@ -60,15 +60,15 @@ func subJson(token string, json string) (out string) {
 }
 
 func subInput(input string, tokens map[string]string) (out string) {
-	tokenInput := strings.Split(tokens["jane.input"], " ")
-	inputEval := strings.Replace(input, "jane.input.", "", -1)
+	tokenInput := strings.Split(tokens["hex.input"], " ")
+	inputEval := strings.Replace(input, "hex.input.", "", -1)
 	var tokenStart int
 	var tokenEnd int
 	var err error
 	inputRange := strings.Split(inputEval, ":")
 	if len(inputRange) == 1 {
 		if inputRange[0] == "*" {
-			out = tokens["jane.input"]
+			out = tokens["hex.input"]
 		}
 		tokenStart, err = strconv.Atoi(inputRange[0])
 		if err != nil {

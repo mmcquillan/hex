@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/projectjane/jane/core"
-	"github.com/projectjane/jane/models"
+	"github.com/hexbotio/hex/core"
+	"github.com/hexbotio/hex/models"
 	"sync"
 )
 
@@ -13,6 +13,7 @@ func main() {
 	params := core.Params()
 	config := core.Config(params, version)
 	core.Logging(&config)
+	core.StartUp()
 	inputMsgs := make(chan models.Message, 1)
 	outputMsgs := make(chan models.Message, 1)
 	var wg sync.WaitGroup

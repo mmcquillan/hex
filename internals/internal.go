@@ -4,7 +4,7 @@ import (
 	"log"
 	"reflect"
 
-	"github.com/projectjane/jane/models"
+	"github.com/hexbotio/hex/models"
 )
 
 // Input interface

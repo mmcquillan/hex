@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/projectjane/jane/models"
+	"github.com/hexbotio/hex/models"
 )
 
 type Twilio struct {
@@ -23,7 +23,7 @@ func (x Twilio) Write(outputMsgs <-chan models.Message, service models.Service) 
 		urlStr := "https://api.twilio.com/2010-04-01/Accounts/" + accountSid + "/Messages.json"
 
 		values := url.Values{}
-		values.Set("To", message.Inputs["jane.output"])
+		values.Set("To", message.Inputs["hex.output"])
 		values.Set("From", service.Config["From"])
 		values.Set("Body", textmsg)
 

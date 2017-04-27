@@ -3,7 +3,7 @@ package inputs
 import (
 	"github.com/SlyMarbo/rss"
 	"github.com/kennygrant/sanitize"
-	"github.com/projectjane/jane/models"
+	"github.com/hexbotio/hex/models"
 	"html"
 	"log"
 	"time"
@@ -36,10 +36,10 @@ func callRss(lastMarker string, inputMsgs chan<- models.Message, service models.
 		if item.Date.String() > lastMarker {
 			title := html.UnescapeString(sanitize.HTML(item.Title))
 			message := models.MakeMessage(service.Type, service.Name, "", "", title)
-			message.Inputs["jane.rss.title"] = title
-			message.Inputs["jane.rss.content"] = html.UnescapeString(sanitize.HTML(item.Content))
-			message.Inputs["jane.rss.date"] = item.Date.String()
-			message.Inputs["jane.rss.link"] = item.Link
+			message.Inputs["hex.rss.title"] = title
+			message.Inputs["hex.rss.content"] = html.UnescapeString(sanitize.HTML(item.Content))
+			message.Inputs["hex.rss.date"] = item.Date.String()
+			message.Inputs["hex.rss.link"] = item.Link
 			inputMsgs <- message
 			if i == 0 {
 				lastMarker = item.Date.String()

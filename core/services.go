@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/projectjane/jane/models"
+	"github.com/hexbotio/hex/models"
 )
 
 func ActiveServices(config *models.Config) (cnt int) {

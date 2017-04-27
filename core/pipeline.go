@@ -4,10 +4,10 @@ import (
 	"log"
 	"strings"
 
-	"github.com/projectjane/jane/actions"
-	"github.com/projectjane/jane/internals"
-	"github.com/projectjane/jane/models"
-	"github.com/projectjane/jane/parse"
+	"github.com/hexbotio/hex/actions"
+	"github.com/hexbotio/hex/internals"
+	"github.com/hexbotio/hex/models"
+	"github.com/hexbotio/hex/parse"
 )
 
 func Pipeline(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, config *models.Config) {
@@ -27,22 +27,22 @@ func Pipeline(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message,
 						var matchPipeline = true
 
 						// match by type
-						if !(input.Type == message.Inputs["jane.type"] || input.Type == "*" || input.Type == "") {
+						if !(input.Type == message.Inputs["hex.type"] || input.Type == "*" || input.Type == "") {
 							matchPipeline = false
 						}
 
 						// match by service name
-						if !(input.Name == message.Inputs["jane.name"] || input.Name == "*" || input.Name == "") {
+						if !(input.Name == message.Inputs["hex.name"] || input.Name == "*" || input.Name == "") {
 							matchPipeline = false
 						}
 
 						// match by target
-						if !(parse.Match(input.Target, message.Inputs["jane.target"]) || input.Target == "*" || input.Target == "") {
+						if !(parse.Match(input.Target, message.Inputs["hex.target"]) || input.Target == "*" || input.Target == "") {
 							matchPipeline = false
 						}
 
 						// match by input
-						if !(parse.Match(input.Match, message.Inputs["jane.input"]) || input.Match == "*" || input.Match == "") {
+						if !(parse.Match(input.Match, message.Inputs["hex.input"]) || input.Match == "*" || input.Match == "") {
 							matchPipeline = false
 						}
 
@@ -50,7 +50,7 @@ func Pipeline(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message,
 						if !(input.ACL == "" || input.ACL == "*") {
 							aclList := strings.Split(input.ACL, ",")
 							for _, acl := range aclList {
-								if message.Inputs["jane.user"] != strings.TrimSpace(acl) && message.Inputs["jane.target"] != strings.TrimSpace(acl) {
+								if message.Inputs["hex.user"] != strings.TrimSpace(acl) && message.Inputs["hex.target"] != strings.TrimSpace(acl) {
 									matchPipeline = false
 								}
 							}
@@ -58,7 +58,7 @@ func Pipeline(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message,
 
 						// if a match, then execute actions
 						if matchPipeline {
-							message.Inputs["jane.pipeline"] = pipeline.Name
+							message.Inputs["hex.pipeline"] = pipeline.Name
 							message.Outputs = pipeline.Outputs
 							go runActions(pipeline.Actions, message, outputMsgs, config)
 						}
@@ -89,14 +89,14 @@ func runActions(actionList []models.Action, message models.Message, outputMsgs c
 
 func runInternals(message models.Message, outputMsgs chan<- models.Message, config *models.Config) {
 	for internal, _ := range internals.List {
-		if parse.Match(config.BotName+" "+internal, message.Inputs["jane.input"]) {
+		if parse.Match(config.BotName+" "+internal, message.Inputs["hex.input"]) {
 			internalService := internals.Make(internal).(internals.Action)
 			if internalService != nil {
 				internalService.Act(&message, config)
 				var output models.Output
-				output.Name = message.Inputs["jane.name"]
-				output.Targets = message.Inputs["jane.target"]
-				message.Inputs["jane.pipeline"] = "internal"
+				output.Name = message.Inputs["hex.name"]
+				output.Targets = message.Inputs["hex.target"]
+				message.Inputs["hex.pipeline"] = "internal"
 				message.Outputs = append(message.Outputs, output)
 				if config.Debug {
 					log.Printf("PostInternal: %+v", message)
@@ -109,18 +109,18 @@ func runInternals(message models.Message, outputMsgs chan<- models.Message, conf
 
 func aliasMessages(message *models.Message, config *models.Config) {
 	for _, alias := range config.Aliases {
-		if parse.Match(alias.Match, message.Inputs["jane.input"]) {
-			message.Inputs["jane.input"] = parse.Substitute(alias.Output, message.Inputs)
+		if parse.Match(alias.Match, message.Inputs["hex.input"]) {
+			message.Inputs["hex.input"] = parse.Substitute(alias.Output, message.Inputs)
 		}
 	}
 }
 
 func splitMessages(message models.Message) (msgs []models.Message) {
-	if strings.Contains(message.Inputs["jane.input"], "&&") {
-		cmds := strings.Split(message.Inputs["jane.input"], "&&")
+	if strings.Contains(message.Inputs["hex.input"], "&&") {
+		cmds := strings.Split(message.Inputs["hex.input"], "&&")
 		for _, cmd := range cmds {
 			var m = message
-			m.Inputs["jane.input"] = strings.TrimSpace(cmd)
+			m.Inputs["hex.input"] = strings.TrimSpace(cmd)
 			msgs = append(msgs, m)
 		}
 	} else {

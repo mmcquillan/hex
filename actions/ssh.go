@@ -4,8 +4,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/projectjane/jane/models"
-	"github.com/projectjane/jane/parse"
+	"github.com/hexbotio/hex/models"
+	"github.com/hexbotio/hex/parse"
 	"golang.org/x/crypto/ssh"
 )
 

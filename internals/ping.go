@@ -1,7 +1,7 @@
 package internals
 
 import (
-	"github.com/projectjane/jane/models"
+	"github.com/hexbotio/hex/models"
 )
 
 type Ping struct {

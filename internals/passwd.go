@@ -5,7 +5,7 @@ import (
 	"encoding/base64"
 	"log"
 
-	"github.com/projectjane/jane/models"
+	"github.com/hexbotio/hex/models"
 )
 
 type Passwd struct {

@@ -6,7 +6,7 @@ import (
 
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
-	"github.com/projectjane/jane/models"
+	"github.com/hexbotio/hex/models"
 )
 
 // Twitter Struct representing the
@@ -31,7 +31,7 @@ func (x Twitter) Read(inputMsgs chan<- models.Message, service models.Service) {
 
 	demux.Tweet = func(tweet *twitter.Tweet) {
 		message := models.MakeMessage(service.Type, service.Name, "", tweet.User.ScreenName, tweet.Text)
-		message.Inputs["jane.twitter.lang"] = tweet.Lang
+		message.Inputs["hex.twitter.lang"] = tweet.Lang
 		inputMsgs <- message
 	}
 

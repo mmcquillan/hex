@@ -1,6 +1,6 @@
-# Jane
+# Hex
 
-Jane is a chatops bot written in Go and is completely configuration driven. Contributions are welcome via pull requests. Jane was started as a way of getting DevOps tasks and feedback into Slack. There are a billion other bots, but we wanted to learn Go, so this was a fun way to learn it and meet our needs. The name "Jane" was chosen by @kcwinner because he is a big fan of the [_Ender's Game_ books](https://en.wikipedia.org/wiki/Jane_(Ender%27s_Game)). The name is not meant to be gender specific and can be effectively changed when you set your bot up.
+Hex is a chatops bot written in Go and is completely configuration driven. Contributions are welcome via pull requests. Hex was started as a way of getting DevOps tasks and feedback into Slack. There are a billion other bots, but we wanted to learn Go, so this was a fun way to learn it and meet our needs. The name "Hex" was chosen by @kcwinner because he is a big fan of the [_Ender's Game_ books](https://en.wikipedia.org/wiki/Hex_(Ender%27s_Game)). The name is not meant to be gender specific and can be effectively changed when you set your bot up.
 
 * [Installing](#Installing)
 * [Concepts](#Concepts)
@@ -15,15 +15,15 @@ Jane is a chatops bot written in Go and is completely configuration driven. Cont
 
 
 ## Installing
-Run with [Docker](https://hub.docker.com/r/projectjane/jane/):
+Run with [Docker](https://hub.docker.com/r/hexbotio/hex/):
 ```
-docker run --name my-jane -v /some/jane.json:/etc/jane.json -d projectjane/jane:v2.0
+docker run --name my-hex -v /some/hex.json:/etc/hex.json -d hexbotio/hex:v2.0
 ```
 
 Manually with Go 1.8.1:
 ```
-go get github.com/projectjane/jane
-go install github.com/projectjane/jane
+go get github.com/hexbotio/hex
+go install github.com/hexbotio/hex
 ```
 
 
@@ -33,23 +33,23 @@ go install github.com/projectjane/jane
 * Message - The event from an Input that passes through a Pipeline.
 * Output - A Service that takes the results of a Pipeline.
 * Pipeline - The collection of actions that are triggered by one or more Inputs where the results go to one or more Outputs.
-* Service - An enabled external service which Jane can interact with.
+* Service - An enabled external service which Hex can interact with.
 
 
 ## Configuration
-The configuration of Jane is via a json config file and will be looked for in this order:
+The configuration of Hex is via a json config file and will be looked for in this order:
 * `JANE_CONFIG` - Environment variable
 * `--config <file name>` - Command line parameter
-* `./jane.json` - the location of the jane binary
-* `~/jane.json` - the home directory of the user
-* `/etc/jane.json` - the global config
+* `./hex.json` - the location of the hex binary
+* `~/hex.json` - the home directory of the user
+* `/etc/hex.json` - the global config
 
 The basic configuration file should include these elements:
 ```
 {
-  "BotName": "jane",
+  "BotName": "hex",
   "Debug": false,
-  "LogFile": "/var/log/jane.log",
+  "LogFile": "/var/log/hex.log",
   "Aliases": [
   ],
   "Services": [
@@ -61,7 +61,7 @@ The basic configuration file should include these elements:
 
 To protect sensitive data, you can use environment variables throughout the configuration file's Config values with the format `${SLACK_TOKEN}`. Additionally, environment variables can be used in the Command property of Pipeline Actions.
 
-Jane has these builtin environment variables:
+Hex has these builtin environment variables:
 
 * JANE_CONFIG - The path to the configuration file
 * JANE_LOGFILE - The path to the logfile
@@ -70,7 +70,7 @@ Jane has these builtin environment variables:
 
 
 ## Services
-Services are how you can activate features within Jane to get inputs and outputs with the outside world. Below are the list of supported Services and example configuration for each.
+Services are how you can activate features within Hex to get inputs and outputs with the outside world. Below are the list of supported Services and example configuration for each.
 * [CLI Service](#cli-service)
 * [File Service](#file-service)
 * [RSS Service](#rss-service)
@@ -98,7 +98,7 @@ Example:
 ```
 
 #### File
-This service enables files for reading or writing, though the file must reside on the same system that the Jane process runs on.
+This service enables files for reading or writing, though the file must reside on the same system that the Hex process runs on.
 
 Supports:
 * Inputs (if Mode is set to "r" and will optionally filter results to the Filter [mached](#matching) value)
@@ -126,10 +126,10 @@ Supports:
 * Inputs
 
 Variables:
-* `${jane.rss.title}` - RSS Feed title
-* `${jane.rss.content}` - RSS Feed content
-* `${jane.rss.date}` - RSS Feed date
-* `${jane.rss.link}` - RSS Feed link
+* `${hex.rss.title}` - RSS Feed title
+* `${hex.rss.content}` - RSS Feed content
+* `${hex.rss.date}` - RSS Feed date
+* `${hex.rss.link}` - RSS Feed link
 
 Example:
 ```
@@ -179,7 +179,7 @@ Example:
     {"Type": "slack", "Name": "my slack", "Active": true,
       "Config": {
         "Key": "${SLACK_TOKEN}",
-        "Image": ":jane:",
+        "Image": ":hex:",
         "SlackDebug": "false"
       }
     }
@@ -201,7 +201,7 @@ Example:
       "Config": {
         "Server": "myserver.com",
         "Port": "22",
-        "Login": "jane",
+        "Login": "hex",
         "Pass": "${MYSERVER_PASSWORD}"
       }
     }
@@ -237,7 +237,7 @@ Supports:
 * Inputs
 
 Variables:
-* `${jane.twitter.lang}` - Twitter tweet language
+* `${hex.twitter.lang}` - Twitter tweet language
 
 Example:
 ```
@@ -289,7 +289,7 @@ Example:
       "Config": {
         "Server": "myserver.com",
         "Port": "5985",
-        "Login": "jane",
+        "Login": "hex",
         "Pass": "${MYSERVER_PASSWORD}"
       }
     }
@@ -352,7 +352,7 @@ Example RSS Feed to a Sack Channel:
       ],
       "Actions": [
         {
-          "Name": "Respond", "Type": "format", "Command": "${jane.rss.title}"
+          "Name": "Respond", "Type": "format", "Command": "${hex.rss.title}"
         }
       ],
       "Outputs": [
@@ -382,7 +382,7 @@ Example:
 ```
 "Actions": [
   {
-    "Name": "My Message ID", "Type": "format", "Command": "Hey ${jane.user}, your Message ID is ${jane.id}"
+    "Name": "My Message ID", "Type": "format", "Command": "Hey ${hex.user}, your Message ID is ${hex.id}"
   }
 ]
 ```
@@ -429,19 +429,19 @@ Example:
 
 
 ## Aliases
-With Jane, you can create aliases for commands.
+With Hex, you can create aliases for commands.
 
 Example:
 ```
 "Aliases": [
-  {"Match": "jane monitor prod", "Output": "jane monitor prod1 && jane monitor prod2 && jane monitor prod3", "HideHelp": false},
-  {"Match": "jane deploy*", "Output": "jane upgrade service ${1}", "Help": "jane deploy <service name>"}
+  {"Match": "hex monitor prod", "Output": "hex monitor prod1 && hex monitor prod2 && hex monitor prod3", "HideHelp": false},
+  {"Match": "hex deploy*", "Output": "hex upgrade service ${1}", "Help": "hex deploy <service name>"}
 ]
 ```
 
 
 ## Matching
-Jane uses a consistent string matching method.
+Hex uses a consistent string matching method.
 
 Examples:
 * `*failure*` - Match anywhere in a string
@@ -451,30 +451,30 @@ Examples:
 
 
 ## Substitutions
-Jane uses a consistent format for variable substitution. Each service may add additional variables for substitution.
+Hex uses a consistent format for variable substitution. Each service may add additional variables for substitution.
 
 Built-in Variables:
 * `${ENVIRONMENT_VARIABLE}` - Environment variables are always available
-* `${jane.id}` - A unique identifier for each message that passes through
-* `${jane.timestamp}` - An epoch timestamp of the Message's creation
-* `${jane.type}` - The type of Service which created the Message
-* `${jane.name}` - The name of the Service which created the Message
-* `${jane.target}` - The target from which the Message was created
-* `${jane.user}` - The user who created the Message
-* `${jane.input}` - The raw input of Message
-* `${jane.input.0}` - The first word of the input
-* `${jane.input.1}` - The second word of the input
-* `${jane.input.2:*}` - The third through end of the input
-* `${jane.input.3:4}` - The fourth through fifth word of the input
-* `${jane.input.json:web.api}` - The json value at {"web": {"api": "some value"}}
+* `${hex.id}` - A unique identifier for each message that passes through
+* `${hex.timestamp}` - An epoch timestamp of the Message's creation
+* `${hex.type}` - The type of Service which created the Message
+* `${hex.name}` - The name of the Service which created the Message
+* `${hex.target}` - The target from which the Message was created
+* `${hex.user}` - The user who created the Message
+* `${hex.input}` - The raw input of Message
+* `${hex.input.0}` - The first word of the input
+* `${hex.input.1}` - The second word of the input
+* `${hex.input.2:*}` - The third through end of the input
+* `${hex.input.3:4}` - The fourth through fifth word of the input
+* `${hex.input.json:web.api}` - The json value at {"web": {"api": "some value"}}
 
 
 ## Getting Involved
 Development Environment
 * Get your toes wet with Go
 * Setup your Go 1.8.1 environment
-* Pull the project with 'go get github.com/projectjane/jane'
-* Compile with 'go install jane.go'
-* Use the sample _jane.json_ file checked in as a starting point
-* Run your code and config with `go run jane.go --config ~/jane.json`
+* Pull the project with 'go get github.com/hexbotio/hex'
+* Compile with 'go install hex.go'
+* Use the sample _hex.json_ file checked in as a starting point
+* Run your code and config with `go run hex.go --config ~/hex.json`
 

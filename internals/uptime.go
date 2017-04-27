@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/projectjane/jane/models"
+	"github.com/hexbotio/hex/models"
 )
 
 type Uptime struct {

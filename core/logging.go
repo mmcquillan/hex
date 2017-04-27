@@ -2,7 +2,7 @@ package core
 
 import (
 	"fmt"
-	"github.com/projectjane/jane/models"
+	"github.com/hexbotio/hex/models"
 	"log"
 	"os"
 )
@@ -25,6 +25,4 @@ func Logging(config *models.Config) {
 		}
 		log.SetOutput(f)
 	}
-	log.Print("---")
-	log.Print("Starting jane bot...")
 }

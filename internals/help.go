@@ -1,7 +1,7 @@
 package internals
 
 import (
-	"github.com/projectjane/jane/models"
+	"github.com/hexbotio/hex/models"
 	"sort"
 	"strings"
 )
@@ -31,7 +31,7 @@ func (x Help) Act(message *models.Message, config *models.Config) {
 	for _, pipeline := range config.Pipelines {
 		if pipeline.Active {
 			for _, input := range pipeline.Inputs {
-				if input.Type == message.Inputs["jane.type"] || input.Type == "*" {
+				if input.Type == message.Inputs["hex.type"] || input.Type == "*" {
 					if !(input.Hide || input.Match == "*") {
 						if input.Help != "" {
 							help = append(help, input.Help)
@@ -49,7 +49,7 @@ func (x Help) Act(message *models.Message, config *models.Config) {
 	sort.Strings(help)
 	var lasthelp = ""
 	var newhelp = make([]string, 0)
-	var filter = strings.TrimSpace(strings.Replace(message.Inputs["jane.input"], config.BotName+" help", "", 1))
+	var filter = strings.TrimSpace(strings.Replace(message.Inputs["hex.input"], config.BotName+" help", "", 1))
 	newhelp = append(newhelp, helpTitle)
 	for _, h := range help {
 		if strings.Contains(h, filter) || filter == "" {

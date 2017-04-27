@@ -11,8 +11,8 @@ import (
 
 	"github.com/kardianos/osext"
 	"github.com/mitchellh/go-homedir"
-	"github.com/projectjane/jane/models"
-	"github.com/projectjane/jane/parse"
+	"github.com/hexbotio/hex/models"
+	"github.com/hexbotio/hex/parse"
 )
 
 func Config(params models.Params, version string) (config models.Config) {
@@ -34,7 +34,7 @@ func Config(params models.Params, version string) (config models.Config) {
 
 func locateConfig(params models.Params) (configFile string) {
 	tryfile := ""
-	file := "jane.json"
+	file := "hex.json"
 
 	// first try env param
 	tryfile = os.Getenv("JANE_CONFIG")
@@ -48,21 +48,21 @@ func locateConfig(params models.Params) (configFile string) {
 		return tryfile
 	}
 
-	// third try jane config in current executable dir
+	// third try hex config in current executable dir
 	tryfile, _ = osext.ExecutableFolder()
 	tryfile += "/" + file
 	if FileExists(tryfile) {
 		return tryfile
 	}
 
-	// fourth try jane config in home dir
+	// fourth try hex config in home dir
 	tryfile, _ = homedir.Dir()
 	tryfile += "/" + file
 	if FileExists(tryfile) {
 		return tryfile
 	}
 
-	// fifth try jane config in /etc
+	// fifth try hex config in /etc
 	tryfile = "/etc/" + file
 	if FileExists(tryfile) {
 		return tryfile
@@ -88,7 +88,7 @@ func subConfig(config *models.Config) {
 	if os.Getenv("JANE_BOT_NAME") != "" {
 		config.BotName = os.Getenv("JANE_BOT_NAME")
 	} else if config.BotName == "" {
-		config.BotName = "jane"
+		config.BotName = "hex"
 	}
 	if os.Getenv("JANE_DEBUG") != "" {
 		if strings.ToLower(os.Getenv("JANE_DEBUG")) == "true" || config.Debug {

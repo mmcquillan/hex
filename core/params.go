@@ -3,7 +3,7 @@ package core
 import (
 	"flag"
 
-	"github.com/projectjane/jane/models"
+	"github.com/hexbotio/hex/models"
 )
 
 func Params() (params models.Params) {

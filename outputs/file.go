@@ -1,7 +1,7 @@
 package outputs
 
 import (
-	"github.com/projectjane/jane/models"
+	"github.com/hexbotio/hex/models"
 	"log"
 	"os"
 	"strings"

@@ -4,7 +4,7 @@ import (
 	"log"
 	"sync"
 
-	"github.com/projectjane/jane/models"
+	"github.com/hexbotio/hex/models"
 	"github.com/robfig/cron"
 )
 

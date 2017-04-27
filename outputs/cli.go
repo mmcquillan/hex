@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
-	"github.com/projectjane/jane/models"
+	"github.com/hexbotio/hex/models"
 )
 
 type Cli struct {

@@ -2,7 +2,7 @@ package inputs
 
 import (
 	"fmt"
-	"github.com/projectjane/jane/models"
+	"github.com/hexbotio/hex/models"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -33,7 +33,7 @@ func (x Webhook) Read(inputMsgs chan<- models.Message, service models.Service) {
 		inputMsgs <- message
 
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("JaneBot"))
+		w.Write([]byte("HexBot"))
 	}
 
 	http.HandleFunc("/", handle)

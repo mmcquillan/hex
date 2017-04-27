@@ -1,9 +1,9 @@
 package core
 
 import (
-	"github.com/projectjane/jane/models"
-	"github.com/projectjane/jane/outputs"
-	"github.com/projectjane/jane/parse"
+	"github.com/hexbotio/hex/models"
+	"github.com/hexbotio/hex/outputs"
+	"github.com/hexbotio/hex/parse"
 	"log"
 	"strings"
 )
@@ -28,9 +28,9 @@ func Outputs(outputMsgs <-chan models.Message, config *models.Config) {
 				if parse.Match(serviceOutput, output.Name) {
 					for _, target := range strings.Split(output.Targets, ",") {
 						if target == "*" {
-							target = message.Inputs["jane.input"]
+							target = message.Inputs["hex.input"]
 						}
-						message.Inputs["jane.output"] = target
+						message.Inputs["hex.output"] = target
 						outputChannels[serviceOutput] <- message
 					}
 				}

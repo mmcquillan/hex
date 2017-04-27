@@ -12,7 +12,7 @@ func CatchExit() {
 	go func() {
 		for sig := range c {
 			log.Printf("Received signal %v", sig)
-			log.Print("Stopping jane bot...")
+			log.Print("Stopping hex bot...")
 			os.Exit(0)
 		}
 	}()

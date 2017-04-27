@@ -1,7 +1,7 @@
 [Unit]
-Description=Jane Bot
+Description=Hex Bot
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/jane
+ExecStart=/usr/local/bin/hex
 Restart=on-failure

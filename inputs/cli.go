@@ -3,7 +3,7 @@ package inputs
 import (
 	"bufio"
 	"fmt"
-	"github.com/projectjane/jane/models"
+	"github.com/hexbotio/hex/models"
 	"os"
 	"os/user"
 	"strings"

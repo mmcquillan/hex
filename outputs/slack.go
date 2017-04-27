@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/nlopes/slack"
-	"github.com/projectjane/jane/models"
+	"github.com/hexbotio/hex/models"
 )
 
 // Slack struct
@@ -30,6 +30,6 @@ func (x Slack) Write(outputMsgs <-chan models.Message, service models.Service) {
 		} else {
 			msg = strings.Join(message.Response[:], "\n")
 		}
-		api.PostMessage(message.Inputs["jane.output"], msg, params)
+		api.PostMessage(message.Inputs["hex.output"], msg, params)
 	}
 }
