@@ -28,7 +28,7 @@ func Outputs(outputMsgs <-chan models.Message, config *models.Config) {
 				if parse.Match(serviceOutput, output.Name) {
 					for _, target := range strings.Split(output.Targets, ",") {
 						if target == "*" {
-							target = message.Inputs["hex.input"]
+							target = message.Inputs["hex.target"]
 						}
 						message.Inputs["hex.output"] = target
 						outputChannels[serviceOutput] <- message

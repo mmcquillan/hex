@@ -1,4 +1,4 @@
-package internals
+package commands
 
 import (
 	"github.com/hexbotio/hex/models"
@@ -14,7 +14,7 @@ func (x Help) Act(message *models.Message, config *models.Config) {
 	help := make([]string, 0)
 
 	// pull internal help
-	help = InternalHelp(config)
+	help = CommandHelp(config)
 
 	// pull all help from the aliases
 	for _, alias := range config.Aliases {
@@ -49,12 +49,12 @@ func (x Help) Act(message *models.Message, config *models.Config) {
 	sort.Strings(help)
 	var lasthelp = ""
 	var newhelp = make([]string, 0)
-	var filter = strings.TrimSpace(strings.Replace(message.Inputs["hex.input"], config.BotName+" help", "", 1))
+	var filter = strings.TrimSpace(strings.Replace(message.Inputs["hex.input"], "help", "", 1))
 	newhelp = append(newhelp, helpTitle)
 	for _, h := range help {
 		if strings.Contains(h, filter) || filter == "" {
 			if h != lasthelp {
-				newhelp = append(newhelp, "* "+h)
+				newhelp = append(newhelp, " - "+h)
 			}
 			lasthelp = h
 		}

@@ -38,7 +38,7 @@ go install github.com/hexbotio/hex
 
 ## Configuration
 The configuration of Hex is via a json config file and will be looked for in this order:
-* `JANE_CONFIG` - Environment variable
+* `HEX_CONFIG` - Environment variable
 * `--config <file name>` - Command line parameter
 * `./hex.json` - the location of the hex binary
 * `~/hex.json` - the home directory of the user
@@ -63,10 +63,11 @@ To protect sensitive data, you can use environment variables throughout the conf
 
 Hex has these builtin environment variables:
 
-* JANE_CONFIG - The path to the configuration file
-* JANE_LOGFILE - The path to the logfile
-* JANE_DEBUG - Set as true/false to globally turn on logging
-* JANE_BOT_NAME - If you want to set your own bot name
+* HEX_CONFIG - The path to the configuration file
+* HEX_LOGFILE - The path to the logfile
+* HEX_WORKSPACE - The temporary workspace where pipelines can write to
+* HEX_DEBUG - Set as true/false to globally turn on logging
+* HEX_BOT_NAME - If you want to set your own bot name
 
 
 ## Services
@@ -464,9 +465,12 @@ Built-in Variables:
 * `${hex.input}` - The raw input of Message
 * `${hex.input.0}` - The first word of the input
 * `${hex.input.1}` - The second word of the input
-* `${hex.input.2:*}` - The third through end of the input
+* `${hex.input.2:*}` - The third through last word of the input
 * `${hex.input.3:4}` - The fourth through fifth word of the input
 * `${hex.input.json:web.api}` - The json value at {"web": {"api": "some value"}}
+* `${hex.pipeline.name}` - The Name of the matching Pipeline
+* `${hex.pipeline.runid}` - A Unique identifier for each instance of a Pipeline run
+* `${hex.pipeline.workspace}` - Location of the workspace for this Pipeline run
 
 
 ## Getting Involved

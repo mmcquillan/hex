@@ -3,8 +3,8 @@ package outputs
 import (
 	"strings"
 
-	"github.com/nlopes/slack"
 	"github.com/hexbotio/hex/models"
+	"github.com/nlopes/slack"
 )
 
 // Slack struct
@@ -19,7 +19,11 @@ func (x Slack) Write(outputMsgs <-chan models.Message, service models.Service) {
 		msg := ""
 		params := slack.NewPostMessageParameters()
 		params.Username = service.BotName
-		params.IconEmoji = service.Config["Image"]
+		image := service.Config["Image"]
+		if image == "" {
+			image = ":nut_and_bolt:"
+		}
+		params.IconEmoji = image
 		if !message.Success {
 			attachment := slack.Attachment{
 				Title:      strings.Join(message.Response[:], "\n"),

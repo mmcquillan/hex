@@ -5,8 +5,8 @@ import (
 	"log"
 	"strings"
 
-	"github.com/nlopes/slack"
 	"github.com/hexbotio/hex/models"
+	"github.com/nlopes/slack"
 )
 
 // Slack struct
@@ -34,6 +34,7 @@ func (x Slack) Read(inputMsgs chan<- models.Message, service models.Service) {
 	}
 
 	// get user array
+	bot := ""
 	users := make(map[string]string)
 	userList, err := api.GetUsers()
 	if err != nil {
@@ -41,6 +42,16 @@ func (x Slack) Read(inputMsgs chan<- models.Message, service models.Service) {
 	}
 	for _, user := range userList {
 		users[user.ID] = user.Name
+		if service.BotName == user.Name {
+			bot = user.ID
+		}
+	}
+
+	// validate bot
+	if bot == "" {
+		log.Print("WARNING - Bot does not seem to be configured in Slack as '" + service.BotName + "'")
+	} else {
+		bot = "<@" + bot + ">"
 	}
 
 	// listen to messages
@@ -58,8 +69,11 @@ func (x Slack) Read(inputMsgs chan<- models.Message, service models.Service) {
 						channel = ev.Channel
 					}
 
-					message := models.MakeMessage(service.Type, service.Name, channel, users[ev.User], html.UnescapeString(ev.Text))
-					inputMsgs <- message
+					if strings.HasPrefix(ev.Text, bot) {
+						input := strings.Replace(html.UnescapeString(ev.Text), bot+" ", "", 1)
+						message := models.MakeMessage(service.Type, service.Name, channel, users[ev.User], input)
+						inputMsgs <- message
+					}
 
 				}
 			}

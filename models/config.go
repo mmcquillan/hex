@@ -7,6 +7,7 @@ type Config struct {
 	Debug     bool
 	Version   string
 	LogFile   string
+	Workspace string
 	Aliases   []Alias
 	Services  []Service
 	Pipelines []Pipeline

@@ -1,4 +1,4 @@
-package internals
+package commands
 
 import (
 	"log"
@@ -24,16 +24,16 @@ func init() {
 	List["whoami"] = reflect.TypeOf(Whoami{})
 }
 
-// InternalHelp function
-func InternalHelp(config *models.Config) (internal []string) {
-	internal = make([]string, 6)
-	internal[0] = config.BotName + " help <filter> - This help"
-	internal[1] = config.BotName + " passwd - Password generator"
-	internal[2] = config.BotName + " ping - Simple ping response for the bot"
-	internal[3] = config.BotName + " uptime - Number of seconds process has been running"
-	internal[4] = config.BotName + " version - Compiled version number/sha"
-	internal[5] = config.BotName + " whoami - Your user name"
-	return internal
+// commandHelp function
+func CommandHelp(config *models.Config) (command []string) {
+	command = make([]string, 6)
+	command[0] = "help <filter> - This help"
+	command[1] = "passwd - Password generator"
+	command[2] = "ping - Simple ping response for the bot"
+	command[3] = "uptime - Number of seconds process has been running"
+	command[4] = "version - Compiled version number/sha"
+	command[5] = "whoami - Your user name"
+	return command
 }
 
 // Exists function

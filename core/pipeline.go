@@ -5,9 +5,10 @@ import (
 	"strings"
 
 	"github.com/hexbotio/hex/actions"
-	"github.com/hexbotio/hex/internals"
+	"github.com/hexbotio/hex/commands"
 	"github.com/hexbotio/hex/models"
 	"github.com/hexbotio/hex/parse"
+	"github.com/rs/xid"
 )
 
 func Pipeline(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, config *models.Config) {
@@ -20,7 +21,7 @@ func Pipeline(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message,
 		messages := splitMessages(message)
 		for _, message := range messages {
 			aliasMessages(&message, config)
-			runInternals(message, outputMsgs, config)
+			runCommands(message, outputMsgs, config)
 			for _, pipeline := range config.Pipelines {
 				if pipeline.Active {
 					for _, input := range pipeline.Inputs {
@@ -58,7 +59,10 @@ func Pipeline(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message,
 
 						// if a match, then execute actions
 						if matchPipeline {
-							message.Inputs["hex.pipeline"] = pipeline.Name
+							message.Inputs["hex.botname"] = config.BotName
+							message.Inputs["hex.pipeline.name"] = pipeline.Name
+							message.Inputs["hex.pipeline.runid"] = xid.New().String()
+							message.Inputs["hex.pipeline.workspace"] = config.Workspace + message.Inputs["hex.pipeline.runid"]
 							message.Outputs = pipeline.Outputs
 							go runActions(pipeline.Actions, message, outputMsgs, config)
 						}
@@ -87,19 +91,19 @@ func runActions(actionList []models.Action, message models.Message, outputMsgs c
 	outputMsgs <- message
 }
 
-func runInternals(message models.Message, outputMsgs chan<- models.Message, config *models.Config) {
-	for internal, _ := range internals.List {
-		if parse.Match(config.BotName+" "+internal, message.Inputs["hex.input"]) {
-			internalService := internals.Make(internal).(internals.Action)
-			if internalService != nil {
-				internalService.Act(&message, config)
+func runCommands(message models.Message, outputMsgs chan<- models.Message, config *models.Config) {
+	for command, _ := range commands.List {
+		if parse.Match(command, message.Inputs["hex.input"]) {
+			commandService := commands.Make(command).(commands.Action)
+			if commandService != nil {
+				commandService.Act(&message, config)
 				var output models.Output
 				output.Name = message.Inputs["hex.name"]
 				output.Targets = message.Inputs["hex.target"]
-				message.Inputs["hex.pipeline"] = "internal"
+				message.Inputs["hex.pipeline.name"] = "command"
 				message.Outputs = append(message.Outputs, output)
 				if config.Debug {
-					log.Printf("PostInternal: %+v", message)
+					log.Printf("PostCommand: %+v", message)
 				}
 				outputMsgs <- message
 			}
