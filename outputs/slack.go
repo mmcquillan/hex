@@ -26,14 +26,16 @@ func (x Slack) Write(outputMsgs <-chan models.Message, service models.Service) {
 		params.IconEmoji = image
 		if !message.Success {
 			attachment := slack.Attachment{
-				Title:      strings.Join(message.Response[:], "\n"),
+				Title:      message.Inputs["hex.pipeline.name"],
+				Text:       "```" + strings.Join(message.Response[:], "\n") + "```",
 				Color:      "danger",
 				MarkdownIn: []string{"text"},
 			}
 			params.Attachments = []slack.Attachment{attachment}
 		} else if message.Inputs["hex.pipeline.alert"] == "true" && message.Success {
 			attachment := slack.Attachment{
-				Title:      strings.Join(message.Response[:], "\n"),
+				Title:      message.Inputs["hex.pipeline.name"],
+				Text:       "```" + strings.Join(message.Response[:], "\n") + "```",
 				Color:      "good",
 				MarkdownIn: []string{"text"},
 			}

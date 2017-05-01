@@ -469,6 +469,7 @@ Built-in Variables:
 * `${hex.input.3:4}` - The fourth through fifth word of the input
 * `${hex.input.json:web.api}` - The json value at {"web": {"api": "some value"}}
 * `${hex.pipeline.name}` - The Name of the matching Pipeline
+* `${hex.pipeline.alert}` - If this is set as an alert or not
 * `${hex.pipeline.runid}` - A Unique identifier for each instance of a Pipeline run
 * `${hex.pipeline.workspace}` - Location of the workspace for this Pipeline run
 
