@@ -13,14 +13,15 @@ import (
 func Substitute(value string, tokens map[string]string) string {
 	if match, hits := findVars(value); match {
 		for _, hit := range hits {
-			if strings.HasPrefix(strip(hit), "hex.input.json:") {
-				value = strings.Replace(value, hit, subJson(strip(hit), tokens["hex.input"]), -1)
-			} else if strings.HasPrefix(strip(hit), "hex.input.") {
-				value = strings.Replace(value, hit, subInput(strip(hit), tokens), -1)
-			} else if _, ok := tokens[strip(hit)]; ok {
-				value = strings.Replace(value, hit, tokens[strip(hit)], -1)
+			clean_hit := strip(hit)
+			if strings.HasPrefix(clean_hit, "hex.input.json:") {
+				value = strings.Replace(value, hit, subJson(clean_hit, tokens["hex.input"]), -1)
+			} else if strings.HasPrefix(clean_hit, "hex.input.") {
+				value = strings.Replace(value, hit, subInput(clean_hit, tokens), -1)
+			} else if _, ok := tokens[clean_hit]; ok {
+				value = strings.Replace(value, hit, tokens[clean_hit], -1)
 			} else {
-				value = strings.Replace(value, hit, os.Getenv(strip(hit)), -1)
+				value = strings.Replace(value, hit, os.Getenv(clean_hit), -1)
 			}
 		}
 	}

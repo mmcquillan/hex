@@ -31,6 +31,13 @@ func (x Slack) Write(outputMsgs <-chan models.Message, service models.Service) {
 				MarkdownIn: []string{"text"},
 			}
 			params.Attachments = []slack.Attachment{attachment}
+		} else if message.Inputs["hex.pipeline.alert"] == "true" && message.Success {
+			attachment := slack.Attachment{
+				Title:      strings.Join(message.Response[:], "\n"),
+				Color:      "good",
+				MarkdownIn: []string{"text"},
+			}
+			params.Attachments = []slack.Attachment{attachment}
 		} else {
 			msg = strings.Join(message.Response[:], "\n")
 		}

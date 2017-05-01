@@ -303,7 +303,7 @@ Example:
 A pipeline allows you to match incoming commands, schedules or webhooks to a series of actions.
 * Name - A unique name for the Pipeline
 * Active - A way to mark pipelines as being active or note (true/false)
-* Track - TBD
+* Alert - Treat this pipeline as an alert and only report on state change
 * Inputs - One or more Service Inputs to match against. Wildcards of `*` can be used to match allows.
   * Type - Match against a Service Type
   * Name - Match against a Service Name
@@ -322,7 +322,7 @@ Example Checking Disk space every minute:
     {
       "Name": "Check Disk",
       "Active": true,
-      "Track": true,
+      "Alert": true,
       "Inputs": [
         {"Type": "schedule", "Name": "every minute", "Target": "*", "Match": "*", "ACL": "*"}
       ],
@@ -347,7 +347,7 @@ Example RSS Feed to a Sack Channel:
     {
       "Name": "AWS RSS Feeds",
       "Active": true,
-      "Track": true,
+      "Alert": false,
       "Inputs": [
         {"Type": "rss", "Name": "*", "Target": "*", "Match": "*", "ACL": "*"}
       ],

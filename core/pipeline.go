@@ -2,6 +2,7 @@ package core
 
 import (
 	"log"
+	"strconv"
 	"strings"
 
 	"github.com/hexbotio/hex/actions"
@@ -11,7 +12,12 @@ import (
 	"github.com/rs/xid"
 )
 
+var pipelineState = make(map[string]bool)
+
 func Pipeline(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, config *models.Config) {
+	for _, pipeline := range config.Pipelines {
+		pipelineState[pipeline.Name] = true
+	}
 	for {
 		message := <-inputMsgs
 		if config.Debug {
@@ -61,10 +67,11 @@ func Pipeline(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message,
 						if matchPipeline {
 							message.Inputs["hex.botname"] = config.BotName
 							message.Inputs["hex.pipeline.name"] = pipeline.Name
+							message.Inputs["hex.pipeline.alert"] = strconv.FormatBool(pipeline.Alert)
 							message.Inputs["hex.pipeline.runid"] = xid.New().String()
 							message.Inputs["hex.pipeline.workspace"] = config.Workspace + message.Inputs["hex.pipeline.runid"]
 							message.Outputs = pipeline.Outputs
-							go runActions(pipeline.Actions, message, outputMsgs, config)
+							go runActions(pipeline, message, outputMsgs, config)
 						}
 
 					}
@@ -74,8 +81,8 @@ func Pipeline(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message,
 	}
 }
 
-func runActions(actionList []models.Action, message models.Message, outputMsgs chan<- models.Message, config *models.Config) {
-	for _, action := range actionList {
+func runActions(pipeline models.Pipeline, message models.Message, outputMsgs chan<- models.Message, config *models.Config) {
+	for _, action := range pipeline.Actions {
 		if actions.Exists(action.Type) {
 			actionService := actions.Make(action.Type).(actions.Action)
 			if actionService != nil {
@@ -88,7 +95,14 @@ func runActions(actionList []models.Action, message models.Message, outputMsgs c
 	if config.Debug {
 		log.Printf("PostAction: %+v", message)
 	}
-	outputMsgs <- message
+	if pipeline.Alert {
+		if pipelineState[pipeline.Name] != message.Success {
+			outputMsgs <- message
+			pipelineState[pipeline.Name] = message.Success
+		}
+	} else {
+		outputMsgs <- message
+	}
 }
 
 func runCommands(message models.Message, outputMsgs chan<- models.Message, config *models.Config) {

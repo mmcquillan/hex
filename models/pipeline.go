@@ -4,7 +4,7 @@ package models
 type Pipeline struct {
 	Name    string `json:"Name"`
 	Active  bool   `json:"Active"`
-	Track   bool   `json:"Track"`
+	Alert   bool   `json:"Alert"`
 	Inputs  []Input
 	Actions []Action
 	Outputs []Output

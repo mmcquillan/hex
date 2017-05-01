@@ -22,6 +22,6 @@ func (x Cli) Write(outputMsgs <-chan models.Message, service models.Service) {
 		}
 		fmt.Println(strings.Join(message.Response[:], "\n"))
 		color.Unset()
-		fmt.Print("\n", service.BotName, "> ")
+		fmt.Print("\n@", service.BotName, "> ")
 	}
 }

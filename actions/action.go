@@ -48,12 +48,15 @@ func Recovery(service models.Service) {
 
 // ActionSuccess
 func ActionSuccess(results string, success string, failure string) (state bool) {
-	state = true
 	if results != "" && success != "" {
-		state = parse.Match(success, results)
+		if parse.Match(success, results) {
+			state = true
+		}
 	}
 	if results != "" && failure != "" {
-		state = parse.Match(failure, results)
+		if parse.Match(failure, results) {
+			state = false
+		}
 	}
 	return state
 }
