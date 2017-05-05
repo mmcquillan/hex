@@ -2,6 +2,7 @@ package core
 
 import (
 	"log"
+	"os"
 	"strconv"
 	"strings"
 
@@ -69,7 +70,7 @@ func Pipeline(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message,
 							message.Inputs["hex.pipeline.name"] = pipeline.Name
 							message.Inputs["hex.pipeline.alert"] = strconv.FormatBool(pipeline.Alert)
 							message.Inputs["hex.pipeline.runid"] = xid.New().String()
-							message.Inputs["hex.pipeline.workspace"] = config.Workspace + message.Inputs["hex.pipeline.runid"]
+							message.Inputs["hex.pipeline.workspace"] = config.Workspace + config.BotName + message.Inputs["hex.pipeline.runid"]
 							message.Outputs = pipeline.Outputs
 							go runActions(pipeline, message, outputMsgs, config)
 						}
@@ -90,6 +91,13 @@ func runActions(pipeline models.Pipeline, message models.Message, outputMsgs cha
 					actionService.Act(action, &message, config)
 				}
 			}
+		}
+	}
+	if _, err := os.Stat(message.Inputs["hex.pipeline.workspace"]); err == nil {
+		err := os.RemoveAll(message.Inputs["hex.pipeline.workspace"])
+		if err != nil {
+			log.Print("ERROR - Cleaning Workspace: " + message.Inputs["hex.pipeline.workspace"])
+			log.Print(err)
 		}
 	}
 	if config.Debug {

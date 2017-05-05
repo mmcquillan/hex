@@ -130,6 +130,10 @@ func subConfig(config *models.Config) {
 	if !strings.HasSuffix(config.Workspace, "/") {
 		config.Workspace = config.Workspace + "/"
 	}
+	if _, err := os.Stat(config.Workspace); os.IsNotExist(err) {
+		fmt.Println("ERROR - Workspace directory is invalid: " + config.Workspace)
+		os.Exit(1)
+	}
 
 	// handle debug
 	if os.Getenv("HEX_DEBUG") != "" {

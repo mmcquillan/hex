@@ -18,6 +18,8 @@ var List = make(map[string]reflect.Type)
 
 func init() {
 	List["format"] = reflect.TypeOf(Format{})
+	List["local"] = reflect.TypeOf(Local{})
+	List["sleep"] = reflect.TypeOf(Sleep{})
 	List["ssh"] = reflect.TypeOf(Ssh{})
 	List["winrm"] = reflect.TypeOf(WinRM{})
 }
@@ -48,6 +50,7 @@ func Recovery(service models.Service) {
 
 // ActionSuccess
 func ActionSuccess(results string, success string, failure string) (state bool) {
+	state = true
 	if results != "" && success != "" {
 		if parse.Match(success, results) {
 			state = true
