@@ -1,5 +1,5 @@
 [Unit]
-Description=Hex Bot
+Description=HexBot
 
 [Service]
 Type=simple
