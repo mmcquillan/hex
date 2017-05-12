@@ -15,6 +15,11 @@ Hex is a chatops bot written in Go and is completely configuration driven. Contr
 
 
 ## Installing
+Run via Binary:
+* Download the Hex Binary at ...
+* Copy the systemd hex.service
+* Run `sudo systemctl enable hex.service`
+
 Run with [Docker](https://hub.docker.com/r/hexbotio/hex/):
 ```
 docker run --name my-hex -v /some/hex.json:/etc/hex.json -d hexbotio/hex:v2.0
