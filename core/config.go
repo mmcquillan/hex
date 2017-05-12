@@ -11,70 +11,41 @@ import (
 
 	"github.com/hexbotio/hex/models"
 	"github.com/hexbotio/hex/parse"
-	"github.com/kardianos/osext"
-	"github.com/mitchellh/go-homedir"
 )
 
-func Config(params models.Params, version string) (config models.Config) {
-	configFile := locateConfig(params)
-	if checkConfig(configFile) {
-		config = readConfig(configFile)
-		configRules(&config)
-		subConfig(&config)
-		if params.Validate {
-			fmt.Println("SUCCESS - Config file is valid: " + configFile)
+func Config(config *models.Config) {
+	locateConfigFile(config)
+	if checkConfig(config) {
+		readConfig(config)
+		subConfig(config)
+		configRules(config)
+		if config.Validate {
+			fmt.Println("SUCCESS - Config file is valid: " + config.ConfigFile)
 			os.Exit(0)
 		}
 	} else {
 		os.Exit(1)
 	}
-	config.Version = version
 	config.StartTime = time.Now().Unix()
-	return config
 }
 
-func locateConfig(params models.Params) (configFile string) {
-	tryfile := ""
-	file := "hex.json"
-
-	// first try env param
-	tryfile = os.Getenv("HEX_CONFIG")
-	if FileExists(tryfile) {
-		return tryfile
+func locateConfigFile(config *models.Config) {
+	locations := []string{
+		os.Getenv("HEX_CONFIG"),
+		config.ConfigFile,
+		"/etc/hex.json",
+		"/etc/hex/hex.json",
 	}
-
-	// second try param
-	tryfile = params.ConfigFile
-	if FileExists(tryfile) {
-		return tryfile
+	for _, location := range locations {
+		if FileExists(location) {
+			config.ConfigFile = location
+			return
+		}
 	}
-
-	// third try hex config in current executable dir
-	tryfile, _ = osext.ExecutableFolder()
-	tryfile += "/" + file
-	if FileExists(tryfile) {
-		return tryfile
-	}
-
-	// fourth try hex config in home dir
-	tryfile, _ = homedir.Dir()
-	tryfile += "/" + file
-	if FileExists(tryfile) {
-		return tryfile
-	}
-
-	// fifth try hex config in /etc
-	tryfile = "/etc/" + file
-	if FileExists(tryfile) {
-		return tryfile
-	}
-
-	return file
-
 }
 
-func readConfig(location string) (config models.Config) {
-	file, err := ioutil.ReadFile(location)
+func readConfig(config *models.Config) {
+	file, err := ioutil.ReadFile(config.ConfigFile)
 	if err != nil {
 		log.Print(err)
 	}
@@ -82,31 +53,6 @@ func readConfig(location string) (config models.Config) {
 	if err != nil {
 		log.Print(err)
 	}
-	return config
-}
-
-func configRules(config *models.Config) {
-
-	// check for service name uniqueness
-	serviceChk := make(map[string]bool)
-	for _, service := range config.Services {
-		serviceChk[service.Name] = true
-	}
-	if len(config.Services) > len(serviceChk) {
-		log.Print("ERROR - Duplicate Service Names exist")
-		os.Exit(1)
-	}
-
-	// check for pipeline name uniqueness
-	pipelineChk := make(map[string]bool)
-	for _, pipeline := range config.Pipelines {
-		pipelineChk[pipeline.Name] = true
-	}
-	if len(config.Pipelines) > len(pipelineChk) {
-		log.Print("ERROR - Duplicate Pipeline Names exist")
-		os.Exit(1)
-	}
-
 }
 
 func subConfig(config *models.Config) {
@@ -157,14 +103,38 @@ func subConfig(config *models.Config) {
 
 }
 
-func checkConfig(location string) (exists bool) {
+func configRules(config *models.Config) {
+
+	// check for service name uniqueness
+	serviceChk := make(map[string]bool)
+	for _, service := range config.Services {
+		serviceChk[service.Name] = true
+	}
+	if len(config.Services) > len(serviceChk) {
+		log.Print("ERROR - Duplicate Service Names exist")
+		os.Exit(1)
+	}
+
+	// check for pipeline name uniqueness
+	pipelineChk := make(map[string]bool)
+	for _, pipeline := range config.Pipelines {
+		pipelineChk[pipeline.Name] = true
+	}
+	if len(config.Pipelines) > len(pipelineChk) {
+		log.Print("ERROR - Duplicate Pipeline Names exist")
+		os.Exit(1)
+	}
+
+}
+
+func checkConfig(config *models.Config) (exists bool) {
 	exists = true
-	if _, err := os.Stat(location); os.IsNotExist(err) {
+	if _, err := os.Stat(config.ConfigFile); os.IsNotExist(err) {
 		fmt.Println("Error - Missing a config file")
 		exists = false
 	}
 	if exists {
-		file, err := ioutil.ReadFile(location)
+		file, err := ioutil.ReadFile(config.ConfigFile)
 		if err != nil {
 			log.Print(err)
 		}
@@ -175,4 +145,13 @@ func checkConfig(location string) (exists bool) {
 		}
 	}
 	return exists
+}
+
+func FileExists(file string) bool {
+	if _, err := os.Stat(file); err != nil {
+		if os.IsNotExist(err) {
+			return false
+		}
+	}
+	return true
 }
