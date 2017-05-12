@@ -16,6 +16,10 @@ type Slack struct {
 // Read function
 func (x Slack) Read(inputMsgs chan<- models.Message, service models.Service) {
 	defer Recovery(service)
+	var useAt = true
+	if strings.ToLower(service.Config["UseAt"]) == "false" {
+		useAt = false
+	}
 	api := slack.New(service.Config["Key"])
 	var slackDebug = false
 	if strings.ToLower(service.Config["SlackDebug"]) == "true" {
@@ -69,12 +73,16 @@ func (x Slack) Read(inputMsgs chan<- models.Message, service models.Service) {
 						channel = ev.Channel
 					}
 
-					if strings.HasPrefix(ev.Text, bot) {
+					if useAt && strings.HasPrefix(ev.Text, bot) {
 						input := strings.Replace(html.UnescapeString(ev.Text), bot+" ", "", 1)
 						message := models.MakeMessage(service.Type, service.Name, channel, users[ev.User], input)
 						inputMsgs <- message
 					}
-
+					if !useAt && strings.HasPrefix(ev.Text, service.BotName) {
+						input := strings.Replace(html.UnescapeString(ev.Text), service.BotName+" ", "", 1)
+						message := models.MakeMessage(service.Type, service.Name, channel, users[ev.User], input)
+						inputMsgs <- message
+					}
 				}
 			}
 		}
