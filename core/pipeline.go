@@ -56,11 +56,15 @@ func Pipeline(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message,
 
 						// match by ACL
 						if !(input.ACL == "" || input.ACL == "*") {
+							matchAcl := false
 							aclList := strings.Split(input.ACL, ",")
 							for _, acl := range aclList {
-								if message.Inputs["hex.user"] != strings.TrimSpace(acl) && message.Inputs["hex.target"] != strings.TrimSpace(acl) {
-									matchPipeline = false
+								if message.Inputs["hex.user"] == strings.TrimSpace(acl) || message.Inputs["hex.target"] == strings.TrimSpace(acl) {
+									matchAcl = true
 								}
+							}
+							if !matchAcl {
+								matchPipeline = false
 							}
 						}
 
