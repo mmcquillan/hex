@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/hexbotio/hex/models"
 	"github.com/hexbotio/hex/parse"
 )
@@ -16,6 +17,7 @@ import (
 func Config(config *models.Config) {
 	locateConfigFile(config)
 	if checkConfig(config) {
+		go watchConfig(config)
 		readConfig(config)
 		subConfig(config)
 		configRules(config)
@@ -42,6 +44,37 @@ func locateConfigFile(config *models.Config) {
 			return
 		}
 	}
+}
+
+func watchConfig(config *models.Config) {
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		log.Print(err)
+	}
+	defer watcher.Close()
+
+	done := make(chan bool)
+	go func() {
+		for {
+			select {
+			case event := <-watcher.Events:
+				if event.Op&fsnotify.Write == fsnotify.Write {
+					readConfig(config)
+					subConfig(config)
+					configRules(config)
+					log.Print("Config Reloaded: ", event.Name)
+				}
+			case err := <-watcher.Errors:
+				log.Print("CONFIG ERROR:", err)
+			}
+		}
+	}()
+
+	err = watcher.Add(config.ConfigFile)
+	if err != nil {
+		log.Print(err)
+	}
+	<-done
 }
 
 func readConfig(config *models.Config) {
