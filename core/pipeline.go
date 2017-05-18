@@ -10,14 +10,15 @@ import (
 	"github.com/hexbotio/hex/commands"
 	"github.com/hexbotio/hex/models"
 	"github.com/hexbotio/hex/parse"
+	"github.com/mohae/deepcopy"
 	"github.com/rs/xid"
 )
 
 var pipelineState = make(map[string]bool)
 
 func Pipeline(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, config *models.Config) {
-	for _, pipeline := range config.Pipelines {
-		pipelineState[pipeline.Name] = true
+	for _, pipeinit := range config.Pipelines {
+		pipelineState[pipeinit.Name] = true
 	}
 	for {
 		message := <-inputMsgs
@@ -70,13 +71,14 @@ func Pipeline(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message,
 
 						// if a match, then execute actions
 						if matchPipeline {
-							message.Inputs["hex.botname"] = config.BotName
-							message.Inputs["hex.pipeline.name"] = pipeline.Name
-							message.Inputs["hex.pipeline.alert"] = strconv.FormatBool(pipeline.Alert)
-							message.Inputs["hex.pipeline.runid"] = xid.New().String()
-							message.Inputs["hex.pipeline.workspace"] = config.Workspace + config.BotName + message.Inputs["hex.pipeline.runid"]
-							message.Outputs = pipeline.Outputs
-							go runActions(pipeline, message, outputMsgs, config)
+							m := deepcopy.Copy(message).(models.Message)
+							m.Inputs["hex.botname"] = config.BotName
+							m.Inputs["hex.pipeline.name"] = pipeline.Name
+							m.Inputs["hex.pipeline.alert"] = strconv.FormatBool(pipeline.Alert)
+							m.Inputs["hex.pipeline.runid"] = xid.New().String()
+							m.Inputs["hex.pipeline.workspace"] = config.Workspace + config.BotName + m.Inputs["hex.pipeline.runid"]
+							m.Outputs = pipeline.Outputs
+							go runActions(pipeline, m, outputMsgs, config)
 						}
 
 					}
