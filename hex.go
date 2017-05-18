@@ -18,7 +18,7 @@ func main() {
 	core.Starter(&config)
 	inputMsgs := make(chan models.Message, 1)
 	outputMsgs := make(chan models.Message, 1)
-	wg.Add(core.ActiveServices(&config) + 3)
+	wg.Add(3)
 	go core.Inputs(inputMsgs, &config)
 	go core.Pipeline(inputMsgs, outputMsgs, &config)
 	go core.Outputs(outputMsgs, &config)
