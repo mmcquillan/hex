@@ -61,7 +61,7 @@ func (x Ssh) Act(action models.Action, message *models.Message, config *models.C
 							} else {
 								defer session.Close()
 								b, err := session.CombinedOutput(command)
-								if err != nil {
+								if err != nil && !strings.HasPrefix(err.Error(), "Process exited with status") {
 									log.Print(err)
 								}
 								out = string(b[:])
