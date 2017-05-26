@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/hexbotio/hex/actions"
 	"github.com/hexbotio/hex/commands"
@@ -14,12 +15,10 @@ import (
 	"github.com/rs/xid"
 )
 
-var pipelineState = make(map[string]bool)
+var state = make(map[string]models.State)
 
 func Pipeline(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, config *models.Config) {
-	for _, pipeinit := range config.Pipelines {
-		pipelineState[pipeinit.Name] = true
-	}
+	initState(config)
 	for {
 		message := <-inputMsgs
 		if config.Debug {
@@ -89,6 +88,10 @@ func Pipeline(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message,
 }
 
 func runActions(pipeline models.Pipeline, message models.Message, outputMsgs chan<- models.Message, config *models.Config) {
+	if pipeline.Alert && state[pipeline.Name].Running {
+		return
+	}
+	setRunning(pipeline.Name, true)
 	for _, action := range pipeline.Actions {
 		if actions.Exists(action.Type) {
 			actionService := actions.Make(action.Type).(actions.Action)
@@ -99,6 +102,7 @@ func runActions(pipeline models.Pipeline, message models.Message, outputMsgs cha
 			}
 		}
 	}
+	setLastRun(pipeline.Name)
 	if _, err := os.Stat(message.Inputs["hex.pipeline.workspace"]); err == nil {
 		err := os.RemoveAll(message.Inputs["hex.pipeline.workspace"])
 		if err != nil {
@@ -110,13 +114,18 @@ func runActions(pipeline models.Pipeline, message models.Message, outputMsgs cha
 		log.Printf("PostAction: %+v", message)
 	}
 	if pipeline.Alert {
-		if pipelineState[pipeline.Name] != message.Success {
+		if state[pipeline.Name].Success != message.Success {
 			outputMsgs <- message
-			pipelineState[pipeline.Name] = message.Success
+			setState(pipeline.Name, message.Success)
+			setLastAlert(pipeline.Name)
+		} else if !message.Success && (time.Now().Unix()-state[pipeline.Name].LastAlert) > (15*60) {
+			outputMsgs <- message
+			setLastAlert(pipeline.Name)
 		}
 	} else {
 		outputMsgs <- message
 	}
+	setRunning(pipeline.Name, false)
 }
 
 func runCommands(message models.Message, outputMsgs chan<- models.Message, config *models.Config) {
@@ -159,4 +168,43 @@ func splitMessages(message models.Message) (msgs []models.Message) {
 		msgs = append(msgs, message)
 	}
 	return msgs
+}
+
+func initState(config *models.Config) {
+	for _, p := range config.Pipelines {
+		state[p.Name] = models.State{
+			LastRun:    0,
+			LastChange: 0,
+			LastAlert:  0,
+			Success:    true,
+			Running:    false,
+		}
+	}
+}
+
+func setRunning(pipeline string, running bool) {
+	s := state[pipeline]
+	s.Running = running
+	state[pipeline] = s
+}
+
+func setState(pipeline string, success bool) {
+	s := state[pipeline]
+	if s.Success != success {
+		s.LastChange = time.Now().Unix()
+	}
+	s.Success = success
+	state[pipeline] = s
+}
+
+func setLastRun(pipeline string) {
+	s := state[pipeline]
+	s.LastRun = time.Now().Unix()
+	state[pipeline] = s
+}
+
+func setLastAlert(pipeline string) {
+	s := state[pipeline]
+	s.LastAlert = time.Now().Unix()
+	state[pipeline] = s
 }
