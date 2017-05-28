@@ -16,10 +16,11 @@ func NewState(config *models.Config) (state *State) {
 	for _, p := range config.Pipelines {
 		state.States[p.Name] = models.State{
 			LastRun:    0,
-			LastChange: 0,
+			LastChange: time.Now().Unix(),
 			LastAlert:  0,
 			Success:    true,
 			Running:    false,
+			Alert:      p.Alert,
 		}
 	}
 	return state

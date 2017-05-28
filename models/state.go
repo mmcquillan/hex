@@ -7,4 +7,5 @@ type State struct {
 	LastAlert  int64
 	Success    bool
 	Running    bool
+	Alert      bool
 }

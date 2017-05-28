@@ -19,6 +19,7 @@ func init() {
 	List["help*"] = reflect.TypeOf(Help{})
 	List["passwd"] = reflect.TypeOf(Passwd{})
 	List["ping"] = reflect.TypeOf(Ping{})
+	List["state"] = reflect.TypeOf(State{})
 	List["uptime"] = reflect.TypeOf(Uptime{})
 	List["version"] = reflect.TypeOf(Version{})
 	List["whoami"] = reflect.TypeOf(Whoami{})
@@ -26,13 +27,14 @@ func init() {
 
 // commandHelp function
 func CommandHelp(config *models.Config) (command []string) {
-	command = make([]string, 6)
+	command = make([]string, 7)
 	command[0] = "help <filter> - This help"
 	command[1] = "passwd - Password generator"
 	command[2] = "ping - Simple ping response for the bot"
-	command[3] = "uptime - Number of seconds process has been running"
-	command[4] = "version - Compiled version number/sha"
-	command[5] = "whoami - Your user name"
+	command[3] = "state - Shows that status of all pipelines"
+	command[4] = "uptime - Number of seconds process has been running"
+	command[5] = "version - Compiled version number/sha"
+	command[6] = "whoami - Your user name"
 	return command
 }
 
