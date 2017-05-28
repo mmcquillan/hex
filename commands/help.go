@@ -9,7 +9,7 @@ import (
 type Help struct {
 }
 
-func (x Help) Act(message *models.Message, config *models.Config) {
+func (x Help) Act(message *models.Message, states map[string]models.State, config *models.Config) {
 
 	help := make([]string, 0)
 

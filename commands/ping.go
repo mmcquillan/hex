@@ -7,6 +7,6 @@ import (
 type Ping struct {
 }
 
-func (x Ping) Act(message *models.Message, config *models.Config) {
+func (x Ping) Act(message *models.Message, states map[string]models.State, config *models.Config) {
 	message.Response = append(message.Response, "pong")
 }

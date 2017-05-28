@@ -11,7 +11,7 @@ import (
 type Passwd struct {
 }
 
-func (x Passwd) Act(message *models.Message, config *models.Config) {
+func (x Passwd) Act(message *models.Message, states map[string]models.State, config *models.Config) {
 	key := make([]byte, 32)
 	_, err := rand.Read(key)
 	if err != nil {

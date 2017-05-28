@@ -9,7 +9,7 @@ import (
 
 // Input interface
 type Action interface {
-	Act(message *models.Message, config *models.Config)
+	Act(message *models.Message, states map[string]models.State, config *models.Config)
 }
 
 // List of Inputs

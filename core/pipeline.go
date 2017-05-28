@@ -24,61 +24,58 @@ func Pipeline(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message,
 		if config.Debug {
 			log.Printf("PipelineEval: %+v", message)
 		}
-		messages := splitMessages(message)
-		for _, message := range messages {
-			runCommands(message, outputMsgs, config)
-			for _, pipeline := range config.Pipelines {
-				if pipeline.Active {
-					for _, input := range pipeline.Inputs {
-						var matchPipeline = true
+		runCommands(message, outputMsgs, config)
+		for _, pipeline := range config.Pipelines {
+			if pipeline.Active {
+				for _, input := range pipeline.Inputs {
+					var matchPipeline = true
 
-						// match by type
-						if !(input.Type == message.Inputs["hex.type"] || input.Type == "*" || input.Type == "") {
-							matchPipeline = false
-						}
-
-						// match by service name
-						if !(input.Name == message.Inputs["hex.name"] || input.Name == "*" || input.Name == "") {
-							matchPipeline = false
-						}
-
-						// match by target
-						if !(parse.Match(input.Target, message.Inputs["hex.target"]) || input.Target == "*" || input.Target == "") {
-							matchPipeline = false
-						}
-
-						// match by input
-						if !(parse.Match(input.Match, message.Inputs["hex.input"]) || input.Match == "*" || input.Match == "") {
-							matchPipeline = false
-						}
-
-						// match by ACL
-						if !(input.ACL == "" || input.ACL == "*") {
-							matchAcl := false
-							aclList := strings.Split(input.ACL, ",")
-							for _, acl := range aclList {
-								if message.Inputs["hex.user"] == strings.TrimSpace(acl) || message.Inputs["hex.target"] == strings.TrimSpace(acl) {
-									matchAcl = true
-								}
-							}
-							if !matchAcl {
-								matchPipeline = false
-							}
-						}
-
-						// if a match, then execute actions
-						if matchPipeline {
-							m := deepcopy.Copy(message).(models.Message)
-							m.Inputs["hex.botname"] = config.BotName
-							m.Inputs["hex.pipeline.name"] = pipeline.Name
-							m.Inputs["hex.pipeline.alert"] = strconv.FormatBool(pipeline.Alert)
-							m.Inputs["hex.pipeline.runid"] = xid.New().String()
-							m.Inputs["hex.pipeline.workspace"] = config.Workspace + config.BotName + m.Inputs["hex.pipeline.runid"]
-							m.Outputs = pipeline.Outputs
-							go runActions(pipeline, m, outputMsgs, config)
-						}
-
+					// match by type
+					if !(input.Type == message.Inputs["hex.type"] || input.Type == "*" || input.Type == "") {
+						matchPipeline = false
 					}
+
+					// match by service name
+					if !(input.Name == message.Inputs["hex.name"] || input.Name == "*" || input.Name == "") {
+						matchPipeline = false
+					}
+
+					// match by target
+					if !(parse.Match(input.Target, message.Inputs["hex.target"]) || input.Target == "*" || input.Target == "") {
+						matchPipeline = false
+					}
+
+					// match by input
+					if !(parse.Match(input.Match, message.Inputs["hex.input"]) || input.Match == "*" || input.Match == "") {
+						matchPipeline = false
+					}
+
+					// match by ACL
+					if !(input.ACL == "" || input.ACL == "*") {
+						matchAcl := false
+						aclList := strings.Split(input.ACL, ",")
+						for _, acl := range aclList {
+							if message.Inputs["hex.user"] == strings.TrimSpace(acl) || message.Inputs["hex.target"] == strings.TrimSpace(acl) {
+								matchAcl = true
+							}
+						}
+						if !matchAcl {
+							matchPipeline = false
+						}
+					}
+
+					// if a match, then execute actions
+					if matchPipeline {
+						m := deepcopy.Copy(message).(models.Message)
+						m.Inputs["hex.botname"] = config.BotName
+						m.Inputs["hex.pipeline.name"] = pipeline.Name
+						m.Inputs["hex.pipeline.alert"] = strconv.FormatBool(pipeline.Alert)
+						m.Inputs["hex.pipeline.runid"] = xid.New().String()
+						m.Inputs["hex.pipeline.workspace"] = config.Workspace + config.BotName + m.Inputs["hex.pipeline.runid"]
+						m.Outputs = pipeline.Outputs
+						go runActions(pipeline, m, outputMsgs, config)
+					}
+
 				}
 			}
 		}
@@ -131,7 +128,7 @@ func runCommands(message models.Message, outputMsgs chan<- models.Message, confi
 		if parse.Match(command, message.Inputs["hex.input"]) {
 			commandService := commands.Make(command).(commands.Action)
 			if commandService != nil {
-				commandService.Act(&message, config)
+				commandService.Act(&message, state.States, config)
 				var output models.Output
 				output.Name = message.Inputs["hex.name"]
 				output.Targets = message.Inputs["hex.target"]
@@ -144,18 +141,4 @@ func runCommands(message models.Message, outputMsgs chan<- models.Message, confi
 			}
 		}
 	}
-}
-
-func splitMessages(message models.Message) (msgs []models.Message) {
-	if strings.Contains(message.Inputs["hex.input"], "&&") {
-		cmds := strings.Split(message.Inputs["hex.input"], "&&")
-		for _, cmd := range cmds {
-			var m = message
-			m.Inputs["hex.input"] = strings.TrimSpace(cmd)
-			msgs = append(msgs, m)
-		}
-	} else {
-		msgs = append(msgs, message)
-	}
-	return msgs
 }

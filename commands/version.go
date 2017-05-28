@@ -7,7 +7,7 @@ import (
 type Version struct {
 }
 
-func (x Version) Act(message *models.Message, config *models.Config) {
+func (x Version) Act(message *models.Message, states map[string]models.State, config *models.Config) {
 	if config.Version != "" {
 		message.Response = append(message.Response, "Version: "+config.Version)
 	} else {
