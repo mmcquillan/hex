@@ -15,10 +15,10 @@ import (
 	"github.com/rs/xid"
 )
 
-var state = make(map[string]models.State)
+var state *State
 
 func Pipeline(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, config *models.Config) {
-	initState(config)
+	state = NewState(config)
 	for {
 		message := <-inputMsgs
 		if config.Debug {
@@ -88,10 +88,10 @@ func Pipeline(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message,
 }
 
 func runActions(pipeline models.Pipeline, message models.Message, outputMsgs chan<- models.Message, config *models.Config) {
-	if pipeline.Alert && state[pipeline.Name].Running {
+	if pipeline.Alert && state.States[pipeline.Name].Running {
 		return
 	}
-	setRunning(pipeline.Name, true)
+	state.SetRunning(pipeline.Name, true)
 	for _, action := range pipeline.Actions {
 		if actions.Exists(action.Type) {
 			actionService := actions.Make(action.Type).(actions.Action)
@@ -102,7 +102,7 @@ func runActions(pipeline models.Pipeline, message models.Message, outputMsgs cha
 			}
 		}
 	}
-	setLastRun(pipeline.Name)
+	state.SetLastRun(pipeline.Name)
 	if _, err := os.Stat(message.Inputs["hex.pipeline.workspace"]); err == nil {
 		err := os.RemoveAll(message.Inputs["hex.pipeline.workspace"])
 		if err != nil {
@@ -114,18 +114,18 @@ func runActions(pipeline models.Pipeline, message models.Message, outputMsgs cha
 		log.Printf("PostAction: %+v", message)
 	}
 	if pipeline.Alert {
-		if state[pipeline.Name].Success != message.Success {
+		if state.States[pipeline.Name].Success != message.Success {
 			outputMsgs <- message
-			setState(pipeline.Name, message.Success)
-			setLastAlert(pipeline.Name)
-		} else if !message.Success && (time.Now().Unix()-state[pipeline.Name].LastAlert) > (15*60) {
+			state.SetState(pipeline.Name, message.Success)
+			state.SetLastAlert(pipeline.Name)
+		} else if !message.Success && (time.Now().Unix()-state.States[pipeline.Name].LastAlert) > (15*60) {
 			outputMsgs <- message
-			setLastAlert(pipeline.Name)
+			state.SetLastAlert(pipeline.Name)
 		}
 	} else {
 		outputMsgs <- message
 	}
-	setRunning(pipeline.Name, false)
+	state.SetRunning(pipeline.Name, false)
 }
 
 func runCommands(message models.Message, outputMsgs chan<- models.Message, config *models.Config) {
@@ -168,43 +168,4 @@ func splitMessages(message models.Message) (msgs []models.Message) {
 		msgs = append(msgs, message)
 	}
 	return msgs
-}
-
-func initState(config *models.Config) {
-	for _, p := range config.Pipelines {
-		state[p.Name] = models.State{
-			LastRun:    0,
-			LastChange: 0,
-			LastAlert:  0,
-			Success:    true,
-			Running:    false,
-		}
-	}
-}
-
-func setRunning(pipeline string, running bool) {
-	s := state[pipeline]
-	s.Running = running
-	state[pipeline] = s
-}
-
-func setState(pipeline string, success bool) {
-	s := state[pipeline]
-	if s.Success != success {
-		s.LastChange = time.Now().Unix()
-	}
-	s.Success = success
-	state[pipeline] = s
-}
-
-func setLastRun(pipeline string) {
-	s := state[pipeline]
-	s.LastRun = time.Now().Unix()
-	state[pipeline] = s
-}
-
-func setLastAlert(pipeline string) {
-	s := state[pipeline]
-	s.LastAlert = time.Now().Unix()
-	state[pipeline] = s
 }
