@@ -24,10 +24,8 @@ func Pipeline(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message,
 		if config.Debug {
 			log.Printf("PipelineEval: %+v", message)
 		}
-		aliasMessages(&message, config)
 		messages := splitMessages(message)
 		for _, message := range messages {
-			aliasMessages(&message, config)
 			runCommands(message, outputMsgs, config)
 			for _, pipeline := range config.Pipelines {
 				if pipeline.Active {
@@ -144,14 +142,6 @@ func runCommands(message models.Message, outputMsgs chan<- models.Message, confi
 				}
 				outputMsgs <- message
 			}
-		}
-	}
-}
-
-func aliasMessages(message *models.Message, config *models.Config) {
-	for _, alias := range config.Aliases {
-		if parse.Match(alias.Match, message.Inputs["hex.input"]) {
-			message.Inputs["hex.input"] = parse.Substitute(alias.Output, message.Inputs)
 		}
 	}
 }

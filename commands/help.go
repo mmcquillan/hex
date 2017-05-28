@@ -16,18 +16,7 @@ func (x Help) Act(message *models.Message, config *models.Config) {
 	// pull internal help
 	help = CommandHelp(config)
 
-	// pull all help from the aliases
-	for _, alias := range config.Aliases {
-		if !alias.Hide {
-			if alias.Help != "" {
-				help = append(help, alias.Help)
-			} else {
-				help = append(help, alias.Match)
-			}
-		}
-	}
-
-	// pull all help from the connectors
+	// pull all help from the pipelines
 	for _, pipeline := range config.Pipelines {
 		if pipeline.Active {
 			for _, input := range pipeline.Inputs {

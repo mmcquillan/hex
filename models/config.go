@@ -10,7 +10,6 @@ type Config struct {
 	Version    string
 	LogFile    string
 	Workspace  string
-	Aliases    []Alias
 	Services   []Service
 	Pipelines  []Pipeline
 }
