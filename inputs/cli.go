@@ -19,11 +19,11 @@ func (x Cli) Read(inputMsgs chan<- models.Message, service models.Service) {
 	hostname, _ := os.Hostname()
 	user, _ := user.Current()
 	fmt.Println("Starting in cli mode...\n")
-	fmt.Print("@"+service.BotName, "> ")
+	fmt.Print(service.BotName, "> ")
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		req := scanner.Text()
-		fmt.Print("\n@", service.BotName, "> ")
+		fmt.Print("\n", service.BotName, "> ")
 		if strings.TrimSpace(req) != "" {
 			message := models.MakeMessage(service.Type, service.Name, hostname, user.Username, req)
 			inputMsgs <- message

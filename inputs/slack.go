@@ -16,9 +16,9 @@ type Slack struct {
 // Read function
 func (x Slack) Read(inputMsgs chan<- models.Message, service models.Service) {
 	defer Recovery(service)
-	var useAt = true
-	if strings.ToLower(service.Config["UseAt"]) == "false" {
-		useAt = false
+	var useAt = false
+	if strings.ToLower(service.Config["UseAt"]) == "true" {
+		useAt = true
 	}
 	api := slack.New(service.Config["Key"])
 	var slackDebug = false
