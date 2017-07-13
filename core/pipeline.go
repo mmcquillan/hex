@@ -113,7 +113,7 @@ func runActions(pipeline models.Pipeline, message models.Message, outputMsgs cha
 			outputMsgs <- message
 			state.SetState(pipeline.Name, message.Success)
 			state.SetLastAlert(pipeline.Name)
-		} else if !message.Success && (time.Now().Unix()-state.States[pipeline.Name].LastAlert) > (15*60) {
+		} else if !message.Success && (time.Now().Unix()-state.States[pipeline.Name].LastAlert) > (pipeline.Remind*60) {
 			outputMsgs <- message
 			state.SetLastAlert(pipeline.Name)
 		}

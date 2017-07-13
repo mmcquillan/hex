@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/hexbotio/hex/models"
@@ -20,6 +21,9 @@ func (x State) Act(message *models.Message, states map[string]models.State, conf
 			}
 			if state.LastRun > 0 && state.Running {
 				r = fmt.Sprintf("%s for %d secs (running)", r, now-state.LastChange)
+			}
+			if strings.Contains(message.Inputs["hex.input"], "debug") {
+				r = fmt.Sprintf("%s\n%+v", r, state)
 			}
 			message.Response = append(message.Response, r)
 		}

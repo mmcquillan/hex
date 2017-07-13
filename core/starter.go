@@ -43,12 +43,6 @@ func Starter(config *models.Config) {
 
 	// init logging feedback
 	log.Print("")
-	log.Print("    ====      H  H   EEEE   X   X")
-	log.Print("  //    \\\\    H  H   E       X X")
-	log.Print(" ((      ))   HHHH   EEE      X")
-	log.Print("  \\\\    //    H  H   E       X X")
-	log.Print("    ====      H  H   EEEE   X   X")
-	log.Print("")
 	log.Print("Starting HexBot " + config.Version)
 	log.Print("http://hexbot.io")
 

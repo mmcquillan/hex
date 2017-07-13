@@ -19,7 +19,7 @@ func init() {
 	List["help*"] = reflect.TypeOf(Help{})
 	List["passwd"] = reflect.TypeOf(Passwd{})
 	List["ping"] = reflect.TypeOf(Ping{})
-	List["state"] = reflect.TypeOf(State{})
+	List["state*"] = reflect.TypeOf(State{})
 	List["uptime"] = reflect.TypeOf(Uptime{})
 	List["version"] = reflect.TypeOf(Version{})
 	List["whoami"] = reflect.TypeOf(Whoami{})
