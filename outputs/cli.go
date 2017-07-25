@@ -15,10 +15,12 @@ func (x Cli) Write(outputMsgs <-chan models.Message, service models.Service) {
 	for {
 		message := <-outputMsgs
 		fmt.Print("\n")
-		if message.Success {
-			color.Set(color.FgGreen)
-		} else {
-			color.Set(color.FgRed)
+		if message.Inputs["hex.pipeline.alert"] == "true" {
+			if message.Success {
+				color.Set(color.FgGreen)
+			} else {
+				color.Set(color.FgRed)
+			}
 		}
 		fmt.Println(strings.Join(message.Response[:], "\n"))
 		color.Unset()
