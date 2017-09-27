@@ -40,7 +40,7 @@ func SubstituteEnv(value string) string {
 func findVars(value string) (match bool, tokens []string) {
 	match = false
 	re := regexp.MustCompile("\\${([A-Za-z0-9:*_\\-\\.\\?]+)}")
-	tokens = re.FindAllString(value, -1)
+	tokens = re.FindAllString(strings.Replace(value, "$${", "X{", -1), -1)
 	if len(tokens) > 0 {
 		match = true
 	}

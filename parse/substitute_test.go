@@ -21,6 +21,15 @@ func TestSubstituteInput(t *testing.T) {
 	}
 }
 
+func TestSubstituteEscapedToken(t *testing.T) {
+	tokens := setupTokens("never eat soggy waffles")
+	e := "$${hex.input}"
+	a := Substitute("$${hex.input}", tokens)
+	if e != a {
+		t.Fatalf("Expected %s, but got %s", e, a)
+	}
+}
+
 func TestSubstituteInputSingle(t *testing.T) {
 	tokens := setupTokens("never eat soggy waffles")
 	e := "eat"
