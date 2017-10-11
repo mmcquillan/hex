@@ -7,6 +7,11 @@ import (
 type Ping struct {
 }
 
-func (x Ping) Act(message *models.Message, states map[string]models.State, config *models.Config) {
-	message.Response = append(message.Response, "pong")
+func (x Ping) Act(message *models.Message, rules *map[string]models.Rule, config models.Config) {
+	message.Outputs = append(message.Outputs, models.Output{
+		Rule:      "ping",
+		StartTime: models.MessageTimestamp(),
+		EndTime:   models.MessageTimestamp(),
+		Response:  "pong",
+	})
 }

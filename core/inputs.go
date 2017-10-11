@@ -3,17 +3,38 @@ package core
 import (
 	"github.com/hexbotio/hex/inputs"
 	"github.com/hexbotio/hex/models"
-	"log"
 )
 
-func Inputs(inputMsgs chan<- models.Message, config *models.Config) {
-	for _, service := range config.Services {
-		if service.Active && inputs.Exists(service.Type) {
-			inputService := inputs.Make(service.Type).(inputs.Input)
-			if inputService != nil {
-				log.Print("Initializing Input " + service.Type + ": " + service.Name)
-				go inputService.Read(inputMsgs, service)
-			}
+func Inputs(inputMsgs chan<- models.Message, config models.Config) {
+
+	// cli
+	if config.CLI {
+		startInput("cli", inputMsgs, config)
+	}
+
+	// slack
+	if config.Slack {
+		startInput("slack", inputMsgs, config)
+	}
+
+	// scheduler
+	if config.Scheduler {
+		startInput("scheduler", inputMsgs, config)
+	}
+
+	// webhook
+	if config.Webhook {
+		startInput("webhook", inputMsgs, config)
+	}
+
+}
+
+func startInput(service string, inputMsgs chan<- models.Message, config models.Config) {
+	if inputs.Exists(service) {
+		inputService := inputs.Make(service).(inputs.Input)
+		if inputService != nil {
+			config.Logger.Info("Initializing Input for " + service)
+			go inputService.Read(inputMsgs, config)
 		}
 	}
 }

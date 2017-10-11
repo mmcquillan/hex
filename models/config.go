@@ -1,15 +1,27 @@
 package models
 
-// Config Represents the values for configuring a hex server
+import (
+	"github.com/hashicorp/go-hclog"
+)
+
+// Config
 type Config struct {
-	BotName    string
-	StartTime  int64
-	Debug      bool
-	ConfigFile string
-	Validate   bool
-	Version    string
-	LogFile    string
-	Workspace  string
-	Services   []Service
-	Pipelines  []Pipeline
+	Version      string
+	Logger       hclog.Logger
+	PluginsDir   string `json:"plugins_dir"`
+	RulesDir     string `json:"rules_dir"`
+	LogFile      string `json:"log_file"`
+	WorkspaceDir string `json:"workspace_Dir"`
+	Debug        bool   `json:"debug"`
+	BotName      string `json:"bot_name"`
+	CLI          bool   `json:"cli"`
+	Auditing     bool   `json:"auditing"`
+	AuditingFile string `json:"auditing_file"`
+	Slack        bool   `json:"slack"`
+	SlackToken   string `json:"slack_token"`
+	SlackIcon    string `json:"slack_icon"`
+	SlackDebug   bool   `json:"slack_debug"`
+	Scheduler    bool   `json:"scheduler"`
+	Webhook      bool   `json:"webhook"`
+	WebhookPort  int    `json:"webhook_port"`
 }

@@ -3,38 +3,32 @@ package core
 import (
 	"github.com/hexbotio/hex/models"
 	"github.com/hexbotio/hex/outputs"
-	"github.com/hexbotio/hex/parse"
-	"log"
-	"strings"
 )
 
-func Outputs(outputMsgs <-chan models.Message, config *models.Config) {
-	var outputChannels = make(map[string]chan models.Message)
-	for _, service := range config.Services {
-		if service.Active && outputs.Exists(service.Type) {
-			outputChannels[service.Name] = make(chan models.Message)
-			outputService := outputs.Make(service.Type).(outputs.Output)
-			if outputService != nil {
-				log.Print("Initializing Output " + service.Type + ": " + service.Name)
-				go outputService.Write(outputChannels[service.Name], service)
-
-			}
-		}
-	}
+func Outputs(outputMsgs <-chan models.Message, config models.Config) {
 	for {
 		message := <-outputMsgs
-		for _, output := range message.Outputs {
-			for serviceOutput, _ := range outputChannels {
-				if parse.Match(serviceOutput, output.Name) {
-					for _, target := range strings.Split(output.Targets, ",") {
-						if target == "*" {
-							target = message.Inputs["hex.target"]
-						}
-						message.Inputs["hex.output"] = target
-						outputChannels[serviceOutput] <- message
-					}
-				}
-			}
+		if config.CLI {
+			var cli outputs.Cli
+			cli.Write(message, config)
+		}
+		if config.Slack {
+			var slack outputs.Slack
+			slack.Write(message, config)
+		}
+		if config.Auditing {
+			var auditing outputs.Auditing
+			auditing.Write(message, config)
+		}
+	}
+}
+
+func startOutput(service string, outputMsgs <-chan models.Message, config models.Config) {
+	if outputs.Exists(service) {
+		outputService := outputs.Make(service).(outputs.Output)
+		if outputService != nil {
+			config.Logger.Info("Initializing Output for " + service)
+			go outputService.Write(outputMsgs, config)
 		}
 	}
 }

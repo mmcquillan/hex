@@ -2,189 +2,144 @@ package core
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+	"strconv"
 	"strings"
-	"time"
 
-	"github.com/fsnotify/fsnotify"
 	"github.com/hexbotio/hex/models"
-	"github.com/hexbotio/hex/parse"
 )
 
-func Config(config *models.Config) {
-	locateConfigFile(config)
-	if checkConfig(config) {
-		go watchConfig(config)
-		readConfig(config)
-		subConfig(config)
-		configRules(config)
-		if config.Validate {
-			fmt.Println("SUCCESS - Config file is valid: " + config.ConfigFile)
-			os.Exit(0)
+func Config(config *models.Config, version string) {
+
+	// start with defaults
+	config.Version = version
+	config.PluginsDir = "/etc/hex/plugins"
+	config.RulesDir = "/etc/hex/rules"
+	config.LogFile = ""
+	config.WorkspaceDir = "/tmp"
+	config.Debug = false
+	config.BotName = "hex"
+	config.CLI = false
+	config.Auditing = false
+	config.Slack = false
+	config.SlackToken = ""
+	config.SlackIcon = ":nut_and_bolt:"
+	config.SlackDebug = false
+	config.Scheduler = false
+	config.Webhook = false
+	config.WebhookPort = 8000
+
+	// version and exit
+	if len(os.Args) > 1 && os.Args[1] == "version" {
+		fmt.Print("HexBot " + config.Version + "\n")
+		os.Exit(0)
+	}
+
+	// evaluate for config file
+	if len(os.Args) > 1 && FileExists(os.Args[1]) {
+		file, err := ioutil.ReadFile(os.Args[1])
+		if err != nil {
+			log.Fatal("Config File Read - ", err)
 		}
-	} else {
-		os.Exit(1)
-	}
-	config.StartTime = time.Now().Unix()
-}
-
-func locateConfigFile(config *models.Config) {
-	locations := []string{
-		os.Getenv("HEX_CONFIG"),
-		config.ConfigFile,
-		"/etc/hex.json",
-		"/etc/hex/hex.json",
-	}
-	for _, location := range locations {
-		if FileExists(location) {
-			config.ConfigFile = location
-			return
+		err = json.Unmarshal(file, &config)
+		if err != nil {
+			log.Fatal("Config File Unmarshal - ", err)
 		}
 	}
-}
 
-func watchConfig(config *models.Config) {
-	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		log.Print(err)
+	// environment
+	if os.Getenv("HEX_RULES_DIR") != "" {
+		config.RulesDir = os.Getenv("HEX_RULES_DIR")
 	}
-	defer watcher.Close()
-
-	done := make(chan bool)
-	go func() {
-		for {
-			select {
-			case event := <-watcher.Events:
-				if event.Op&fsnotify.Write == fsnotify.Write {
-					readConfig(config)
-					subConfig(config)
-					configRules(config)
-					log.Print("Config Reloaded: ", event.Name)
-				}
-			case err := <-watcher.Errors:
-				log.Print("CONFIG ERROR:", err)
-			}
-		}
-	}()
-
-	err = watcher.Add(config.ConfigFile)
-	if err != nil {
-		log.Print(err)
+	if os.Getenv("HEX_PLUGINS_DIR") != "" {
+		config.PluginsDir = os.Getenv("HEX_PLUGINS_DIR")
 	}
-	<-done
-}
-
-func readConfig(config *models.Config) {
-	file, err := ioutil.ReadFile(config.ConfigFile)
-	if err != nil {
-		log.Print(err)
+	if os.Getenv("HEX_LOG_FILE") != "" {
+		config.LogFile = os.Getenv("HEX_LOG_FILE")
 	}
-	err = json.Unmarshal(file, &config)
-	if err != nil {
-		log.Print(err)
+	if os.Getenv("HEX_WORKSPACE_DIR") != "" {
+		config.WorkspaceDir = os.Getenv("HEX_WORKSPACE_DIR")
 	}
-}
-
-func subConfig(config *models.Config) {
-
-	// handle bot name
+	if strings.ToUpper(os.Getenv("HEX_DEBUG")) == "TRUE" {
+		config.Debug = true
+	}
 	if os.Getenv("HEX_BOT_NAME") != "" {
 		config.BotName = os.Getenv("HEX_BOT_NAME")
-	} else if config.BotName == "" {
-		config.BotName = "hex"
 	}
-	if strings.HasPrefix(config.BotName, "@") {
-		config.BotName = strings.Replace(config.BotName, "@", "", -1)
+	if strings.ToUpper(os.Getenv("HEX_CLI")) == "TRUE" {
+		config.CLI = true
 	}
-
-	// handle workspace
-	if os.Getenv("HEX_WORKSPACE") != "" {
-		config.BotName = os.Getenv("HEX_WORKSPACE")
-	} else if config.Workspace == "" {
-		config.Workspace = "/tmp"
+	if strings.ToUpper(os.Getenv("HEX_AUDITING")) == "TRUE" {
+		config.Auditing = true
 	}
-	if !strings.HasSuffix(config.Workspace, "/") {
-		config.Workspace = config.Workspace + "/"
+	if os.Getenv("HEX_AUDITING_FILE") != "" {
+		config.AuditingFile = os.Getenv("HEX_AUDITING_FILE")
 	}
-	if _, err := os.Stat(config.Workspace); os.IsNotExist(err) {
-		fmt.Println("ERROR - Workspace directory is invalid: " + config.Workspace)
-		os.Exit(1)
+	if strings.ToUpper(os.Getenv("HEX_SLACK")) == "TRUE" {
+		config.Slack = true
 	}
-
-	// handle debug
-	if os.Getenv("HEX_DEBUG") != "" {
-		if strings.ToLower(os.Getenv("HEX_DEBUG")) == "true" || config.Debug {
-			config.Debug = true
-		} else {
-			config.Debug = false
-		}
+	if os.Getenv("HEX_SLACK_TOKEN") != "" {
+		config.SlackToken = os.Getenv("HEX_SLACK_TOKEN")
 	}
-	for i := 0; i < len(config.Services); i++ {
-		for k, v := range config.Services[i].Config {
-			config.Services[i].Config[k] = parse.SubstituteEnv(v)
-		}
-		config.Services[i].BotName = config.BotName
+	if os.Getenv("HEX_SLACK_ICON") != "" {
+		config.SlackIcon = os.Getenv("HEX_SLACK_ICON")
 	}
-
-	// handle logfile
-	if os.Getenv("HEX_LOGFILE") != "" {
-		config.LogFile = os.Getenv("HEX_LOGFILE")
+	if strings.ToUpper(os.Getenv("HEX_SLACK_DEBUG")) == "TRUE" {
+		config.SlackDebug = true
 	}
-
-}
-
-func configRules(config *models.Config) {
-
-	// check for service name uniqueness
-	serviceChk := make(map[string]bool)
-	for _, service := range config.Services {
-		serviceChk[service.Name] = true
+	if strings.ToUpper(os.Getenv("HEX_SCHEDULER")) == "TRUE" {
+		config.Scheduler = true
 	}
-	if len(config.Services) > len(serviceChk) {
-		log.Print("ERROR - Duplicate Service Names exist")
-		os.Exit(1)
+	if strings.ToUpper(os.Getenv("HEX_WEBHOOK")) == "TRUE" {
+		config.Webhook = true
 	}
-
-	// check for pipeline name uniqueness
-	pipelineChk := make(map[string]bool)
-	for _, pipeline := range config.Pipelines {
-		pipelineChk[pipeline.Name] = true
-	}
-	if len(config.Pipelines) > len(pipelineChk) {
-		log.Print("ERROR - Duplicate Pipeline Names exist")
-		os.Exit(1)
-	}
-
-}
-
-func checkConfig(config *models.Config) (exists bool) {
-	exists = true
-	if _, err := os.Stat(config.ConfigFile); os.IsNotExist(err) {
-		fmt.Println("Error - Missing a config file")
-		exists = false
-	}
-	if exists {
-		file, err := ioutil.ReadFile(config.ConfigFile)
+	if os.Getenv("HEX_WEBHOOK_PORT") != "" {
+		port, err := strconv.Atoi(os.Getenv("HEX_WEBHOOK_PORT"))
 		if err != nil {
-			log.Print(err)
+			log.Fatal("Webhook Port is not a Number")
 		}
-		var js interface{}
-		exists = json.Unmarshal(file, &js) == nil
-		if !exists {
-			fmt.Println("Error - Config file does not appear to be valid json")
-		}
+		config.WebhookPort = port
 	}
-	return exists
-}
 
-func FileExists(file string) bool {
-	if _, err := os.Stat(file); err != nil {
-		if os.IsNotExist(err) {
-			return false
-		}
-	}
-	return true
+	// flags
+	RulesDir := flag.String("rules-dir", config.RulesDir, "Rules Directory [/etc/hex/rules]")
+	PluginsDir := flag.String("plugins-dir", config.PluginsDir, "Plugins Directory [/etc/hex/plugins]")
+	LogFile := flag.String("log-file", config.LogFile, "Log File")
+	WorkspaceDir := flag.String("workspace-dir", config.WorkspaceDir, "Workspace Directory [/tmp]")
+	Debug := flag.Bool("debug", config.Debug, "Debug [false]")
+	BotName := flag.String("bot-name", config.BotName, "Bot Name [hex]")
+	CLI := flag.Bool("cli", config.CLI, "CLI [false]")
+	Auditing := flag.Bool("auditing", config.Auditing, "Audting [false]")
+	AuditingFile := flag.String("auditing-file", config.AuditingFile, "Auditing File")
+	Slack := flag.Bool("slack", config.Slack, "Slack [false]")
+	SlackToken := flag.String("slack-token", config.SlackToken, "Slack Token")
+	SlackIcon := flag.String("slack-icon", config.SlackIcon, "Slack Icon [:nut_and_bolt:]")
+	SlackDebug := flag.Bool("slack-debug", config.SlackDebug, "Slack Debug [false]")
+	Scheduler := flag.Bool("scheduler", config.Scheduler, "Scheduler [false]")
+	Webhook := flag.Bool("webhook", config.Webhook, "Webhook [false]")
+	WebhookPort := flag.Int("webhook-port", config.WebhookPort, "Webhook Port [8000]")
+	flag.Parse()
+
+	// set flags
+	config.RulesDir = *RulesDir
+	config.PluginsDir = *PluginsDir
+	config.LogFile = *LogFile
+	config.WorkspaceDir = *WorkspaceDir
+	config.Debug = *Debug
+	config.BotName = *BotName
+	config.CLI = *CLI
+	config.Auditing = *Auditing
+	config.AuditingFile = *AuditingFile
+	config.Slack = *Slack
+	config.SlackToken = *SlackToken
+	config.SlackIcon = *SlackIcon
+	config.SlackDebug = *SlackDebug
+	config.Scheduler = *Scheduler
+	config.Webhook = *Webhook
+	config.WebhookPort = *WebhookPort
+
 }

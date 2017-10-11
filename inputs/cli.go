@@ -3,10 +3,12 @@ package inputs
 import (
 	"bufio"
 	"fmt"
-	"github.com/hexbotio/hex/models"
 	"os"
 	"os/user"
 	"strings"
+
+	"github.com/hexbotio/hex/models"
+	"github.com/hexbotio/hex/parse"
 )
 
 // Cli struct
@@ -14,18 +16,23 @@ type Cli struct {
 }
 
 // Read function
-func (x Cli) Read(inputMsgs chan<- models.Message, service models.Service) {
-	defer Recovery(service)
+func (x Cli) Read(inputMsgs chan<- models.Message, config models.Config) {
 	hostname, _ := os.Hostname()
 	user, _ := user.Current()
 	fmt.Println("Starting in cli mode...\n")
-	fmt.Print(service.BotName, "> ")
+	fmt.Print(config.BotName, "> ")
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		req := scanner.Text()
-		fmt.Print("\n", service.BotName, "> ")
+		fmt.Print("\n", config.BotName, "> ")
+		input, debug := parse.Flag(req, "--debug")
 		if strings.TrimSpace(req) != "" {
-			message := models.MakeMessage(service.Type, service.Name, hostname, user.Username, req)
+			message := models.NewMessage()
+			message.Attributes["hex.service"] = "cli"
+			message.Attributes["hex.hostname"] = hostname
+			message.Attributes["hex.user"] = user.Username
+			message.Attributes["hex.input"] = input
+			message.Debug = debug
 			inputMsgs <- message
 		}
 	}

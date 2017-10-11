@@ -7,10 +7,15 @@ import (
 type Version struct {
 }
 
-func (x Version) Act(message *models.Message, states map[string]models.State, config *models.Config) {
+func (x Version) Act(message *models.Message, rules *map[string]models.Rule, config models.Config) {
+	response := "Version: Non Standard Build"
 	if config.Version != "" {
-		message.Response = append(message.Response, "Version: "+config.Version)
-	} else {
-		message.Response = append(message.Response, "Version: Non Standard Build")
+		response = "Version: " + config.Version
 	}
+	message.Outputs = append(message.Outputs, models.Output{
+		Rule:      "version",
+		StartTime: models.MessageTimestamp(),
+		EndTime:   models.MessageTimestamp(),
+		Response:  response,
+	})
 }
