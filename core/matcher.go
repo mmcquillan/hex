@@ -37,6 +37,9 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 			if _, exists := plugins[action.Type]; exists {
 				startTime := models.MessageTimestamp()
 				attrName := "hex.output." + strconv.Itoa(actionCounter)
+				for key, _ := range action.Config {
+					action.Config[key] = parse.Substitute(action.Config[key], message.Attributes)
+				}
 				args := hexplugin.Arguments{
 					Debug:   rule.Debug || config.Debug,
 					Command: parse.Substitute(action.Command, message.Attributes),
