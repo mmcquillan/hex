@@ -31,30 +31,34 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 	message.Attributes["hex.rule.name"] = rule.Name
 	message.Attributes["hex.rule.format"] = strconv.FormatBool(rule.Format)
 	actionCounter := 0
+	lastAction := true
 	for _, action := range rule.Actions {
-		if _, exists := plugins[action.Type]; exists {
-			startTime := models.MessageTimestamp()
-			attrName := "hex.output." + strconv.Itoa(actionCounter)
-			args := hexplugin.Arguments{
-				Debug:   rule.Debug || config.Debug,
-				Command: parse.Substitute(action.Command, message.Attributes),
-				Config:  action.Config,
-			}
-			resp := plugins[action.Type].Action.Perform(args)
-			if action.OutputToVar {
-				message.Attributes[attrName+".response"] = strings.TrimSpace(resp.Output)
+		if lastAction || action.RunOnFail {
+			if _, exists := plugins[action.Type]; exists {
+				startTime := models.MessageTimestamp()
+				attrName := "hex.output." + strconv.Itoa(actionCounter)
+				args := hexplugin.Arguments{
+					Debug:   rule.Debug || config.Debug,
+					Command: parse.Substitute(action.Command, message.Attributes),
+					Config:  action.Config,
+				}
+				resp := plugins[action.Type].Action.Perform(args)
+				if action.OutputToVar {
+					message.Attributes[attrName+".response"] = strings.TrimSpace(resp.Output)
+				} else {
+					message.Outputs = append(message.Outputs, models.Output{
+						Rule:     rule.Name,
+						Response: resp.Output,
+						Success:  resp.Success,
+					})
+				}
+				lastAction = resp.Success
+				message.Attributes[attrName+".duration"] = strconv.FormatInt(models.MessageTimestamp()-startTime, 10)
 			} else {
-				message.Outputs = append(message.Outputs, models.Output{
-					Rule:     rule.Name,
-					Response: resp.Output,
-					Success:  resp.Success,
-				})
+				config.Logger.Error("Missing Plugin " + action.Type)
 			}
-			message.Attributes[attrName+".duration"] = strconv.FormatInt(models.MessageTimestamp()-startTime, 10)
-		} else {
-			config.Logger.Error("Missing Plugin " + action.Type)
+			actionCounter += 1
 		}
-		actionCounter += 1
 	}
 	message.EndTime = models.MessageTimestamp()
 	outputMsgs <- message

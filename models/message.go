@@ -6,10 +6,6 @@ import (
 	"github.com/rs/xid"
 )
 
-var PASS = "pass"
-var WARN = "warn"
-var FAIL = "fail"
-
 // Message struct
 type Message struct {
 	Debug      bool
