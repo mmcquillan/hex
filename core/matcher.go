@@ -2,6 +2,7 @@ package core
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/hexbotio/hex-plugin"
 	"github.com/hexbotio/hex/models"
@@ -29,6 +30,7 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 	message.Attributes["hex.rule.runid"] = models.MessageID()
 	message.Attributes["hex.rule.name"] = rule.Name
 	message.Attributes["hex.rule.format"] = strconv.FormatBool(rule.Format)
+	actionCounter := 0
 	for _, action := range rule.Actions {
 		if _, exists := plugins[action.Type]; exists {
 			args := hexplugin.Arguments{
@@ -37,16 +39,21 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 				Config:  action.Config,
 			}
 			resp := plugins[action.Type].Action.Perform(args)
-			message.Outputs = append(message.Outputs, models.Output{
-				Rule:      rule.Name,
-				StartTime: models.MessageTimestamp(),
-				EndTime:   models.MessageTimestamp(),
-				Response:  resp.Output,
-				Success:   resp.Success,
-			})
+			if action.OutputToVar {
+				message.Attributes["hex.output."+strconv.Itoa(actionCounter)+".response"] = strings.TrimSpace(resp.Output)
+			} else {
+				message.Outputs = append(message.Outputs, models.Output{
+					Rule:      rule.Name,
+					StartTime: models.MessageTimestamp(),
+					EndTime:   models.MessageTimestamp(),
+					Response:  resp.Output,
+					Success:   resp.Success,
+				})
+			}
 		} else {
 			config.Logger.Error("Missing Plugin " + action.Type)
 		}
+		actionCounter += 1
 	}
 	outputMsgs <- message
 }
