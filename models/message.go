@@ -22,7 +22,7 @@ type Output struct {
 	Rule      string
 	StartTime int64
 	EndTime   int64
-	State     string
+	Success   bool
 	Response  string
 }
 

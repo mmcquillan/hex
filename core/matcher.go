@@ -1,6 +1,8 @@
 package core
 
 import (
+	"strconv"
+
 	"github.com/hexbotio/hex-plugin"
 	"github.com/hexbotio/hex/models"
 	"github.com/hexbotio/hex/parse"
@@ -26,19 +28,21 @@ func Matcher(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, 
 func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.Message, plugins map[string]models.Plugin, config models.Config) {
 	message.Attributes["hex.rule.runid"] = models.MessageID()
 	message.Attributes["hex.rule.name"] = rule.Name
+	message.Attributes["hex.rule.format"] = strconv.FormatBool(rule.Format)
 	for _, action := range rule.Actions {
 		if _, exists := plugins[action.Type]; exists {
-			args := hexplugin.Args{
+			args := hexplugin.Arguments{
 				Debug:   rule.Debug || config.Debug,
 				Command: parse.Substitute(action.Command, message.Attributes),
 				Config:  action.Config,
 			}
-			out := plugins[action.Type].Action.Perform(args)
+			resp := plugins[action.Type].Action.Perform(args)
 			message.Outputs = append(message.Outputs, models.Output{
 				Rule:      rule.Name,
 				StartTime: models.MessageTimestamp(),
 				EndTime:   models.MessageTimestamp(),
-				Response:  out,
+				Response:  resp.Output,
+				Success:   resp.Success,
 			})
 		} else {
 			config.Logger.Error("Missing Plugin " + action.Type)

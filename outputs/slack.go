@@ -24,14 +24,11 @@ func (x Slack) Write(message models.Message, config models.Config) {
 	}
 	params.IconEmoji = image
 	for _, output := range message.Outputs {
-		if output.State != "" {
+		if message.Attributes["hex.rule.format"] == "true" {
 			color := "grey"
-			switch output.State {
-			case models.PASS:
+			if output.Success {
 				color = "good"
-			case models.WARN:
-				color = "warning"
-			case models.FAIL:
+			} else {
 				color = "danger"
 			}
 			attachment := slack.Attachment{

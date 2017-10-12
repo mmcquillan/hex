@@ -16,22 +16,27 @@ func GetHandshakeConfig() plugin.HandshakeConfig {
 	return hc
 }
 
-// call args
-type Args struct {
+// Arguments
+type Arguments struct {
 	Debug   bool
 	Command string
 	Config  map[string]string
 }
 
+// response args
+type Response struct {
+	Output  string
+	Success bool
+}
+
 // Action - interface for the plugin
 type Action interface {
-	Perform(args Args) string
+	Perform(args Arguments) (resp Response)
 }
 
 type ActionRPC struct{ client *rpc.Client }
 
-func (g *ActionRPC) Perform(args Args) string {
-	var resp string
+func (g *ActionRPC) Perform(args Arguments) (resp Response) {
 	err := g.client.Call("Plugin.Action", args, &resp)
 	if err != nil {
 		// do something with return
@@ -45,7 +50,7 @@ type ActionRPCServer struct {
 	Impl Action
 }
 
-func (s *ActionRPCServer) Action(args Args, resp *string) error {
+func (s *ActionRPCServer) Action(args Arguments, resp *Response) error {
 	*resp = s.Impl.Perform(args)
 	return nil
 }

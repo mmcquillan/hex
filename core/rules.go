@@ -63,6 +63,7 @@ func readRule(ruleFile string, config models.Config) (rule models.Rule) {
 	rule = models.Rule{
 		Active: true,
 		Debug:  false,
+		Format: false,
 		Hide:   false,
 		ACL:    "*",
 	}
