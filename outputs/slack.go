@@ -48,7 +48,7 @@ func (x Slack) Write(message models.Message, config models.Config) {
 			keys = append(keys, key)
 		}
 		sort.Strings(keys)
-		msg = msg + fmt.Sprintf("\n```MESSAGE DEBUG (%d sec to complete)\n", models.MessageTimestamp()-message.CreateTime)
+		msg = msg + fmt.Sprintf("\n```MESSAGE DEBUG (%d sec to complete)\n", message.EndTime-message.StartTime)
 		for _, key := range keys {
 			msg = msg + fmt.Sprintf("  %s: '%s'\n", key, message.Attributes[key])
 		}

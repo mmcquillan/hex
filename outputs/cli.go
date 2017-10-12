@@ -32,7 +32,7 @@ func (x Cli) Write(message models.Message, config models.Config) {
 			keys = append(keys, key)
 		}
 		sort.Strings(keys)
-		fmt.Printf("MESSAGE DEBUG (%d sec to complete)\n", models.MessageTimestamp()-message.CreateTime)
+		fmt.Printf("MESSAGE DEBUG (%d sec to complete)\n", message.EndTime-message.StartTime)
 		for _, key := range keys {
 			fmt.Printf("  %s: '%s'\n", key, message.Attributes[key])
 		}

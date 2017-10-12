@@ -13,9 +13,7 @@ func (x Version) Act(message *models.Message, rules *map[string]models.Rule, con
 		response = "Version: " + config.Version
 	}
 	message.Outputs = append(message.Outputs, models.Output{
-		Rule:      "version",
-		StartTime: models.MessageTimestamp(),
-		EndTime:   models.MessageTimestamp(),
-		Response:  response,
+		Rule:     "version",
+		Response: response,
 	})
 }

@@ -13,17 +13,16 @@ var FAIL = "fail"
 // Message struct
 type Message struct {
 	Debug      bool
-	CreateTime int64
+	StartTime  int64
+	EndTime    int64
 	Attributes map[string]string
 	Outputs    []Output
 }
 
 type Output struct {
-	Rule      string
-	StartTime int64
-	EndTime   int64
-	Success   bool
-	Response  string
+	Rule     string
+	Success  bool
+	Response string
 }
 
 func MessageID() string {
@@ -36,7 +35,7 @@ func MessageTimestamp() int64 {
 
 // MakeMessage function
 func NewMessage() (message Message) {
-	message.CreateTime = MessageTimestamp()
+	message.StartTime = MessageTimestamp()
 	message.Attributes = make(map[string]string)
 	message.Attributes["hex.id"] = MessageID()
 	message.Debug = false

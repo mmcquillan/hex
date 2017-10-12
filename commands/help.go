@@ -55,10 +55,8 @@ func (x Help) Act(message *models.Message, rules *map[string]models.Rule, config
 	// output help
 	if len(newhelp) > 1 {
 		message.Outputs = append(message.Outputs, models.Output{
-			Rule:      "help",
-			StartTime: models.MessageTimestamp(),
-			EndTime:   models.MessageTimestamp(),
-			Response:  strings.Join(newhelp[:], "\n"),
+			Rule:     "help",
+			Response: strings.Join(newhelp[:], "\n"),
 		})
 	}
 

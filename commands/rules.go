@@ -15,9 +15,7 @@ func (x Rules) Act(message *models.Message, rules *map[string]models.Rule, confi
 		res = fmt.Sprintf("%s%s - %+v\n", res, key, rule)
 	}
 	message.Outputs = append(message.Outputs, models.Output{
-		Rule:      "rules",
-		StartTime: models.MessageTimestamp(),
-		EndTime:   models.MessageTimestamp(),
-		Response:  res,
+		Rule:     "rules",
+		Response: res,
 	})
 }

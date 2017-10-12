@@ -33,6 +33,8 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 	actionCounter := 0
 	for _, action := range rule.Actions {
 		if _, exists := plugins[action.Type]; exists {
+			startTime := models.MessageTimestamp()
+			attrName := "hex.output." + strconv.Itoa(actionCounter)
 			args := hexplugin.Arguments{
 				Debug:   rule.Debug || config.Debug,
 				Command: parse.Substitute(action.Command, message.Attributes),
@@ -40,20 +42,20 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 			}
 			resp := plugins[action.Type].Action.Perform(args)
 			if action.OutputToVar {
-				message.Attributes["hex.output."+strconv.Itoa(actionCounter)+".response"] = strings.TrimSpace(resp.Output)
+				message.Attributes[attrName+".response"] = strings.TrimSpace(resp.Output)
 			} else {
 				message.Outputs = append(message.Outputs, models.Output{
-					Rule:      rule.Name,
-					StartTime: models.MessageTimestamp(),
-					EndTime:   models.MessageTimestamp(),
-					Response:  resp.Output,
-					Success:   resp.Success,
+					Rule:     rule.Name,
+					Response: resp.Output,
+					Success:  resp.Success,
 				})
 			}
+			message.Attributes[attrName+".duration"] = strconv.FormatInt(models.MessageTimestamp()-startTime, 10)
 		} else {
 			config.Logger.Error("Missing Plugin " + action.Type)
 		}
 		actionCounter += 1
 	}
+	message.EndTime = models.MessageTimestamp()
 	outputMsgs <- message
 }
