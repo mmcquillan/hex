@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/hexbotio/hex/models"
+	"github.com/hexbotio/hex/parse"
 )
 
 type Help struct {
@@ -17,24 +18,18 @@ func (x Help) Act(message *models.Message, rules *map[string]models.Rule, config
 	// pull internal help
 	help = CommandHelp(config)
 
-	// pull all help from the pipelines
-	/*
-		for _, pipeline := range config.Pipelines {
-			if pipeline.Active {
-				for _, input := range pipeline.Inputs {
-					if input.Type == message.Inputs["hex.type"] || input.Type == "*" {
-						if !(input.Hide || input.Match == "*") {
-							if input.Help != "" {
-								help = append(help, input.Help)
-							} else {
-								help = append(help, input.Match)
-							}
-						}
-					}
+	// pull all help from rules
+	for _, rule := range *rules {
+		if rule.Active && !rule.Hide {
+			if parse.Member(rule.ACL, message.Attributes["hex.user"]) || parse.Member(rule.ACL, message.Attributes["hex.channel"]) {
+				if rule.Help != "" {
+					help = append(help, rule.Help)
+				} else {
+					help = append(help, rule.Match)
 				}
 			}
 		}
-	*/
+	}
 
 	// sort, filter and de-dupe help
 	helpTitle := "Help for " + config.BotName + "..."
