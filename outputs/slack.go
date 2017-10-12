@@ -32,7 +32,7 @@ func (x Slack) Write(message models.Message, config models.Config) {
 				color = "danger"
 			}
 			attachment := slack.Attachment{
-				Title:      "TBD", //message.Attributes["hex.pipeline.name"],
+				Title:      message.Attributes["hex.rule.name"],
 				Text:       "```" + output.Response + "```",
 				Color:      color,
 				MarkdownIn: []string{"text"},
