@@ -54,5 +54,10 @@ func (x Slack) Write(message models.Message, config models.Config) {
 		}
 		msg = msg + "```"
 	}
-	api.PostMessage(message.Attributes["hex.channel"], msg, params)
+	if message.Attributes["hex.channel"] != "" {
+		api.PostMessage(message.Attributes["hex.channel"], msg, params)
+	}
+	if message.Attributes["hex.rule.channel"] != "" && message.Attributes["hex.channel"] != message.Attributes["hex.rule.channel"] {
+		api.PostMessage(message.Attributes["hex.rule.channel"], msg, params)
+	}
 }

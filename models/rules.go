@@ -6,6 +6,7 @@ type Rule struct {
 	Match    string   `json:"match"`
 	Schedule string   `json:"schedule"`
 	ACL      string   `json:"acl"`
+	Channel  string   `json:"channel"`
 	Format   bool     `json:"format"`
 	Help     string   `json:"help"`
 	Hide     bool     `json:"hide"`
