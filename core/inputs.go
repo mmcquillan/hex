@@ -5,36 +5,26 @@ import (
 	"github.com/hexbotio/hex/models"
 )
 
-func Inputs(inputMsgs chan<- models.Message, config models.Config) {
+func Inputs(inputMsgs chan<- models.Message, rules *map[string]models.Rule, config models.Config) {
 
-	// cli
 	if config.CLI {
-		startInput("cli", inputMsgs, config)
+		var cli = new(inputs.Cli)
+		go cli.Read(inputMsgs, config)
 	}
 
-	// slack
 	if config.Slack {
-		startInput("slack", inputMsgs, config)
+		var slack = new(inputs.Slack)
+		go slack.Read(inputMsgs, config)
 	}
 
-	// scheduler
 	if config.Scheduler {
-		startInput("scheduler", inputMsgs, config)
+		var scheduler = new(inputs.Scheduler)
+		go scheduler.Read(inputMsgs, rules, config)
 	}
 
-	// webhook
 	if config.Webhook {
-		startInput("webhook", inputMsgs, config)
+		var webhook = new(inputs.Webhook)
+		go webhook.Read(inputMsgs, config)
 	}
 
-}
-
-func startInput(service string, inputMsgs chan<- models.Message, config models.Config) {
-	if inputs.Exists(service) {
-		inputService := inputs.Make(service).(inputs.Input)
-		if inputService != nil {
-			config.Logger.Info("Initializing Input for " + service)
-			go inputService.Read(inputMsgs, config)
-		}
-	}
 }

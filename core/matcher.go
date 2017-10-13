@@ -15,13 +15,23 @@ func Matcher(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, 
 		message := <-inputMsgs
 		Commands(message, outputMsgs, rules, config)
 		for _, rule := range *rules {
-			if rule.Active && parse.Match(rule.Match, message.Attributes["hex.input"]) {
+
+			// match for input
+			if rule.Active && rule.Match != "" && parse.Match(rule.Match, message.Attributes["hex.input"]) {
 				if parse.Member(rule.ACL, message.Attributes["hex.user"]) || parse.Member(rule.ACL, message.Attributes["hex.channel"]) {
 					config.Logger.Debug("Matched Rule '" + rule.Name + "' with input '" + message.Attributes["hex.input"] + "'")
 					msg := deepcopy.Copy(message).(models.Message)
 					go runRule(rule, msg, outputMsgs, *plugins, config)
 				}
 			}
+
+			// match for schedule
+			if rule.Active && rule.Schedule != "" && rule.Schedule == message.Attributes["hex.schedule"] {
+				config.Logger.Debug("Matched Rule '" + rule.Name + "' with schedule '" + message.Attributes["hex.schedule"] + "'")
+				msg := deepcopy.Copy(message).(models.Message)
+				go runRule(rule, msg, outputMsgs, *plugins, config)
+			}
+
 		}
 	}
 }

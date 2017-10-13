@@ -12,16 +12,29 @@ type Scheduler struct {
 }
 
 //Input function
-func (x Scheduler) Read(inputMsgs chan<- models.Message, config models.Config) {
+func (x Scheduler) Read(inputMsgs chan<- models.Message, rules *map[string]models.Rule, config models.Config) {
+
+	// find schedules
+	var schedules = make(map[string]int)
+	for _, rule := range *rules {
+		if rule.Active && rule.Schedule != "" {
+			schedules[rule.Schedule] = 0
+		}
+	}
+
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	cron := cron.New()
-	/*
-		cron.AddFunc(service.Config["Schedule"], func() {
-			message := models.MakeMessage(service.Type, service.Name, service.Config["Schedule"], "", "")
+	for schedule, _ := range schedules {
+		config.Logger.Debug("Adding Schedule :" + schedule)
+		cron.AddFunc(schedule, func() {
+			message := models.NewMessage()
+			message.Attributes["hex.service"] = "scheduler"
+			message.Attributes["hex.schedule"] = schedule
+			message.Attributes["hex.input"] = ""
 			inputMsgs <- message
 		})
-	*/
+	}
 	cron.Start()
 	defer cron.Stop()
 	wg.Wait()
