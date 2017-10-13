@@ -79,6 +79,9 @@ func readRule(ruleFile string, config models.Config) (rule models.Rule) {
 			rule.Active = false
 		}
 	}
+	if rule.Name == "" {
+		rule.Name = rule.Match
+	}
 	return rule
 }
 
