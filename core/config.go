@@ -22,7 +22,7 @@ func Config(config *models.Config, version string) {
 	config.LogFile = ""
 	config.WorkspaceDir = "/tmp"
 	config.Debug = false
-	config.BotName = "hex"
+	config.BotName = "@hex"
 	config.CLI = false
 	config.Auditing = false
 	config.Slack = false

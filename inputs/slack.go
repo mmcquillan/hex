@@ -28,8 +28,15 @@ func (x Slack) Read(inputMsgs chan<- models.Message, config models.Config) {
 		channels[channel.ID] = "#" + channel.Name
 	}
 
+	// decode the bot name
+	var botName = config.BotName
+	var useAt = false
+	if strings.HasPrefix(config.BotName, "@") {
+		useAt = true
+		botName = strings.Replace(botName, "@", "", 1)
+	}
+
 	// get user array
-	bot := ""
 	users := make(map[string]string)
 	userList, err := api.GetUsers()
 	if err != nil {
@@ -37,16 +44,16 @@ func (x Slack) Read(inputMsgs chan<- models.Message, config models.Config) {
 	}
 	for _, user := range userList {
 		users[user.ID] = user.Name
-		if config.BotName == user.Name {
-			bot = user.ID
+		if botName == user.Name {
+			botName = user.ID
 		}
 	}
 
 	// validate bot
-	if bot == "" {
+	if botName == "" {
 		config.Logger.Warn("Bot name is not the same as configured in Slack")
 	} else {
-		bot = "<@" + bot + ">"
+		botName = "<@" + botName + ">"
 	}
 
 	// listen to messages
@@ -64,8 +71,17 @@ func (x Slack) Read(inputMsgs chan<- models.Message, config models.Config) {
 						channel = ev.Channel
 					}
 
-					if strings.HasPrefix(ev.Text, bot) {
-						input := strings.Replace(html.UnescapeString(ev.Text), bot+" ", "", 1)
+					var match = false
+					var input = ""
+					if useAt && strings.HasPrefix(ev.Text, botName) {
+						match = true
+						input = strings.Replace(html.UnescapeString(ev.Text), botName+" ", "", 1)
+					}
+					if !useAt && strings.HasPrefix(ev.Text, config.BotName) {
+						match = true
+						input = strings.Replace(html.UnescapeString(ev.Text), config.BotName+" ", "", 1)
+					}
+					if match {
 						input, debug := parse.Flag(input, "--debug")
 						message := models.NewMessage()
 						message.Attributes["hex.service"] = "slack"
