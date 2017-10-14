@@ -44,11 +44,11 @@ func Config(config *models.Config, version string) {
 	if len(os.Args) > 1 && FileExists(os.Args[1]) {
 		file, err := ioutil.ReadFile(os.Args[1])
 		if err != nil {
-			log.Fatal("Config File Read - ", err)
+			log.Fatal("ERROR: Config File Read - ", err)
 		}
 		err = json.Unmarshal(file, &config)
 		if err != nil {
-			log.Fatal("Config File Unmarshal - ", err)
+			log.Fatal("ERROR: Config File Unmarshal - ", err)
 		}
 	}
 
@@ -101,7 +101,7 @@ func Config(config *models.Config, version string) {
 	if os.Getenv("HEX_WEBHOOK_PORT") != "" {
 		port, err := strconv.Atoi(os.Getenv("HEX_WEBHOOK_PORT"))
 		if err != nil {
-			log.Fatal("Webhook Port is not a Number")
+			log.Fatal("ERROR: Webhook Port is not a Number")
 		}
 		config.WebhookPort = port
 	}
@@ -145,10 +145,10 @@ func Config(config *models.Config, version string) {
 
 	// a few basic rules
 	if config.Slack && config.SlackToken == "" {
-		log.Fatal("Slack is enabled, but no Slack Token is specified.")
+		log.Fatal("ERROR: Slack is enabled, but no Slack Token is specified.")
 	}
 	if config.Auditing && config.AuditingFile == "" {
-		log.Fatal("Auditing is enabled, but no Auditing File is specified.")
+		log.Fatal("ERROR: Auditing is enabled, but no Auditing File is specified.")
 	}
 
 }
