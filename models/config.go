@@ -12,7 +12,6 @@ type Config struct {
 	PluginsDir   string `json:"plugins_dir"`
 	RulesDir     string `json:"rules_dir"`
 	LogFile      string `json:"log_file"`
-	WorkspaceDir string `json:"workspace_Dir"`
 	Debug        bool   `json:"debug"`
 	BotName      string `json:"bot_name"`
 	CLI          bool   `json:"cli"`

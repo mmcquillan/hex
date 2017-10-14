@@ -21,7 +21,6 @@ func Config(config *models.Config, version string) {
 	config.PluginsDir = "/etc/hex/plugins"
 	config.RulesDir = "/etc/hex/rules"
 	config.LogFile = ""
-	config.WorkspaceDir = "/tmp"
 	config.Debug = false
 	config.BotName = "@hex"
 	config.CLI = false
@@ -65,9 +64,6 @@ func Config(config *models.Config, version string) {
 	}
 	if os.Getenv("HEX_LOG_FILE") != "" {
 		config.LogFile = os.Getenv("HEX_LOG_FILE")
-	}
-	if os.Getenv("HEX_WORKSPACE_DIR") != "" {
-		config.WorkspaceDir = os.Getenv("HEX_WORKSPACE_DIR")
 	}
 	if strings.ToUpper(os.Getenv("HEX_DEBUG")) == "TRUE" {
 		config.Debug = true
@@ -115,7 +111,6 @@ func Config(config *models.Config, version string) {
 	RulesDir := flag.String("rules-dir", config.RulesDir, "Rules Directory [/etc/hex/rules]")
 	PluginsDir := flag.String("plugins-dir", config.PluginsDir, "Plugins Directory [/etc/hex/plugins]")
 	LogFile := flag.String("log-file", config.LogFile, "Log File")
-	WorkspaceDir := flag.String("workspace-dir", config.WorkspaceDir, "Workspace Directory [/tmp]")
 	Debug := flag.Bool("debug", config.Debug, "Debug [false]")
 	BotName := flag.String("bot-name", config.BotName, "Bot Name [hex]")
 	CLI := flag.Bool("cli", config.CLI, "CLI [false]")
@@ -135,7 +130,6 @@ func Config(config *models.Config, version string) {
 	config.RulesDir = *RulesDir
 	config.PluginsDir = *PluginsDir
 	config.LogFile = *LogFile
-	config.WorkspaceDir = *WorkspaceDir
 	config.Debug = *Debug
 	config.BotName = *BotName
 	config.CLI = *CLI

@@ -39,14 +39,6 @@ http://hexbot.io
 - CLI Param:  `-log-file`
 - Conf File: `log_file`
 
-### Workspace Directory
-- Description: The location of the workspace for each rule
-- Default: `/tmp`
-- Type: string
-- Env Variable: `HEX_WORKSPACE_DIR`
-- CLI Param:  `-workspace-dir`
-- Conf File: `workspace_dir`
-
 ### Debug
 - Description: Flag to enable debug for logs
 - Default: `false`
