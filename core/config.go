@@ -17,6 +17,7 @@ func Config(config *models.Config, version string) {
 
 	// start with defaults
 	config.Version = version
+	config.Admins = ""
 	config.PluginsDir = "/etc/hex/plugins"
 	config.RulesDir = "/etc/hex/rules"
 	config.LogFile = ""
@@ -53,6 +54,9 @@ func Config(config *models.Config, version string) {
 	}
 
 	// environment
+	if os.Getenv("HEX_ADMINS") != "" {
+		config.RulesDir = os.Getenv("HEX_ADMINS")
+	}
 	if os.Getenv("HEX_RULES_DIR") != "" {
 		config.RulesDir = os.Getenv("HEX_RULES_DIR")
 	}
@@ -107,6 +111,7 @@ func Config(config *models.Config, version string) {
 	}
 
 	// flags
+	Admins := flag.String("admins", config.Admins, "Admins (comma delimited)")
 	RulesDir := flag.String("rules-dir", config.RulesDir, "Rules Directory [/etc/hex/rules]")
 	PluginsDir := flag.String("plugins-dir", config.PluginsDir, "Plugins Directory [/etc/hex/plugins]")
 	LogFile := flag.String("log-file", config.LogFile, "Log File")
@@ -126,6 +131,7 @@ func Config(config *models.Config, version string) {
 	flag.Parse()
 
 	// set flags
+	config.Admins = *Admins
 	config.RulesDir = *RulesDir
 	config.PluginsDir = *PluginsDir
 	config.LogFile = *LogFile

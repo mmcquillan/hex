@@ -8,15 +8,16 @@ import (
 	"github.com/hexbotio/hex/parse"
 )
 
-type Help struct {
-}
-
-func (x Help) Act(message *models.Message, rules *map[string]models.Rule, config models.Config) {
+func Help(message *models.Message, rules *map[string]models.Rule, config models.Config) {
 
 	help := make([]string, 0)
 
 	// pull internal help
-	help = CommandHelp(config)
+	help = make([]string, 4)
+	help[0] = "help <filter> - This help"
+	help[1] = "ping - Simple ping response for the bot"
+	help[2] = "rules - dump of loaded rules"
+	help[3] = "version - Compiled version number/sha"
 
 	// pull all help from rules
 	for _, rule := range *rules {

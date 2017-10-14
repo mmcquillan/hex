@@ -7,6 +7,14 @@ http://hexbot.io
 
 ## Configuration
 
+### Admins
+- Description: Comma delimited list of admins (users or channels)
+- Default:
+- Type: string
+- Env Variable: `HEX_ADMINS`
+- CLI Param:  `-admins`
+- Conf File: `admins`
+
 ### Plugins Directory
 - Description: The location of the hex plugins
 - Default: `/etc/hex/plugins`

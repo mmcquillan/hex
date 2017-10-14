@@ -4,10 +4,7 @@ import (
 	"github.com/hexbotio/hex/models"
 )
 
-type Ping struct {
-}
-
-func (x Ping) Act(message *models.Message, rules *map[string]models.Rule, config models.Config) {
+func Ping(message *models.Message) {
 	message.Outputs = append(message.Outputs, models.Output{
 		Rule:     "ping",
 		Response: "pong",

@@ -8,6 +8,7 @@ import (
 type Config struct {
 	Version      string
 	Logger       hclog.Logger
+	Admins       string `json:"admins"`
 	PluginsDir   string `json:"plugins_dir"`
 	RulesDir     string `json:"rules_dir"`
 	LogFile      string `json:"log_file"`
