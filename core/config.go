@@ -25,6 +25,7 @@ func Config(config *models.Config, version string) {
 	config.BotName = "@hex"
 	config.CLI = false
 	config.Auditing = false
+	config.AuditingFile = ""
 	config.Slack = false
 	config.SlackToken = ""
 	config.SlackIcon = ":nut_and_bolt:"
