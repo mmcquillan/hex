@@ -143,4 +143,12 @@ func Config(config *models.Config, version string) {
 	config.Webhook = *Webhook
 	config.WebhookPort = *WebhookPort
 
+	// a few basic rules
+	if config.Slack && config.SlackToken == "" {
+		log.Fatal("Slack is enabled, but no Slack Token is specified.")
+	}
+	if config.Auditing && config.AuditingFile == "" {
+		log.Fatal("Auditing is enabled, but no Auditing File is specified.")
+	}
+
 }
