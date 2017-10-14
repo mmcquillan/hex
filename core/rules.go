@@ -10,7 +10,6 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/hexbotio/hex/models"
-	"github.com/hexbotio/hex/parse"
 )
 
 var fileFilter = ".json"
@@ -79,11 +78,7 @@ func readRule(ruleFile string, config models.Config) (rule models.Rule) {
 			config.Logger.Error("Add Rule Unmarshal "+ruleFile, err)
 			rule.Active = false
 		}
-		for i := 0; i < len(rule.Actions); i++ {
-			for k, v := range rule.Actions[i].Config {
-				rule.Actions[i].Config[k] = parse.SubstituteEnv(v)
-			}
-		}
+		// no need to sub action.config as this happens at matcher time
 	}
 	if rule.Name == "" {
 		rule.Name = rule.Match
