@@ -186,6 +186,12 @@ Each rule is a seperate json file which consists of some rule options and a seri
 - Default:
 - Type: string
 
+### URL
+- Config: `url`
+- Description: URL to match for incoming webhooks
+- Default:
+- Type: string
+
 ### ACL
 - Config: `acl`
 - Description: A comma delimited list of users and channels allowed to execute the rule

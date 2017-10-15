@@ -32,6 +32,13 @@ func Matcher(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, 
 				go runRule(rule, msg, outputMsgs, *plugins, config)
 			}
 
+			// match for webhook
+			if rule.Active && rule.URL != "" && parse.Match(rule.URL, message.Attributes["hex.url"]) {
+				config.Logger.Debug("Matched Rule '" + rule.Name + "' with url '" + message.Attributes["hex.url"] + "'")
+				msg := deepcopy.Copy(message).(models.Message)
+				go runRule(rule, msg, outputMsgs, *plugins, config)
+			}
+
 		}
 	}
 }
@@ -76,8 +83,8 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 			} else {
 				config.Logger.Error("Missing Plugin " + action.Type)
 			}
-			actionCounter += 1
 		}
+		actionCounter += 1
 	}
 	message.EndTime = models.MessageTimestamp()
 	outputMsgs <- message

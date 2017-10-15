@@ -5,6 +5,7 @@ type Rule struct {
 	Name     string   `json:"rule"`
 	Match    string   `json:"match"`
 	Schedule string   `json:"schedule"`
+	URL      string   `json:"url"`
 	ACL      string   `json:"acl"`
 	Channel  string   `json:"channel"`
 	Format   bool     `json:"format"`
