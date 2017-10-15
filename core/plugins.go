@@ -20,7 +20,7 @@ func Plugins(plugins *map[string]models.Plugin, config models.Config) {
 			return nil
 		})
 		if err != nil {
-			config.Logger.Error("Loading Plugin Dir", err)
+			config.Logger.Error("Loading Plugin Dir" + " - " + err.Error())
 		}
 		for pluginName, pluginPath := range pluginList {
 			addPlugin(pluginName, pluginPath, *plugins, config)
@@ -52,11 +52,11 @@ func addPlugin(pluginName string, pluginPath string, plugins map[string]models.P
 			})
 			rpcClient, err := client.Client()
 			if err != nil {
-				config.Logger.Error("RPC Client", err)
+				config.Logger.Error("RPC Client" + " - " + err.Error())
 			}
 			raw, err := rpcClient.Dispense("action")
 			if err != nil {
-				config.Logger.Error("Plugin Request", err)
+				config.Logger.Error("Plugin Request" + " - " + err.Error())
 			}
 			plugins[pluginName] = models.Plugin{
 				Name:   pluginName,

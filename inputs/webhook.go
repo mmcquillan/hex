@@ -22,7 +22,7 @@ func (x Webhook) Read(inputMsgs chan<- models.Message, config models.Config) {
 		rawbody, err := ioutil.ReadAll(r.Body)
 		body := string(rawbody)
 		if err != nil {
-			config.Logger.Error("Webhook Body Read", err)
+			config.Logger.Error("Webhook Body Read" + " - " + err.Error())
 		}
 		defer r.Body.Close()
 		message := models.NewMessage()
@@ -40,6 +40,6 @@ func (x Webhook) Read(inputMsgs chan<- models.Message, config models.Config) {
 
 	err := server.ListenAndServe()
 	if err != nil {
-		config.Logger.Error("Webhook Listner", err)
+		config.Logger.Error("Webhook Listner" + " - " + err.Error())
 	}
 }

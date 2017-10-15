@@ -22,7 +22,7 @@ func (x Slack) Read(inputMsgs chan<- models.Message, config models.Config) {
 	channels := make(map[string]string)
 	channelList, err := api.GetChannels(true)
 	if err != nil {
-		config.Logger.Error("Slack Channel List", err)
+		config.Logger.Error("Slack Channel List" + " - " + err.Error())
 	}
 	for _, channel := range channelList {
 		channels[channel.ID] = "#" + channel.Name
@@ -40,7 +40,7 @@ func (x Slack) Read(inputMsgs chan<- models.Message, config models.Config) {
 	users := make(map[string]string)
 	userList, err := api.GetUsers()
 	if err != nil {
-		config.Logger.Error("Slack User List", err)
+		config.Logger.Error("Slack User List" + " - " + err.Error())
 	}
 	for _, user := range userList {
 		users[user.ID] = user.Name

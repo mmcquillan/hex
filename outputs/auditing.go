@@ -36,10 +36,10 @@ func (x Auditing) Write(message models.Message, config models.Config) {
 	out := fmt.Sprintf("%s [%s] %s\n", time.Now().Format(time.RFC3339), who, message.Attributes["hex.input"])
 	file, err := os.OpenFile(config.AuditingFile, os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
-		config.Logger.Error("Auditing File", err)
+		config.Logger.Error("Auditing File" + " - " + err.Error())
 	}
 	defer file.Close()
 	if _, err = file.WriteString(out); err != nil {
-		config.Logger.Error("Writing Audit File", err)
+		config.Logger.Error("Writing Audit File" + " - " + err.Error())
 	}
 }

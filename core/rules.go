@@ -25,7 +25,7 @@ func Rules(rules *map[string]models.Rule, config models.Config) {
 			return nil
 		})
 		if err != nil {
-			config.Logger.Error("Loading Rules Directory", err)
+			config.Logger.Error("Loading Rules Directory" + " - " + err.Error())
 		}
 		for _, file := range ruleList {
 			addRule(file, *rules, config)
@@ -70,12 +70,12 @@ func readRule(ruleFile string, config models.Config) (rule models.Rule) {
 	if FileExists(ruleFile) {
 		file, err := ioutil.ReadFile(ruleFile)
 		if err != nil {
-			config.Logger.Error("Add Rule File Read "+ruleFile, err)
+			config.Logger.Error("Add Rule File Read " + ruleFile + " - " + err.Error())
 			rule.Active = false
 		}
 		err = json.Unmarshal(file, &rule)
 		if err != nil {
-			config.Logger.Error("Add Rule Unmarshal "+ruleFile, err)
+			config.Logger.Error("Add Rule Unmarshal " + ruleFile + " - " + err.Error())
 			rule.Active = false
 		}
 		// no need to sub action.config as this happens at matcher time
@@ -89,7 +89,7 @@ func readRule(ruleFile string, config models.Config) (rule models.Rule) {
 func watchRules(config models.Config, rules *map[string]models.Rule) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		config.Logger.Error("File Watcher", err)
+		config.Logger.Error("File Watcher" + " - " + err.Error())
 	}
 	defer watcher.Close()
 
@@ -114,14 +114,14 @@ func watchRules(config models.Config, rules *map[string]models.Rule) {
 					reloadRule(event.Name, *rules, config)
 				}
 			case err := <-watcher.Errors:
-				config.Logger.Error("Rule Load", err)
+				config.Logger.Error("Rule Load" + " - " + err.Error())
 			}
 		}
 	}()
 
 	err = watcher.Add(config.RulesDir)
 	if err != nil {
-		config.Logger.Error("File Watcher Add", err)
+		config.Logger.Error("File Watcher Add" + " - " + err.Error())
 	}
 	<-done
 
