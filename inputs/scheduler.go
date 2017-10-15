@@ -26,7 +26,7 @@ func (x Scheduler) Read(inputMsgs chan<- models.Message, rules *map[string]model
 	wg.Add(1)
 	cron := cron.New()
 	for schedule, _ := range schedules {
-		config.Logger.Debug("Adding Schedule :" + schedule)
+		config.Logger.Debug("Adding Schedule - '" + schedule + "'")
 		cron.AddFunc(schedule, func() {
 			message := models.NewMessage()
 			message.Attributes["hex.service"] = "scheduler"
