@@ -8,15 +8,15 @@ import (
 )
 
 func Handler(plugins *map[string]models.Plugin, config models.Config) {
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	go func() {
-		for _ = range c {
-			config.Logger.Info("Received Interrupt Signal")
-			config.Logger.Info("Stopping Plugins...")
-			StopPlugins(*plugins, config)
-			config.Logger.Info("Stopping Hex Bot...")
-			os.Exit(0)
-		}
-	}()
+	signalChannel := make(chan os.Signal, 1)
+	signal.Notify(signalChannel, os.Interrupt)
+	signal.Notify(signalChannel, os.Kill)
+	go func(signalChannel chan os.Signal) {
+		sig := <-signalChannel
+		config.Logger.Info("Received Signal " + sig.String())
+		config.Logger.Info("Stopping Plugins...")
+		StopPlugins(*plugins, config)
+		config.Logger.Info("Stopping Hex Bot...")
+		os.Exit(0)
+	}(signalChannel)
 }
