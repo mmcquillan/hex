@@ -1,7 +1,8 @@
 package outputs
 
 import (
-	"strings"
+	"fmt"
+	"sort"
 
 	"github.com/hexbotio/hex/models"
 	"github.com/nlopes/slack"
@@ -12,37 +13,51 @@ type Slack struct {
 }
 
 // Output function
-func (x Slack) Write(outputMsgs <-chan models.Message, service models.Service) {
-	api := slack.New(service.Config["Key"])
-	for {
-		message := <-outputMsgs
-		msg := ""
-		params := slack.NewPostMessageParameters()
-		params.Username = service.BotName
-		image := service.Config["Image"]
-		if image == "" {
-			image = ":nut_and_bolt:"
-		}
-		params.IconEmoji = image
-		if !message.Success {
-			attachment := slack.Attachment{
-				Title:      message.Inputs["hex.pipeline.name"],
-				Text:       "```" + strings.Join(message.Response[:], "\n") + "```",
-				Color:      "danger",
-				MarkdownIn: []string{"text"},
+func (x Slack) Write(message models.Message, config models.Config) {
+	api := slack.New(config.SlackToken)
+	msg := ""
+	params := slack.NewPostMessageParameters()
+	params.Username = config.BotName
+	image := config.SlackIcon
+	if image == "" {
+		image = ":nut_and_bolt:"
+	}
+	params.IconEmoji = image
+	for _, output := range message.Outputs {
+		if message.Attributes["hex.rule.format"] == "true" {
+			color := "grey"
+			if output.Success {
+				color = "good"
+			} else {
+				color = "danger"
 			}
-			params.Attachments = []slack.Attachment{attachment}
-		} else if message.Inputs["hex.pipeline.alert"] == "true" && message.Success {
 			attachment := slack.Attachment{
-				Title:      message.Inputs["hex.pipeline.name"],
-				Text:       "```" + strings.Join(message.Response[:], "\n") + "```",
-				Color:      "good",
+				Title:      message.Attributes["hex.rule.name"],
+				Text:       "```" + output.Response + "```",
+				Color:      color,
 				MarkdownIn: []string{"text"},
 			}
 			params.Attachments = []slack.Attachment{attachment}
 		} else {
-			msg = strings.Join(message.Response[:], "\n")
+			msg = msg + output.Response + "\n"
 		}
-		api.PostMessage(message.Inputs["hex.output"], msg, params)
+	}
+	if message.Debug {
+		keys := make([]string, 0, len(message.Attributes))
+		for key, _ := range message.Attributes {
+			keys = append(keys, key)
+		}
+		sort.Strings(keys)
+		msg = msg + fmt.Sprintf("\n```MESSAGE DEBUG (%d sec to complete)\n", message.EndTime-message.StartTime)
+		for _, key := range keys {
+			msg = msg + fmt.Sprintf("  %s: '%s'\n", key, message.Attributes[key])
+		}
+		msg = msg + "```"
+	}
+	if message.Attributes["hex.channel"] != "" {
+		api.PostMessage(message.Attributes["hex.channel"], msg, params)
+	}
+	if message.Attributes["hex.rule.channel"] != "" && message.Attributes["hex.channel"] != message.Attributes["hex.rule.channel"] {
+		api.PostMessage(message.Attributes["hex.rule.channel"], msg, params)
 	}
 }

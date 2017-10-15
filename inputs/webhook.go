@@ -2,23 +2,19 @@ package inputs
 
 import (
 	"fmt"
-	"github.com/hexbotio/hex/models"
 	"io/ioutil"
-	"log"
 	"net/http"
-	"strconv"
+
+	"github.com/hexbotio/hex/models"
 )
 
 type Webhook struct {
 }
 
-func (x Webhook) Read(inputMsgs chan<- models.Message, service models.Service) {
-	defer Recovery(service)
-
-	port, _ := strconv.Atoi(service.Config["Port"])
+func (x Webhook) Read(inputMsgs chan<- models.Message, config models.Config) {
 
 	server := &http.Server{
-		Addr:    fmt.Sprintf(":%d", port),
+		Addr:    fmt.Sprintf(":%d", config.WebhookPort),
 		Handler: nil,
 	}
 
@@ -26,10 +22,14 @@ func (x Webhook) Read(inputMsgs chan<- models.Message, service models.Service) {
 		rawbody, err := ioutil.ReadAll(r.Body)
 		body := string(rawbody)
 		if err != nil {
-			log.Print(err)
+			config.Logger.Error("Webhook Body Read" + " - " + err.Error())
 		}
 		defer r.Body.Close()
-		message := models.MakeMessage(service.Type, service.Name, r.RequestURI, r.RemoteAddr, body)
+		message := models.NewMessage()
+		message.Attributes["hex.service"] = "webhook"
+		message.Attributes["hex.url"] = r.RequestURI
+		message.Attributes["hex.ipaddress"] = r.RemoteAddr
+		message.Attributes["hex.input"] = body
 		inputMsgs <- message
 
 		w.WriteHeader(http.StatusOK)
@@ -40,6 +40,6 @@ func (x Webhook) Read(inputMsgs chan<- models.Message, service models.Service) {
 
 	err := server.ListenAndServe()
 	if err != nil {
-		log.Print(err)
+		config.Logger.Error("Webhook Listner" + " - " + err.Error())
 	}
 }

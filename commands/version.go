@@ -4,13 +4,13 @@ import (
 	"github.com/hexbotio/hex/models"
 )
 
-type Version struct {
-}
-
-func (x Version) Act(message *models.Message, states map[string]models.State, config *models.Config) {
+func Version(message *models.Message, config models.Config) {
+	response := "Version: Non Standard Build"
 	if config.Version != "" {
-		message.Response = append(message.Response, "Version: "+config.Version)
-	} else {
-		message.Response = append(message.Response, "Version: Non Standard Build")
+		response = "Version: " + config.Version
 	}
+	message.Outputs = append(message.Outputs, models.Output{
+		Rule:     "version",
+		Response: response,
+	})
 }
