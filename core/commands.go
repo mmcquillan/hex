@@ -28,7 +28,7 @@ func Commands(message models.Message, outputMsgs chan<- models.Message, rules *m
 	}
 
 	if parse.Match("rules", message.Attributes["hex.input"]) {
-		if parse.Member(config.Admins, message.Attributes["hex.user"]) || parse.Member(config.Admins, message.Attributes["hex.channel"]) {
+		if parse.EitherMember(config.Admins, message.Attributes["hex.user"], message.Attributes["hex.channel"]) {
 			msg := deepcopy.Copy(message).(models.Message)
 			commands.Rules(&msg, rules, config)
 			outputMsgs <- msg

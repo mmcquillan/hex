@@ -15,8 +15,8 @@ type Cli struct {
 func (x Cli) Write(message models.Message, config models.Config) {
 	fmt.Print("\n")
 	for _, output := range message.Outputs {
-		if message.Debug && parse.Member(config.Admins, message.Attributes["hex.user"]) || parse.Member(config.Admins, message.Attributes["hex.channel"]) {
-			output.Response = output.Response + "\n\n[ " + output.Command + " ]"
+		if message.Debug && parse.EitherMember(config.Admins, message.Attributes["hex.user"], message.Attributes["hex.channel"]) {
+			output.Response = output.Response + "\n\n[ Debug: " + output.Command + " ]"
 		}
 		if message.Attributes["hex.rule.format"] == "true" {
 			if output.Success {

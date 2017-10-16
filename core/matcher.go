@@ -18,7 +18,7 @@ func Matcher(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, 
 
 			// match for input
 			if rule.Active && rule.Match != "" && parse.Match(rule.Match, message.Attributes["hex.input"]) {
-				if parse.Member(rule.ACL, message.Attributes["hex.user"]) || parse.Member(rule.ACL, message.Attributes["hex.channel"]) {
+				if parse.EitherMember(rule.ACL, message.Attributes["hex.user"], message.Attributes["hex.channel"]) {
 					config.Logger.Debug("Matched Rule '" + rule.Name + "' with input '" + message.Attributes["hex.input"] + "'")
 					msg := deepcopy.Copy(message).(models.Message)
 					go runRule(rule, msg, outputMsgs, *plugins, config)

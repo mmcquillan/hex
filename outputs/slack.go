@@ -25,10 +25,11 @@ func (x Slack) Write(message models.Message, config models.Config) {
 	}
 	params.IconEmoji = image
 	for _, output := range message.Outputs {
-		if message.Debug && parse.Member(config.Admins, message.Attributes["hex.user"]) || parse.Member(config.Admins, message.Attributes["hex.channel"]) {
-			output.Response = output.Response + "\n\n[ " + output.Command + " ]"
+		if message.Debug && parse.EitherMember(config.Admins, message.Attributes["hex.user"], message.Attributes["hex.channel"]) {
+			output.Response = output.Response + "\n\n[ Debug: " + output.Command + " ]"
 		}
 		if message.Attributes["hex.rule.format"] == "true" {
+			msg = "*" + message.Attributes["hex.rule.name"] + "*"
 			color := "grey"
 			if output.Success {
 				color = "good"
@@ -36,12 +37,11 @@ func (x Slack) Write(message models.Message, config models.Config) {
 				color = "danger"
 			}
 			attachment := slack.Attachment{
-				Title:      message.Attributes["hex.rule.name"],
 				Text:       "```" + output.Response + "```",
 				Color:      color,
 				MarkdownIn: []string{"text"},
 			}
-			params.Attachments = []slack.Attachment{attachment}
+			params.Attachments = append(params.Attachments, attachment)
 		} else {
 			msg = msg + output.Response + "\n"
 		}
@@ -52,11 +52,16 @@ func (x Slack) Write(message models.Message, config models.Config) {
 			keys = append(keys, key)
 		}
 		sort.Strings(keys)
-		msg = msg + fmt.Sprintf("\n```MESSAGE DEBUG (%d sec to complete)\n", message.EndTime-message.StartTime)
+		out := fmt.Sprintf("\nMESSAGE DEBUG (%d sec to complete)\n", message.EndTime-message.StartTime)
 		for _, key := range keys {
-			msg = msg + fmt.Sprintf("  %s: '%s'\n", key, message.Attributes[key])
+			out = out + fmt.Sprintf("  %s: '%s'\n", key, message.Attributes[key])
 		}
-		msg = msg + "```"
+		attachment := slack.Attachment{
+			Text:       "```" + out + "```",
+			Color:      "grey",
+			MarkdownIn: []string{"text"},
+		}
+		params.Attachments = append(params.Attachments, attachment)
 	}
 	if message.Attributes["hex.channel"] != "" {
 		api.PostMessage(message.Attributes["hex.channel"], msg, params)

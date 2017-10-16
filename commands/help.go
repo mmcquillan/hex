@@ -22,7 +22,7 @@ func Help(message *models.Message, rules *map[string]models.Rule, config models.
 	// pull all help from rules
 	for _, rule := range *rules {
 		if rule.Active && !rule.Hide {
-			if parse.Member(rule.ACL, message.Attributes["hex.user"]) || parse.Member(rule.ACL, message.Attributes["hex.channel"]) {
+			if parse.EitherMember(rule.ACL, message.Attributes["hex.user"], message.Attributes["hex.channel"]) {
 				if rule.Help != "" {
 					help = append(help, rule.Help)
 				} else {
