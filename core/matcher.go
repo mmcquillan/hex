@@ -62,9 +62,10 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 				for key, _ := range action.Config {
 					action.Config[key] = parse.Substitute(action.Config[key], message.Attributes)
 				}
+				cmd := parse.Substitute(action.Command, message.Attributes)
 				args := hexplugin.Arguments{
 					Debug:   rule.Debug || config.Debug,
-					Command: parse.Substitute(action.Command, message.Attributes),
+					Command: cmd,
 					Config:  action.Config,
 				}
 				resp := plugins[action.Type].Action.Perform(args)
@@ -75,6 +76,7 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 						Rule:     rule.Name,
 						Response: resp.Output,
 						Success:  resp.Success,
+						Command:  cmd,
 					})
 				}
 				lastAction = resp.Success

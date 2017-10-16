@@ -6,6 +6,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/hexbotio/hex/models"
+	"github.com/hexbotio/hex/parse"
 )
 
 type Cli struct {
@@ -14,6 +15,9 @@ type Cli struct {
 func (x Cli) Write(message models.Message, config models.Config) {
 	fmt.Print("\n")
 	for _, output := range message.Outputs {
+		if message.Debug && parse.Member(config.Admins, message.Attributes["hex.user"]) || parse.Member(config.Admins, message.Attributes["hex.channel"]) {
+			output.Response = output.Response + "\n\n[ " + output.Command + " ]"
+		}
 		if message.Attributes["hex.rule.format"] == "true" {
 			if output.Success {
 				color.Set(color.FgGreen)

@@ -19,6 +19,7 @@ type Output struct {
 	Rule     string
 	Success  bool
 	Response string
+	Command  string
 }
 
 func MessageID() string {
