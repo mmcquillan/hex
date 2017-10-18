@@ -69,3 +69,15 @@ func addPlugin(pluginName string, pluginPath string, plugins map[string]models.P
 		}
 	}
 }
+
+func ResolvePlugin(plugin string) string {
+	subs := map[string]string{
+		"local":    "hex-local",
+		"response": "hex-response",
+		"ssh":      "hex-ssh",
+	}
+	if match, exists := subs[plugin]; exists {
+		return match
+	}
+	return plugin
+}
