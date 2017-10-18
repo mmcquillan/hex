@@ -38,7 +38,11 @@ func Version(message *models.Message, config models.Config) {
 					config.Logger.Error("Version Body Read - " + err.Error())
 				}
 				body := strings.TrimSpace(string(rawbody))
-				response = response + " (latest is " + body + ")"
+				if body != config.Version {
+					response = response + " (latest is " + body + ")"
+				} else {
+					response = response + " (current)"
+				}
 			}
 		}
 	}
