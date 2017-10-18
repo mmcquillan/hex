@@ -71,7 +71,7 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 				resp := plugins[action.Type].Action.Perform(args)
 				if action.OutputToVar {
 					message.Attributes[attrName+".response"] = strings.TrimSpace(resp.Output)
-				} else {
+				} else if !action.HideOutput {
 					message.Outputs = append(message.Outputs, models.Output{
 						Rule:     rule.Name,
 						Response: resp.Output,

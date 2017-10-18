@@ -4,6 +4,7 @@ package models
 type Action struct {
 	Type        string            `json:"type"`
 	Command     string            `json:"command"`
+	HideOutput  bool              `json:"hide_output"`
 	OutputToVar bool              `json:"output_to_var"`
 	RunOnFail   bool              `json:"run_on_fail"`
 	LastConfig  bool              `json:"last_config"`

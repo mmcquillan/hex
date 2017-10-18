@@ -93,6 +93,12 @@ Each rule is a seperate json file which consists of some rule options and a seri
 - Default:
 - Type: string
 
+### Actions.HideOutput
+- Config: `hide_output`
+- Description: An option to not show the output of an action
+- Default: false
+- Type: bool
+
 ### Actions.OutputToVar
 - Config: `output_to_var`
 - Description: An option to take the output of the action and save it to the `hex.outputs.<action number>.response` var
