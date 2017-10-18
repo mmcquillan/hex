@@ -33,7 +33,7 @@ func (x Webhook) Read(inputMsgs chan<- models.Message, config models.Config) {
 		inputMsgs <- message
 
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("HexBot"))
+		w.Write([]byte("{\"serviced_by\":\"HexBot\", \"message_id\":\"" + message.Attributes["hex.id"] + "\"}"))
 	}
 
 	http.HandleFunc("/", handle)
