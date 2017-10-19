@@ -57,6 +57,12 @@ Each rule is a seperate json file which consists of some rule options and a seri
 - Default: false
 - Type: bool
 
+### OutputFailOnly
+- Config: `output_fail_only`
+- Description: Flag to only output if a failure
+- Default: false
+- Type: bool
+
 ### Help
 - Config: `help`
 - Description: Custom help to display for the rule
