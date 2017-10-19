@@ -2,6 +2,7 @@ package core
 
 import (
 	"os"
+	"strings"
 )
 
 func FileExists(file string) bool {
@@ -15,4 +16,11 @@ func FileExists(file string) bool {
 
 func DirExists(dir string) bool {
 	return FileExists(dir)
+}
+
+func MakePath(dir string, file string) string {
+	if strings.HasSuffix(dir, "/") {
+		return dir + file
+	}
+	return dir + "/" + file
 }

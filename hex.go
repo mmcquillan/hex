@@ -23,7 +23,7 @@ func main() {
 	core.Config(&config, version)
 	core.Logging(&config)
 	core.Rules(&rules, config)
-	core.Plugins(&plugins, config)
+	core.Plugins(&plugins, rules, config)
 	core.Handler(&plugins, config)
 
 	// run application

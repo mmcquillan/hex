@@ -72,16 +72,15 @@ func readRule(ruleFile string, config models.Config) (rule models.Rule) {
 		if err != nil {
 			config.Logger.Error("Add Rule File Read " + ruleFile + " - " + err.Error())
 			rule.Active = false
+			return rule
 		}
 		err = json.Unmarshal(file, &rule)
 		if err != nil {
 			config.Logger.Error("Add Rule Unmarshal " + ruleFile + " - " + err.Error())
 			rule.Active = false
+			return rule
 		}
 		// no need to sub action.config as this happens at matcher time
-	}
-	if rule.Name == "" {
-		rule.Name = rule.Match
 	}
 	return rule
 }

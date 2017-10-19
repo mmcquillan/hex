@@ -53,8 +53,7 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 	lastConfig := rule.Actions[0].Config
 	for _, action := range rule.Actions {
 		if lastAction || action.RunOnFail {
-			pluginType := ResolvePlugin(action.Type)
-			if _, exists := plugins[pluginType]; exists {
+			if _, exists := plugins[action.Type]; exists {
 				startTime := models.MessageTimestamp()
 				attrName := "hex.output." + strconv.Itoa(actionCounter)
 				if action.LastConfig {
@@ -69,7 +68,7 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 					Command: cmd,
 					Config:  action.Config,
 				}
-				resp := plugins[pluginType].Action.Perform(args)
+				resp := plugins[action.Type].Action.Perform(args)
 				if action.OutputToVar {
 					message.Attributes[attrName+".response"] = strings.TrimSpace(resp.Output)
 				} else if !action.HideOutput {
@@ -84,7 +83,7 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 				lastConfig = action.Config
 				message.Attributes[attrName+".duration"] = strconv.FormatInt(models.MessageTimestamp()-startTime, 10)
 			} else {
-				config.Logger.Error("Missing Plugin " + pluginType)
+				config.Logger.Error("Missing Plugin " + action.Type)
 			}
 		}
 		actionCounter += 1
