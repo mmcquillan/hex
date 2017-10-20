@@ -1,6 +1,9 @@
 package core
 
 import (
+	"log"
+	"os"
+
 	"github.com/hexbotio/hex/models"
 	"github.com/hexbotio/hex/outputs"
 )
@@ -23,6 +26,14 @@ func Outputs(outputMsgs <-chan models.Message, config models.Config) {
 		}
 
 		if config.Auditing {
+			if !FileExists(config.AuditingFile) {
+				nf, err := os.Create(config.AuditingFile)
+				if err != nil {
+					log.Fatal("ERROR: Cannot create Auditing File at "+config.AuditingFile, err)
+				}
+				nf.Close()
+				config.Logger.Info("Created Auditing File " + config.AuditingFile)
+			}
 			auditing.Write(message, config)
 		}
 
