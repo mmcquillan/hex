@@ -80,6 +80,9 @@ func readRule(ruleFile string, config models.Config) (rule models.Rule) {
 			rule.Active = false
 			return rule
 		}
+		for i := 0; i < len(rule.Actions); i++ {
+			rule.Actions[i].Type = ResolvePluginName(rule.Actions[i].Type)
+		}
 		// no need to sub action.config as this happens at matcher time
 	}
 	return rule
