@@ -176,6 +176,7 @@ func ResolvePluginName(pluginName string) string {
 		"local":    "hex-local",
 		"response": "hex-response",
 		"ssh":      "hex-ssh",
+		"validate": "hex-validate",
 		"winrm":    "hex-winrm",
 	}
 	if match, exists := subs[pluginName]; exists {

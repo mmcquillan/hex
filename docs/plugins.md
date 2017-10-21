@@ -5,5 +5,6 @@ Plugins are used for basic features of Hex and provide a mechanism to extend fun
 - https://github.com/hexbotio/hex-local
 - https://github.com/hexbotio/hex-response
 - https://github.com/hexbotio/hex-ssh
+- https://github.com/hexbotio/hex-validate
 - https://github.com/hexbotio/hex-winrm
 
