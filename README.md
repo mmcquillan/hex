@@ -10,6 +10,7 @@ Follow us https://twitter.com/hexbotio
 - [Installing](docs/installing.md)
 - [Configuration](docs/configuration.md)
 - [Rules](docs/rules.md)
+- [Examples](docs/examples.md)
 - [Plugins](docs/plugins.md)
 - [Matching](docs/matching.md)
 - [Substitutions](docs/substitutions.md)
