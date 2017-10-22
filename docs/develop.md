@@ -5,7 +5,7 @@ Get involved with the development of Hex or it's plugins.
 
 ### Hex Bot
 
-- Setup your Go 1.8.3 environment
+- Setup your Go 1.9.1 environment
 - Use [govendor](https://github.com/kardianos/govendor) for managing go packages
 - Pull the project with `go get github.com/hexbotio/hex`
 - Setup a local configuration such as `~/hex/config.json` with [configuration settings](configuration.md)

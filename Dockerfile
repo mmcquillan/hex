@@ -1,4 +1,6 @@
-FROM ubuntu
+FROM golang:1.9.1
 MAINTAINER HexBot.io
-ADD ./go/bin/hex /usr/local/bin/hex
-ENTRYPOINT /usr/local/bin/hex
+ENV GOBIN=/go/bin
+RUN go get -d github.com/hexbotio/hex
+RUN go install github.com/hexbotio/hex
+ENTRYPOINT /go/bin/hex
