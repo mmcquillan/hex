@@ -176,6 +176,7 @@ func ResolvePluginName(pluginName string) string {
 		"local":    "hex-local",
 		"response": "hex-response",
 		"ssh":      "hex-ssh",
+		"twilio":   "hex-twilio",
 		"validate": "hex-validate",
 		"winrm":    "hex-winrm",
 	}
