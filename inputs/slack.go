@@ -3,6 +3,7 @@ package inputs
 import (
 	"html"
 	"strings"
+	"time"
 
 	"github.com/hexbotio/hex/models"
 	"github.com/hexbotio/hex/parse"
@@ -11,22 +12,23 @@ import (
 
 // Slack struct
 type Slack struct {
+	API      *slack.Client
+	Channels map[string]string
+	Users    map[string]string
 }
 
 // Read function
 func (x Slack) Read(inputMsgs chan<- models.Message, config models.Config) {
-	api := slack.New(config.SlackToken)
-	api.SetDebug(config.SlackDebug)
+	x.API = slack.New(config.SlackToken)
+	x.API.SetDebug(config.SlackDebug)
 
 	// get channel array
-	channels := make(map[string]string)
-	channelList, err := api.GetChannels(true)
-	if err != nil {
-		config.Logger.Error("Slack Channel List" + " - " + err.Error())
-	}
-	for _, channel := range channelList {
-		channels[channel.ID] = "#" + channel.Name
-	}
+	x.Channels = x.updateChannels(config)
+	go x.refreshChannels(config)
+
+	// get user array
+	x.Users = x.updateUsers(config)
+	go x.refreshUsers(config)
 
 	// decode the bot name
 	var botName = config.BotName
@@ -36,16 +38,10 @@ func (x Slack) Read(inputMsgs chan<- models.Message, config models.Config) {
 		botName = strings.Replace(botName, "@", "", 1)
 	}
 
-	// get user array
-	users := make(map[string]string)
-	userList, err := api.GetUsers()
-	if err != nil {
-		config.Logger.Error("Slack User List" + " - " + err.Error())
-	}
-	for _, user := range userList {
-		users[user.ID] = user.Name
-		if botName == user.Name {
-			botName = user.ID
+	// convert the bot from name to id
+	for userId, userName := range x.Users {
+		if botName == userName {
+			botName = userId
 		}
 	}
 
@@ -57,7 +53,7 @@ func (x Slack) Read(inputMsgs chan<- models.Message, config models.Config) {
 	}
 
 	// listen to messages
-	rtm := api.NewRTM()
+	rtm := x.API.NewRTM()
 	go rtm.ManageConnection()
 	for {
 		select {
@@ -66,7 +62,7 @@ func (x Slack) Read(inputMsgs chan<- models.Message, config models.Config) {
 			case *slack.MessageEvent:
 				if ev.User != "" {
 
-					channel, found := channels[ev.Channel]
+					channel, found := x.Channels[ev.Channel]
 					if !found {
 						channel = ev.Channel
 					}
@@ -86,7 +82,7 @@ func (x Slack) Read(inputMsgs chan<- models.Message, config models.Config) {
 						message := models.NewMessage()
 						message.Attributes["hex.service"] = "slack"
 						message.Attributes["hex.channel"] = channel
-						message.Attributes["hex.user"] = users[ev.User]
+						message.Attributes["hex.user"] = x.Users[ev.User]
 						message.Attributes["hex.input"] = input
 						message.Debug = debug
 						inputMsgs <- message
@@ -96,4 +92,38 @@ func (x Slack) Read(inputMsgs chan<- models.Message, config models.Config) {
 			}
 		}
 	}
+}
+
+func (x Slack) updateUsers(config models.Config) map[string]string {
+	users := make(map[string]string)
+	userList, err := x.API.GetUsers()
+	if err != nil {
+		config.Logger.Error("Slack User List" + " - " + err.Error())
+	}
+	for _, user := range userList {
+		users[user.ID] = user.Name
+	}
+	return users
+}
+
+func (x Slack) refreshUsers(config models.Config) {
+	time.Sleep(5 * time.Minute)
+	x.Users = x.updateUsers(config)
+}
+
+func (x Slack) updateChannels(config models.Config) map[string]string {
+	channels := make(map[string]string)
+	channelList, err := x.API.GetChannels(true)
+	if err != nil {
+		config.Logger.Error("Slack Channel List" + " - " + err.Error())
+	}
+	for _, channel := range channelList {
+		channels[channel.ID] = "#" + channel.Name
+	}
+	return channels
+}
+
+func (x Slack) refreshChannels(config models.Config) {
+	time.Sleep(5 * time.Minute)
+	x.Channels = x.updateChannels(config)
 }
