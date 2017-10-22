@@ -55,6 +55,14 @@ Other config options are lited below:
 - CLI Param:  `-debug`
 - Conf File: `debug`
 
+### Quiet
+- Description: Flag to only log errors out (note, debug takes precedence over this)
+- Default: `false`
+- Type: bool
+- Env Variable: `HEX_QUIET`
+- CLI Param:  `-quiet`
+- Conf File: `quiet`
+
 ### Bot Name
 - Description: Bot Name in Slack
 - Default: `@hex`

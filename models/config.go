@@ -13,6 +13,7 @@ type Config struct {
 	RulesDir     string            `json:"rules_dir"`
 	LogFile      string            `json:"log_file"`
 	Debug        bool              `json:"debug"`
+	Quiet        bool              `json:"quiet"`
 	BotName      string            `json:"bot_name"`
 	CLI          bool              `json:"cli"`
 	Auditing     bool              `json:"auditing"`

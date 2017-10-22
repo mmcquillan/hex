@@ -13,6 +13,9 @@ func Logging(config *models.Config) {
 		Name:  "hex",
 		Level: hclog.Info,
 	}
+	if config.Quiet {
+		logOptions.Level = hclog.Error
+	}
 	if config.Debug {
 		logOptions.Level = hclog.Debug
 	}

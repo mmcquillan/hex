@@ -22,6 +22,7 @@ func Config(config *models.Config, version string) {
 	config.RulesDir = ""
 	config.LogFile = ""
 	config.Debug = false
+	config.Quiet = false
 	config.BotName = "@hex"
 	config.CLI = false
 	config.Auditing = false
@@ -68,6 +69,9 @@ func Config(config *models.Config, version string) {
 	if strings.ToUpper(os.Getenv("HEX_DEBUG")) == "TRUE" {
 		config.Debug = true
 	}
+	if strings.ToUpper(os.Getenv("HEX_QUIET")) == "TRUE" {
+		config.Quiet = true
+	}
 	if os.Getenv("HEX_BOT_NAME") != "" {
 		config.BotName = os.Getenv("HEX_BOT_NAME")
 	}
@@ -112,6 +116,7 @@ func Config(config *models.Config, version string) {
 	PluginsDir := flag.String("plugins-dir", config.PluginsDir, "Plugins Directory [/etc/hex/plugins]")
 	LogFile := flag.String("log-file", config.LogFile, "Log File")
 	Debug := flag.Bool("debug", config.Debug, "Debug [false]")
+	Quiet := flag.Bool("quiet", config.Quiet, "Quiet [false]")
 	BotName := flag.String("bot-name", config.BotName, "Bot Name [hex]")
 	CLI := flag.Bool("cli", config.CLI, "CLI [false]")
 	Auditing := flag.Bool("auditing", config.Auditing, "Audting [false]")
@@ -131,6 +136,7 @@ func Config(config *models.Config, version string) {
 	config.PluginsDir = *PluginsDir
 	config.LogFile = *LogFile
 	config.Debug = *Debug
+	config.Quiet = *Quiet
 	config.BotName = *BotName
 	config.CLI = *CLI
 	config.Auditing = *Auditing
