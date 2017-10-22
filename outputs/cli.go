@@ -3,6 +3,7 @@ package outputs
 import (
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/fatih/color"
 	"github.com/hexbotio/hex/models"
@@ -38,7 +39,11 @@ func (x Cli) Write(message models.Message, config models.Config) {
 		sort.Strings(keys)
 		fmt.Printf("MESSAGE DEBUG (%d sec to complete)\n", message.EndTime-message.StartTime)
 		for _, key := range keys {
-			fmt.Printf("  %s: '%s'\n", key, message.Attributes[key])
+			if strings.HasPrefix(key, "hex.var.") {
+				fmt.Printf("  %s: '%s'\n", key, "********")
+			} else {
+				fmt.Printf("  %s: '%s'\n", key, message.Attributes[key])
+			}
 		}
 	}
 	fmt.Print("\n", config.BotName, "> ")

@@ -3,6 +3,7 @@ package outputs
 import (
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/hexbotio/hex/models"
 	"github.com/hexbotio/hex/parse"
@@ -54,7 +55,11 @@ func (x Slack) Write(message models.Message, config models.Config) {
 		sort.Strings(keys)
 		out := fmt.Sprintf("\nMESSAGE DEBUG (%d sec to complete)\n", message.EndTime-message.StartTime)
 		for _, key := range keys {
-			out = out + fmt.Sprintf("  %s: '%s'\n", key, message.Attributes[key])
+			if strings.HasPrefix(key, "hex.var.") {
+				out = out + fmt.Sprintf("  %s: '%s'\n", key, "********")
+			} else {
+				out = out + fmt.Sprintf("  %s: '%s'\n", key, message.Attributes[key])
+			}
 		}
 		attachment := slack.Attachment{
 			Text:       "```" + out + "```",

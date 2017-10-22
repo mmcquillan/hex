@@ -142,3 +142,10 @@ Other config options are lited below:
 - Env Variable: `HEX_WEBHOOK_PORT`
 - CLI Param:  `-webhook-port`
 - Conf File: `webhook_port`
+
+### Vars
+- Description: Vars are a key/value set of vars which can be used through out rules for injecting sensitive data
+- Default:
+- Type: string key/value
+- Note: These will be available as `${hex.var.KEYNAME}`
+

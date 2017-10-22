@@ -48,6 +48,9 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 	message.Attributes["hex.rule.name"] = rule.Name
 	message.Attributes["hex.rule.format"] = strconv.FormatBool(rule.Format)
 	message.Attributes["hex.rule.channel"] = rule.Channel
+	for key, value := range config.Vars {
+		message.Attributes["hex.var."+key] = value
+	}
 	actionCounter := 0
 	lastAction := true
 	lastConfig := rule.Actions[0].Config
