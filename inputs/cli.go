@@ -26,7 +26,7 @@ func (x Cli) Read(inputMsgs chan<- models.Message, config models.Config) {
 		req := scanner.Text()
 		fmt.Print("\n", config.BotName, "> ")
 		input, debug := parse.Flag(req, "--debug")
-		if strings.TrimSpace(req) != "" {
+		if strings.TrimSpace(input) != "" {
 			message := models.NewMessage()
 			message.Attributes["hex.service"] = "cli"
 			message.Attributes["hex.hostname"] = hostname
