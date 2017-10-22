@@ -49,5 +49,6 @@ func Version(message *models.Message, config models.Config) {
 	message.Outputs = append(message.Outputs, models.Output{
 		Rule:     "version",
 		Response: response,
+		Success:  true,
 	})
 }

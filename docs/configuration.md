@@ -151,6 +151,14 @@ Other config options are lited below:
 - CLI Param:  `-webhook-port`
 - Conf File: `webhook_port`
 
+### Command
+- Description: Command to execute and quit
+- Default:
+- Type: string
+- Env Variable: `HEX_COMMAND`
+- CLI Param:  `-command`
+- Conf File: `command`
+
 ### Vars
 - Description: Vars are a key/value set of vars which can be used through out rules for injecting sensitive data
 - Default:

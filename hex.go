@@ -30,7 +30,7 @@ func main() {
 	wg.Add(3)
 	go core.Inputs(inputMsgs, &rules, config)
 	go core.Matcher(inputMsgs, outputMsgs, &plugins, &rules, config)
-	go core.Outputs(outputMsgs, config)
+	go core.Outputs(outputMsgs, &plugins, config)
 
 	// run indefinately
 	defer wg.Done()

@@ -25,5 +25,6 @@ type Config struct {
 	Scheduler    bool              `json:"scheduler"`
 	Webhook      bool              `json:"webhook"`
 	WebhookPort  int               `json:"webhook_port"`
+	Command      string            `json:"command"`
 	Vars         map[string]string `json:"vars"`
 }

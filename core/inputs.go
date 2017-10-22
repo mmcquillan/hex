@@ -9,6 +9,12 @@ import (
 
 func Inputs(inputMsgs chan<- models.Message, rules *map[string]models.Rule, config models.Config) {
 
+	if config.Command != "" {
+		config.Logger.Info("Initializing Command Input")
+		var command = new(inputs.Command)
+		go command.Read(inputMsgs, config)
+	}
+
 	if config.CLI {
 		config.Logger.Info("Initializing CLI Input")
 		var cli = new(inputs.Cli)

@@ -34,6 +34,7 @@ func Config(config *models.Config, version string) {
 	config.Scheduler = false
 	config.Webhook = false
 	config.WebhookPort = 8000
+	config.Command = ""
 
 	// version and exit
 	if len(os.Args) > 1 && os.Args[1] == "version" {
@@ -109,6 +110,9 @@ func Config(config *models.Config, version string) {
 		}
 		config.WebhookPort = port
 	}
+	if os.Getenv("HEX_COMMAND") != "" {
+		config.Command = os.Getenv("HEX_COMMAND")
+	}
 
 	// flags
 	Admins := flag.String("admins", config.Admins, "Admins (comma delimited)")
@@ -128,6 +132,7 @@ func Config(config *models.Config, version string) {
 	Scheduler := flag.Bool("scheduler", config.Scheduler, "Scheduler [false]")
 	Webhook := flag.Bool("webhook", config.Webhook, "Webhook [false]")
 	WebhookPort := flag.Int("webhook-port", config.WebhookPort, "Webhook Port [8000]")
+	Command := flag.String("command", config.Command, "Command to Execute")
 	flag.Parse()
 
 	// set flags
@@ -148,6 +153,7 @@ func Config(config *models.Config, version string) {
 	config.Scheduler = *Scheduler
 	config.Webhook = *Webhook
 	config.WebhookPort = *WebhookPort
+	config.Command = *Command
 
 	// a few basic rules
 	if config.Slack && config.SlackToken == "" {

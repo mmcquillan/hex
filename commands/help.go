@@ -53,6 +53,7 @@ func Help(message *models.Message, rules *map[string]models.Rule, config models.
 		message.Outputs = append(message.Outputs, models.Output{
 			Rule:     "help",
 			Response: strings.Join(newhelp[:], "\n"),
+			Success:  true,
 		})
 	}
 
