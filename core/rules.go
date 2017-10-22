@@ -15,24 +15,26 @@ import (
 var fileFilter = ".json"
 
 func Rules(rules *map[string]models.Rule, config models.Config) {
-	if DirExists(config.RulesDir) {
-		go watchRules(config, rules)
-		ruleList := []string{}
-		err := filepath.Walk(config.RulesDir, func(path string, f os.FileInfo, err error) error {
-			if !f.IsDir() && strings.HasSuffix(f.Name(), fileFilter) {
-				ruleList = append(ruleList, path)
+	if config.RulesDir != "" {
+		if DirExists(config.RulesDir) {
+			go watchRules(config, rules)
+			ruleList := []string{}
+			err := filepath.Walk(config.RulesDir, func(path string, f os.FileInfo, err error) error {
+				if !f.IsDir() && strings.HasSuffix(f.Name(), fileFilter) {
+					ruleList = append(ruleList, path)
+				}
+				return nil
+			})
+			if err != nil {
+				config.Logger.Error("Loading Rules Directory" + " - " + err.Error())
 			}
-			return nil
-		})
-		if err != nil {
-			config.Logger.Error("Loading Rules Directory" + " - " + err.Error())
+			for _, file := range ruleList {
+				addRule(file, *rules, config)
+			}
+		} else {
+			fmt.Println("ERROR: The rules directory does not exist.")
+			os.Exit(1)
 		}
-		for _, file := range ruleList {
-			addRule(file, *rules, config)
-		}
-	} else {
-		fmt.Println("ERROR: The rules directory does not exist.")
-		os.Exit(1)
 	}
 }
 

@@ -18,8 +18,8 @@ func Config(config *models.Config, version string) {
 	// start with defaults
 	config.Version = version
 	config.Admins = ""
-	config.PluginsDir = "/etc/hex/plugins"
-	config.RulesDir = "/etc/hex/rules"
+	config.PluginsDir = ""
+	config.RulesDir = ""
 	config.LogFile = ""
 	config.Debug = false
 	config.BotName = "@hex"

@@ -25,7 +25,7 @@ Other config options are lited below:
 
 ### Plugins Directory
 - Description: The location of the hex plugins
-- Default: `/etc/hex/plugins`
+- Default:
 - Type: string
 - Env Variable: `HEX_PLUGINS_DIR`
 - CLI Param:  `-plugins-dir`
@@ -33,7 +33,7 @@ Other config options are lited below:
 
 ### Rules Directory
 - Description: The location of the hex rules
-- Default: `/etc/hex/rules`
+- Default:
 - Type: string
 - Env Variable: `HEX_RULES_DIR`
 - CLI Param:  `-rules-dir`

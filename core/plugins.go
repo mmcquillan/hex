@@ -20,22 +20,24 @@ import (
 func Plugins(plugins *map[string]models.Plugin, rules map[string]models.Rule, config models.Config) {
 
 	// look for existing plugins
-	if DirExists(config.PluginsDir) {
-		pluginList := make(map[string]string)
-		err := filepath.Walk(config.PluginsDir, func(path string, f os.FileInfo, err error) error {
-			if !f.IsDir() {
-				pluginList[f.Name()] = path
+	if config.PluginsDir != "" {
+		if DirExists(config.PluginsDir) {
+			pluginList := make(map[string]string)
+			err := filepath.Walk(config.PluginsDir, func(path string, f os.FileInfo, err error) error {
+				if !f.IsDir() {
+					pluginList[f.Name()] = path
+				}
+				return nil
+			})
+			if err != nil {
+				config.Logger.Error("Loading Plugin Dir" + " - " + err.Error())
 			}
-			return nil
-		})
-		if err != nil {
-			config.Logger.Error("Loading Plugin Dir" + " - " + err.Error())
+			for pluginName, pluginPath := range pluginList {
+				addPlugin(pluginName, pluginPath, *plugins, config)
+			}
+		} else {
+			config.Logger.Error("Plugin Directory does not exist")
 		}
-		for pluginName, pluginPath := range pluginList {
-			addPlugin(pluginName, pluginPath, *plugins, config)
-		}
-	} else {
-		config.Logger.Error("Plugin Directory does not exist")
 	}
 
 	// review rules for missing plugins
