@@ -15,8 +15,8 @@ Each rule is a seperate json file which consists of some rule options and a seri
 }
 ```
 
-### Name
-- Config: `name`
+### Rule
+- Config: `rule`
 - Description: Name of the rule, also used as the title for formatted output
 - Default:
 - Type: string
