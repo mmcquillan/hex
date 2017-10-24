@@ -12,18 +12,21 @@ func Commands(message models.Message, outputMsgs chan<- models.Message, rules *m
 	if parse.Match("help*", message.Attributes["hex.input"]) {
 		msg := deepcopy.Copy(message).(models.Message)
 		commands.Help(&msg, rules, config)
+		msg.EndTime = models.MessageTimestamp()
 		outputMsgs <- msg
 	}
 
 	if parse.Match("version", message.Attributes["hex.input"]) {
 		msg := deepcopy.Copy(message).(models.Message)
 		commands.Version(&msg, config)
+		msg.EndTime = models.MessageTimestamp()
 		outputMsgs <- msg
 	}
 
 	if parse.Match("ping", message.Attributes["hex.input"]) {
 		msg := deepcopy.Copy(message).(models.Message)
 		commands.Ping(&msg)
+		msg.EndTime = models.MessageTimestamp()
 		outputMsgs <- msg
 	}
 
@@ -31,6 +34,7 @@ func Commands(message models.Message, outputMsgs chan<- models.Message, rules *m
 		if parse.EitherMember(config.Admins, message.Attributes["hex.user"], message.Attributes["hex.channel"]) {
 			msg := deepcopy.Copy(message).(models.Message)
 			commands.Rules(&msg, rules, config)
+			msg.EndTime = models.MessageTimestamp()
 			outputMsgs <- msg
 		}
 	}
