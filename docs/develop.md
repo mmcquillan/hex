@@ -18,3 +18,10 @@ Plugins are a great way of adding functionality to Hex to increase its capabilit
 
 https://github.com/hexbotio/hex-response
 
+
+### Testing
+
+There are unit tests written for some of the parse methods. In additon there is a testing framework to run integration tests against the bot and the various plugins.
+
+https://github.com/hexbotio/thext
+
