@@ -116,8 +116,8 @@ func Config(config *models.Config, version string) {
 
 	// flags
 	Admins := flag.String("admins", config.Admins, "Admins (comma delimited)")
-	RulesDir := flag.String("rules-dir", config.RulesDir, "Rules Directory [/etc/hex/rules]")
-	PluginsDir := flag.String("plugins-dir", config.PluginsDir, "Plugins Directory [/etc/hex/plugins]")
+	RulesDir := flag.String("rules-dir", config.RulesDir, "Rules Directory")
+	PluginsDir := flag.String("plugins-dir", config.PluginsDir, "Plugins Directory")
 	LogFile := flag.String("log-file", config.LogFile, "Log File")
 	Debug := flag.Bool("debug", config.Debug, "Debug [false]")
 	Quiet := flag.Bool("quiet", config.Quiet, "Quiet [false]")
