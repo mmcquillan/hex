@@ -2,6 +2,7 @@ package models
 
 // Rule Struct
 type Rule struct {
+	Id             string
 	Name           string   `json:"rule"`
 	Match          string   `json:"match"`
 	Schedule       string   `json:"schedule"`
@@ -10,6 +11,7 @@ type Rule struct {
 	Channel        string   `json:"channel"`
 	Format         bool     `json:"format"`
 	OutputFailOnly bool     `json:"output_fail_only"`
+	OutputOnChange bool     `json:"output_on_change"`
 	Help           string   `json:"help"`
 	Hide           bool     `json:"hide"`
 	Active         bool     `json:"active"`

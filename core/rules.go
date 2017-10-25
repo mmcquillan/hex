@@ -63,11 +63,13 @@ func removeRule(ruleFile string, rules map[string]models.Rule, config models.Con
 
 func readRule(ruleFile string, config models.Config) (rule models.Rule) {
 	rule = models.Rule{
-		Active: true,
-		Debug:  false,
-		Format: false,
-		Hide:   false,
-		ACL:    "*",
+		Active:         true,
+		Debug:          false,
+		Format:         false,
+		Hide:           false,
+		ACL:            "*",
+		OutputFailOnly: false,
+		OutputOnChange: false,
 	}
 	if FileExists(ruleFile) {
 		file, err := ioutil.ReadFile(ruleFile)
@@ -87,6 +89,7 @@ func readRule(ruleFile string, config models.Config) (rule models.Rule) {
 		}
 		// no need to sub action.config as this happens at matcher time
 	}
+	rule.Id = ruleFile
 	return rule
 }
 

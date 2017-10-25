@@ -63,6 +63,12 @@ Each rule is a seperate json file which consists of some rule options and a seri
 - Default: false
 - Type: bool
 
+### OutputOnChange
+- Config: `output_on_change`
+- Description: Flag to output on any status change
+- Default: false
+- Type: bool
+
 ### Help
 - Config: `help`
 - Description: Custom help to display for the rule

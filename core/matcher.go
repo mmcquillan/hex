@@ -11,6 +11,10 @@ import (
 )
 
 func Matcher(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, plugins *map[string]models.Plugin, rules *map[string]models.Rule, config models.Config) {
+	state := make(map[string]bool)
+	for _, rule := range *rules {
+		state[rule.Id] = true
+	}
 	for {
 		message := <-inputMsgs
 		Commands(message, outputMsgs, rules, config)
@@ -21,7 +25,7 @@ func Matcher(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, 
 				if parse.EitherMember(rule.ACL, message.Attributes["hex.user"], message.Attributes["hex.channel"]) {
 					config.Logger.Debug("Matched Rule '" + rule.Name + "' with input '" + message.Attributes["hex.input"] + "'")
 					msg := deepcopy.Copy(message).(models.Message)
-					go runRule(rule, msg, outputMsgs, *plugins, config)
+					go runRule(rule, msg, outputMsgs, state, *plugins, config)
 				}
 			}
 
@@ -29,21 +33,21 @@ func Matcher(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, 
 			if rule.Active && rule.Schedule != "" && rule.Schedule == message.Attributes["hex.schedule"] {
 				config.Logger.Debug("Matched Rule '" + rule.Name + "' with schedule '" + message.Attributes["hex.schedule"] + "'")
 				msg := deepcopy.Copy(message).(models.Message)
-				go runRule(rule, msg, outputMsgs, *plugins, config)
+				go runRule(rule, msg, outputMsgs, state, *plugins, config)
 			}
 
 			// match for webhook
 			if rule.Active && rule.URL != "" && parse.Match(rule.URL, message.Attributes["hex.url"]) {
 				config.Logger.Debug("Matched Rule '" + rule.Name + "' with url '" + message.Attributes["hex.url"] + "'")
 				msg := deepcopy.Copy(message).(models.Message)
-				go runRule(rule, msg, outputMsgs, *plugins, config)
+				go runRule(rule, msg, outputMsgs, state, *plugins, config)
 			}
 
 		}
 	}
 }
 
-func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.Message, plugins map[string]models.Plugin, config models.Config) {
+func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.Message, state map[string]bool, plugins map[string]models.Plugin, config models.Config) {
 	message.Attributes["hex.rule.runid"] = models.MessageID()
 	message.Attributes["hex.rule.name"] = rule.Name
 	message.Attributes["hex.rule.format"] = strconv.FormatBool(rule.Format)
@@ -52,6 +56,7 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 		message.Attributes["hex.var."+key] = value
 	}
 	actionCounter := 0
+	ruleResult := true
 	lastAction := true
 	lastConfig := rule.Actions[0].Config
 	for _, action := range rule.Actions {
@@ -72,9 +77,15 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 					Config:  action.Config,
 				}
 				resp := plugins[action.Type].Action.Perform(args)
+				if !resp.Success {
+					ruleResult = false
+				}
+				lastAction = resp.Success
+				lastConfig = action.Config
+				message.Attributes[attrName+".duration"] = strconv.FormatInt(models.MessageTimestamp()-startTime, 10)
 				if action.OutputToVar {
 					message.Attributes[attrName+".response"] = strings.TrimSpace(resp.Output)
-				} else if !action.HideOutput && (!rule.OutputFailOnly || !resp.Success) {
+				} else if !action.HideOutput {
 					message.Outputs = append(message.Outputs, models.Output{
 						Rule:     rule.Name,
 						Response: resp.Output,
@@ -82,9 +93,6 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 						Command:  cmd,
 					})
 				}
-				lastAction = resp.Success
-				lastConfig = action.Config
-				message.Attributes[attrName+".duration"] = strconv.FormatInt(models.MessageTimestamp()-startTime, 10)
 			} else {
 				config.Logger.Error("Missing Plugin " + action.Type)
 			}
@@ -92,5 +100,10 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 		actionCounter += 1
 	}
 	message.EndTime = models.MessageTimestamp()
-	outputMsgs <- message
+	if !rule.OutputOnChange && (!rule.OutputFailOnly || !ruleResult) {
+		outputMsgs <- message
+	} else if rule.OutputOnChange && ruleResult != state[rule.Id] {
+		outputMsgs <- message
+	}
+	state[rule.Id] = ruleResult
 }
