@@ -20,11 +20,11 @@ func (x Cli) Read(inputMsgs chan<- models.Message, config models.Config) {
 	hostname, _ := os.Hostname()
 	user, _ := user.Current()
 	fmt.Println("Starting in cli mode...\n")
-	fmt.Print(config.BotName, "> ")
+	fmt.Print("> ", config.BotName, " ")
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		req := scanner.Text()
-		fmt.Print("\n", config.BotName, "> ")
+		fmt.Print("\n> ", config.BotName, " ")
 		input, debug := parse.Flag(req, "--debug")
 		if strings.TrimSpace(input) != "" {
 			message := models.NewMessage()

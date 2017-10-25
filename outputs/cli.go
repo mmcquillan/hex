@@ -46,5 +46,5 @@ func (x Cli) Write(message models.Message, config models.Config) {
 			}
 		}
 	}
-	fmt.Print("\n", config.BotName, "> ")
+	fmt.Print("\n> ", config.BotName, " ")
 }
