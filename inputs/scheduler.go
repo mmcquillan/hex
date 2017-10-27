@@ -1,6 +1,7 @@
 package inputs
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/hexbotio/hex/models"
@@ -26,12 +27,14 @@ func (x Scheduler) Read(inputMsgs chan<- models.Message, rules *map[string]model
 	wg.Add(1)
 	cron := cron.New()
 	for schedule, _ := range schedules {
-		config.Logger.Debug("Adding Schedule - '" + schedule + "'")
+		config.Logger.Debug("Scheduler Input - Adding Schedule '" + schedule + "'")
 		cron.AddFunc(schedule, func() {
 			message := models.NewMessage()
 			message.Attributes["hex.service"] = "scheduler"
 			message.Attributes["hex.schedule"] = schedule
 			message.Attributes["hex.input"] = ""
+			config.Logger.Debug("Scheduler Input - ID:" + message.Attributes["hex.id"])
+			config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 			inputMsgs <- message
 		})
 	}

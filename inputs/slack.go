@@ -1,6 +1,7 @@
 package inputs
 
 import (
+	"fmt"
 	"html"
 	"strings"
 	"time"
@@ -47,7 +48,7 @@ func (x Slack) Read(inputMsgs chan<- models.Message, config models.Config) {
 
 	// validate bot
 	if botName == "" {
-		config.Logger.Warn("Bot name is not the same as configured in Slack")
+		config.Logger.Warn("Slack Input - Bot name is not the same as configured in Slack")
 	} else {
 		botName = "<@" + botName + ">"
 	}
@@ -85,6 +86,8 @@ func (x Slack) Read(inputMsgs chan<- models.Message, config models.Config) {
 						message.Attributes["hex.user"] = x.Users[ev.User]
 						message.Attributes["hex.input"] = input
 						message.Debug = debug
+						config.Logger.Debug("Slack Input - ID:" + message.Attributes["hex.id"])
+						config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 						inputMsgs <- message
 					}
 
@@ -98,7 +101,7 @@ func (x Slack) updateUsers(config models.Config) map[string]string {
 	users := make(map[string]string)
 	userList, err := x.API.GetUsers()
 	if err != nil {
-		config.Logger.Error("Slack User List" + " - " + err.Error())
+		config.Logger.Error("Slack Input - User List " + err.Error())
 	}
 	for _, user := range userList {
 		users[user.ID] = user.Name
@@ -115,7 +118,7 @@ func (x Slack) updateChannels(config models.Config) map[string]string {
 	channels := make(map[string]string)
 	channelList, err := x.API.GetChannels(true)
 	if err != nil {
-		config.Logger.Error("Slack Channel List" + " - " + err.Error())
+		config.Logger.Error("Slack Input - Channel List " + err.Error())
 	}
 	for _, channel := range channelList {
 		channels[channel.ID] = "#" + channel.Name

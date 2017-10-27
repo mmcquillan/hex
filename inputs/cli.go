@@ -33,6 +33,8 @@ func (x Cli) Read(inputMsgs chan<- models.Message, config models.Config) {
 			message.Attributes["hex.user"] = user.Username
 			message.Attributes["hex.input"] = input
 			message.Debug = debug
+			config.Logger.Debug("Cli Input - ID:" + message.Attributes["hex.id"])
+			config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 			inputMsgs <- message
 		}
 	}

@@ -19,6 +19,9 @@ func Logging(config *models.Config) {
 	if config.Debug {
 		logOptions.Level = hclog.Debug
 	}
+	if config.Trace {
+		logOptions.Level = hclog.Trace
+	}
 	if config.LogFile != "" {
 		if !FileExists(config.LogFile) {
 			nf, err := os.Create(config.LogFile)

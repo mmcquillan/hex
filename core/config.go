@@ -22,6 +22,7 @@ func Config(config *models.Config, version string) {
 	config.RulesDir = ""
 	config.LogFile = ""
 	config.Debug = false
+	config.Trace = false
 	config.Quiet = false
 	config.BotName = "@hex"
 	config.CLI = false
@@ -69,6 +70,9 @@ func Config(config *models.Config, version string) {
 	}
 	if strings.ToUpper(os.Getenv("HEX_DEBUG")) == "TRUE" {
 		config.Debug = true
+	}
+	if strings.ToUpper(os.Getenv("HEX_TRACE")) == "TRUE" {
+		config.Trace = true
 	}
 	if strings.ToUpper(os.Getenv("HEX_QUIET")) == "TRUE" {
 		config.Quiet = true
@@ -121,6 +125,7 @@ func Config(config *models.Config, version string) {
 	LogFile := flag.String("log-file", config.LogFile, "Log File")
 	Debug := flag.Bool("debug", config.Debug, "Debug [false]")
 	Quiet := flag.Bool("quiet", config.Quiet, "Quiet [false]")
+	Trace := flag.Bool("trace", config.Trace, "Trace [false]")
 	BotName := flag.String("bot-name", config.BotName, "Bot Name [hex]")
 	CLI := flag.Bool("cli", config.CLI, "CLI [false]")
 	Auditing := flag.Bool("auditing", config.Auditing, "Audting [false]")
@@ -142,6 +147,7 @@ func Config(config *models.Config, version string) {
 	config.LogFile = *LogFile
 	config.Debug = *Debug
 	config.Quiet = *Quiet
+	config.Trace = *Trace
 	config.BotName = *BotName
 	config.CLI = *CLI
 	config.Auditing = *Auditing

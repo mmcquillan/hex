@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -17,13 +18,16 @@ func Matcher(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, 
 	}
 	for {
 		message := <-inputMsgs
+		config.Logger.Debug("Matcher - Eval of Message ID:" + message.Attributes["hex.id"])
+		config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 		Commands(message, outputMsgs, rules, config)
 		for _, rule := range *rules {
 
 			// match for input
 			if rule.Active && rule.Match != "" && parse.Match(rule.Match, message.Attributes["hex.input"]) {
 				if parse.EitherMember(rule.ACL, message.Attributes["hex.user"], message.Attributes["hex.channel"]) {
-					config.Logger.Debug("Matched Rule '" + rule.Name + "' with input '" + message.Attributes["hex.input"] + "'")
+					config.Logger.Debug("Matcher - Matched Rule '" + rule.Name + "' with input '" + message.Attributes["hex.input"] + "' on ID:" + message.Attributes["hex.id"])
+					config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 					msg := deepcopy.Copy(message).(models.Message)
 					go runRule(rule, msg, outputMsgs, state, *plugins, config)
 				}
@@ -31,14 +35,16 @@ func Matcher(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, 
 
 			// match for schedule
 			if rule.Active && rule.Schedule != "" && rule.Schedule == message.Attributes["hex.schedule"] {
-				config.Logger.Debug("Matched Rule '" + rule.Name + "' with schedule '" + message.Attributes["hex.schedule"] + "'")
+				config.Logger.Debug("Matcher - Matched Rule '" + rule.Name + "' with schedule '" + message.Attributes["hex.schedule"] + "' on ID:" + message.Attributes["hex.id"])
+				config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 				msg := deepcopy.Copy(message).(models.Message)
 				go runRule(rule, msg, outputMsgs, state, *plugins, config)
 			}
 
 			// match for webhook
 			if rule.Active && rule.URL != "" && parse.Match(rule.URL, message.Attributes["hex.url"]) {
-				config.Logger.Debug("Matched Rule '" + rule.Name + "' with url '" + message.Attributes["hex.url"] + "'")
+				config.Logger.Debug("Matcher - Matched Rule '" + rule.Name + "' with url '" + message.Attributes["hex.url"] + "' on ID:" + message.Attributes["hex.id"])
+				config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 				msg := deepcopy.Copy(message).(models.Message)
 				go runRule(rule, msg, outputMsgs, state, *plugins, config)
 			}
@@ -48,6 +54,8 @@ func Matcher(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, 
 }
 
 func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.Message, state map[string]bool, plugins map[string]models.Plugin, config models.Config) {
+	config.Logger.Debug("Matcher - Running Rule " + rule.Name + " for ID:" + message.Attributes["hex.id"])
+	config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 	message.Attributes["hex.rule.runid"] = models.MessageID()
 	message.Attributes["hex.rule.name"] = rule.Name
 	message.Attributes["hex.rule.format"] = strconv.FormatBool(rule.Format)
@@ -60,6 +68,8 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 	lastAction := true
 	lastConfig := rule.Actions[0].Config
 	for _, action := range rule.Actions {
+		config.Logger.Debug("Matcher - Evaluating Action " + rule.Name + "." + action.Type + " [" + strconv.Itoa(actionCounter) + "] for ID:" + message.Attributes["hex.id"])
+		config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 		if lastAction || action.RunOnFail {
 			if _, exists := plugins[action.Type]; exists {
 				startTime := models.MessageTimestamp()
@@ -94,16 +104,23 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 					})
 				}
 			} else {
-				config.Logger.Error("Missing Plugin " + action.Type)
+				config.Logger.Error("Matcher - Missing Plugin " + action.Type)
 			}
 		}
 		actionCounter += 1
 	}
 	message.EndTime = models.MessageTimestamp()
 	if !rule.OutputOnChange && (!rule.OutputFailOnly || !ruleResult) {
+		config.Logger.Debug("Matcher - Output ID:" + message.Attributes["hex.id"])
+		config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 		outputMsgs <- message
 	} else if rule.OutputOnChange && ruleResult != state[rule.Id] {
+		config.Logger.Debug("Matcher - Output Change ID:" + message.Attributes["hex.id"])
+		config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 		outputMsgs <- message
+	} else {
+		config.Logger.Debug("Matcher - Discarding ID:" + message.Attributes["hex.id"])
+		config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 	}
 	state[rule.Id] = ruleResult
 }

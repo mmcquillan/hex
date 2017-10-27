@@ -22,7 +22,7 @@ func (x Webhook) Read(inputMsgs chan<- models.Message, config models.Config) {
 		rawbody, err := ioutil.ReadAll(r.Body)
 		body := string(rawbody)
 		if err != nil {
-			config.Logger.Error("Webhook Body Read" + " - " + err.Error())
+			config.Logger.Error("Webhook Input - Webhook Body Read " + err.Error())
 		}
 		defer r.Body.Close()
 		message := models.NewMessage()
@@ -30,6 +30,8 @@ func (x Webhook) Read(inputMsgs chan<- models.Message, config models.Config) {
 		message.Attributes["hex.url"] = r.RequestURI
 		message.Attributes["hex.ipaddress"] = r.RemoteAddr
 		message.Attributes["hex.input"] = body
+		config.Logger.Debug("Webhook Input - ID:" + message.Attributes["hex.id"])
+		config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 		inputMsgs <- message
 
 		w.WriteHeader(http.StatusOK)
@@ -40,6 +42,6 @@ func (x Webhook) Read(inputMsgs chan<- models.Message, config models.Config) {
 
 	err := server.ListenAndServe()
 	if err != nil {
-		config.Logger.Error("Webhook Listner" + " - " + err.Error())
+		config.Logger.Error("Webhook Input - Webhook Listner " + err.Error())
 	}
 }
