@@ -20,16 +20,20 @@ func Matcher(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, 
 		message := <-inputMsgs
 		config.Logger.Debug("Matcher - Eval of Message ID:" + message.Attributes["hex.id"])
 		config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
-		Commands(message, outputMsgs, rules, config)
+		if parse.EitherMember(config.ACL, message.Attributes["hex.user"], message.Attributes["hex.channel"]) {
+			Commands(message, outputMsgs, rules, config)
+		}
 		for _, rule := range *rules {
 
 			// match for input
 			if rule.Active && rule.Match != "" && parse.Match(rule.Match, message.Attributes["hex.input"]) {
-				if parse.EitherMember(rule.ACL, message.Attributes["hex.user"], message.Attributes["hex.channel"]) {
-					config.Logger.Debug("Matcher - Matched Rule '" + rule.Name + "' with input '" + message.Attributes["hex.input"] + "' on ID:" + message.Attributes["hex.id"])
-					config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
-					msg := deepcopy.Copy(message).(models.Message)
-					go runRule(rule, msg, outputMsgs, state, *plugins, config)
+				if parse.EitherMember(config.ACL, message.Attributes["hex.user"], message.Attributes["hex.channel"]) {
+					if parse.EitherMember(rule.ACL, message.Attributes["hex.user"], message.Attributes["hex.channel"]) {
+						config.Logger.Debug("Matcher - Matched Rule '" + rule.Name + "' with input '" + message.Attributes["hex.input"] + "' on ID:" + message.Attributes["hex.id"])
+						config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
+						msg := deepcopy.Copy(message).(models.Message)
+						go runRule(rule, msg, outputMsgs, state, *plugins, config)
+					}
 				}
 			}
 

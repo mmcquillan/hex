@@ -23,6 +23,14 @@ Other config options are lited below:
 - CLI Param:  `-admins`
 - Conf File: `admins`
 
+### ACL
+- Description: Comma delimited list of users and channels allowed to execute any rule
+- Default: *
+- Type: string
+- Env Variable: `HEX_ACL`
+- CLI Param: `-acl`
+- Conf File: `acl`
+
 ### Plugins Directory
 - Description: The location of the hex plugins
 - Default:
@@ -54,6 +62,14 @@ Other config options are lited below:
 - Env Variable: `HEX_DEBUG`
 - CLI Param:  `-debug`
 - Conf File: `debug`
+
+### Trace
+- Description: Flag to enable trace for logs (WARNING: this is very verbose and can contain sensitve data)
+- Default: `false`
+- Type: bool
+- Env Variable: `HEX_TRACE`
+- CLI Param:  `-trace`
+- Conf File: `trace`
 
 ### Quiet
 - Description: Flag to only log errors out (note, debug takes precedence over this)

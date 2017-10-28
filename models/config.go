@@ -4,11 +4,12 @@ import (
 	"github.com/hashicorp/go-hclog"
 )
 
-// Config
+// Config struct
 type Config struct {
 	Version      string
 	Logger       hclog.Logger
 	Admins       string            `json:"admins"`
+	ACL          string            `json:"acl"`
 	PluginsDir   string            `json:"plugins_dir"`
 	RulesDir     string            `json:"rules_dir"`
 	LogFile      string            `json:"log_file"`

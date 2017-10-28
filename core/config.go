@@ -13,11 +13,13 @@ import (
 	"github.com/hexbotio/hex/models"
 )
 
+// Config func
 func Config(config *models.Config, version string) {
 
 	// start with defaults
 	config.Version = version
 	config.Admins = ""
+	config.ACL = "*"
 	config.PluginsDir = ""
 	config.RulesDir = ""
 	config.LogFile = ""
@@ -58,6 +60,9 @@ func Config(config *models.Config, version string) {
 	// environment
 	if os.Getenv("HEX_ADMINS") != "" {
 		config.RulesDir = os.Getenv("HEX_ADMINS")
+	}
+	if os.Getenv("HEX_ACL") != "" {
+		config.RulesDir = os.Getenv("HEX_ACL")
 	}
 	if os.Getenv("HEX_RULES_DIR") != "" {
 		config.RulesDir = os.Getenv("HEX_RULES_DIR")
@@ -120,6 +125,7 @@ func Config(config *models.Config, version string) {
 
 	// flags
 	Admins := flag.String("admins", config.Admins, "Admins (comma delimited)")
+	ACL := flag.String("acl", config.ACL, "ACL (comma delimited)")
 	RulesDir := flag.String("rules-dir", config.RulesDir, "Rules Directory")
 	PluginsDir := flag.String("plugins-dir", config.PluginsDir, "Plugins Directory")
 	LogFile := flag.String("log-file", config.LogFile, "Log File")
@@ -142,6 +148,7 @@ func Config(config *models.Config, version string) {
 
 	// set flags
 	config.Admins = *Admins
+	config.ACL = *ACL
 	config.RulesDir = *RulesDir
 	config.PluginsDir = *PluginsDir
 	config.LogFile = *LogFile
@@ -162,6 +169,9 @@ func Config(config *models.Config, version string) {
 	config.Command = *Command
 
 	// a few basic rules
+	if config.ACL == "" {
+		log.Println("WARNING: Setting a blank ACL will result in nothing happening.")
+	}
 	if config.Slack && config.SlackToken == "" {
 		log.Fatal("ERROR: Slack is enabled, but no Slack Token is specified.")
 	}
