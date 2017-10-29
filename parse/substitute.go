@@ -13,21 +13,22 @@ import (
 func Substitute(value string, tokens map[string]string) string {
 	if match, hits := findVars(value); match {
 		for _, hit := range hits {
-			clean_hit := strip(hit)
-			if strings.HasPrefix(clean_hit, "hex.input.json:") {
-				value = strings.Replace(value, hit, subJson(clean_hit, tokens["hex.input"]), -1)
-			} else if strings.HasPrefix(clean_hit, "hex.input.") {
-				value = strings.Replace(value, hit, subInput(clean_hit, tokens), -1)
-			} else if _, ok := tokens[clean_hit]; ok {
-				value = strings.Replace(value, hit, tokens[clean_hit], -1)
+			cleanHit := strip(hit)
+			if strings.HasPrefix(cleanHit, "hex.input.json:") {
+				value = strings.Replace(value, hit, subJSON(cleanHit, tokens["hex.input"]), -1)
+			} else if strings.HasPrefix(cleanHit, "hex.input.") {
+				value = strings.Replace(value, hit, subInput(cleanHit, tokens), -1)
+			} else if _, ok := tokens[cleanHit]; ok {
+				value = strings.Replace(value, hit, tokens[cleanHit], -1)
 			} else {
-				value = strings.Replace(value, hit, os.Getenv(clean_hit), -1)
+				value = strings.Replace(value, hit, os.Getenv(cleanHit), -1)
 			}
 		}
 	}
 	return value
 }
 
+// SubstituteEnv function to just substitute envionrment variables
 func SubstituteEnv(value string) string {
 	if match, hits := findVars(value); match {
 		for _, hit := range hits {
@@ -47,7 +48,7 @@ func findVars(value string) (match bool, tokens []string) {
 	return match, tokens
 }
 
-func subJson(token string, json string) (out string) {
+func subJSON(token string, json string) (out string) {
 	jsonParsed, err := gabs.ParseJSON([]byte(json))
 	if err != nil {
 		return out
