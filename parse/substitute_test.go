@@ -39,6 +39,15 @@ func TestSubstituteInputSingle(t *testing.T) {
 	}
 }
 
+func TestSubstituteInputDefault(t *testing.T) {
+	tokens := setupTokens("never eat soggy waffles")
+	e := "pancakes"
+	a := Substitute("${hex.input.5|pancakes}", tokens)
+	if e != a {
+		t.Fatalf("Expected %s, but got %s", e, a)
+	}
+}
+
 func TestSubstituteInputRange(t *testing.T) {
 	tokens := setupTokens("never eat soggy waffles")
 	e := "eat soggy"
@@ -106,6 +115,15 @@ func TestSubstituteJson2(t *testing.T) {
 	tokens := setupTokens("{\"Name\": \"Hex\", \"Birth\": {\"Location\": \"Indiana\", \"Date\": \"Oct 2015\"}}")
 	e := "Indiana"
 	a := Substitute("${hex.input.json:Birth.Location}", tokens)
+	if e != a {
+		t.Fatalf("Expected %s, but got %s", e, a)
+	}
+}
+
+func TestSubstituteJsonDefault(t *testing.T) {
+	tokens := setupTokens("{\"Name\": \"Hex\", \"Birth\": {\"Location\": \"Indiana\", \"Date\": \"Oct 2015\"}}")
+	e := "boots"
+	a := Substitute("${hex.input.json:XYZ|boots}", tokens)
 	if e != a {
 		t.Fatalf("Expected %s, but got %s", e, a)
 	}

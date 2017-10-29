@@ -13,15 +13,22 @@ import (
 func Substitute(value string, tokens map[string]string) string {
 	if match, hits := findVars(value); match {
 		for _, hit := range hits {
-			cleanHit := strip(hit)
-			if strings.HasPrefix(cleanHit, "hex.input.json:") {
-				value = strings.Replace(value, hit, subJSON(cleanHit, tokens["hex.input"]), -1)
-			} else if strings.HasPrefix(cleanHit, "hex.input.") {
-				value = strings.Replace(value, hit, subInput(cleanHit, tokens), -1)
-			} else if _, ok := tokens[cleanHit]; ok {
-				value = strings.Replace(value, hit, tokens[cleanHit], -1)
+			hitParts := strings.Split(strip(hit), "|")
+			tok := hitParts[0]
+			def := ""
+			if len(hitParts) > 1 {
+				def = hitParts[1]
+			}
+			if strings.HasPrefix(tok, "hex.input.json:") {
+				value = strings.Replace(value, hit, orDefault(subJSON(tok, tokens["hex.input"]), def), -1)
+			} else if strings.HasPrefix(tok, "hex.input.") {
+				value = strings.Replace(value, hit, orDefault(subInput(tok, tokens), def), -1)
+			} else if _, ok := tokens[tok]; ok {
+				value = strings.Replace(value, hit, orDefault(tokens[tok], def), -1)
+			} else if os.Getenv(tok) != "" {
+				value = strings.Replace(value, hit, os.Getenv(tok), -1)
 			} else {
-				value = strings.Replace(value, hit, os.Getenv(cleanHit), -1)
+				value = strings.Replace(value, hit, def, -1)
 			}
 		}
 	}
@@ -40,7 +47,7 @@ func SubstituteEnv(value string) string {
 
 func findVars(value string) (match bool, tokens []string) {
 	match = false
-	re := regexp.MustCompile("\\${([A-Za-z0-9:*_\\-\\.\\?]+)}")
+	re := regexp.MustCompile("\\${([A-Za-z0-9:*_\\|\\-\\.\\?]+)}")
 	tokens = re.FindAllString(strings.Replace(value, "$${", "X{", -1), -1)
 	if len(tokens) > 0 {
 		match = true
@@ -104,6 +111,13 @@ func subInput(input string, tokens map[string]string) (out string) {
 	}
 	out = strings.Join(tokenInput[tokenStart:tokenEnd], " ")
 	return out
+}
+
+func orDefault(value string, def string) string {
+	if strings.TrimSpace(value) == "" {
+		return def
+	}
+	return value
 }
 
 func strip(value string) (stripped string) {

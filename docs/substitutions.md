@@ -10,6 +10,7 @@ This substitution method is used for constructing commands passed to plugins.
 - `${hex.input.1}` - The second word of the input
 - `${hex.input.2:*}` - The third through last word of the input
 - `${hex.input.3:4}` - The fourth through fifth word of the input
+- `${hex.input.5|pancakes}` - The sixth word of the input or "pancakes" if not found
 - `${hex.input.json:web.api}` - The json value at `{"web": {"api": "some value"} }`
 - `${hex.user}` - The user who created the Message
 - `${hex.channel}` - The originating channel for a slack input
