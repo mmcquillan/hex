@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/mohae/deepcopy"
 )
 
+// Matcher function
 func Matcher(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, plugins *map[string]models.Plugin, rules *map[string]models.Rule, config models.Config) {
 	state := make(map[string]bool)
 	for _, rule := range *rules {
@@ -18,6 +20,7 @@ func Matcher(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, 
 	}
 	for {
 		message := <-inputMsgs
+		match := false
 		config.Logger.Debug("Matcher - Eval of Message ID:" + message.Attributes["hex.id"])
 		config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 		if parse.EitherMember(config.ACL, message.Attributes["hex.user"], message.Attributes["hex.channel"]) {
@@ -29,6 +32,7 @@ func Matcher(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, 
 			if rule.Active && rule.Match != "" && parse.Match(rule.Match, message.Attributes["hex.input"]) {
 				if parse.EitherMember(config.ACL, message.Attributes["hex.user"], message.Attributes["hex.channel"]) {
 					if parse.EitherMember(rule.ACL, message.Attributes["hex.user"], message.Attributes["hex.channel"]) {
+						match = true
 						config.Logger.Debug("Matcher - Matched Rule '" + rule.Name + "' with input '" + message.Attributes["hex.input"] + "' on ID:" + message.Attributes["hex.id"])
 						config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 						msg := deepcopy.Copy(message).(models.Message)
@@ -39,6 +43,7 @@ func Matcher(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, 
 
 			// match for schedule
 			if rule.Active && rule.Schedule != "" && rule.Schedule == message.Attributes["hex.schedule"] {
+				match = true
 				config.Logger.Debug("Matcher - Matched Rule '" + rule.Name + "' with schedule '" + message.Attributes["hex.schedule"] + "' on ID:" + message.Attributes["hex.id"])
 				config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 				msg := deepcopy.Copy(message).(models.Message)
@@ -47,11 +52,17 @@ func Matcher(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, 
 
 			// match for webhook
 			if rule.Active && rule.URL != "" && parse.Match(rule.URL, message.Attributes["hex.url"]) {
+				match = true
 				config.Logger.Debug("Matcher - Matched Rule '" + rule.Name + "' with url '" + message.Attributes["hex.url"] + "' on ID:" + message.Attributes["hex.id"])
 				config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 				msg := deepcopy.Copy(message).(models.Message)
 				go runRule(rule, msg, outputMsgs, state, *plugins, config)
 			}
+
+		}
+		if !match && message.Attributes["hex.service"] == "command" {
+			StopPlugins(*plugins, config)
+			os.Exit(0)
 
 		}
 	}
