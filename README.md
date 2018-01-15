@@ -1,8 +1,12 @@
-# Hex
+# Hex Bot
 
-An automation focused bot for doing your sysadmin dirty work. http://hexbot.io/
+An automation focused bot for doing your sysadmin dirty work.
 
-Follow us https://twitter.com/hexbotio
+- Bring your Rundeck to Slack
+- Security Model for Users and Channels
+- Scheduler to run Commands
+- Webhooks to Integrate with other Tools
+- Plugin Architecture written in Golang
 
 
 ### Documentation
@@ -17,3 +21,7 @@ Follow us https://twitter.com/hexbotio
 - [Security](docs/security.md)
 - [Develop](docs/develop.md)
 
+
+### Follow Us
+
+https://twitter.com/hexbotio
