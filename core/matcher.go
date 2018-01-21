@@ -110,7 +110,7 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 				message.Attributes[attrName+".duration"] = strconv.FormatInt(models.MessageTimestamp()-startTime, 10)
 				if action.OutputToVar {
 					message.Attributes[attrName+".response"] = strings.TrimSpace(resp.Output)
-				} else if !action.HideOutput {
+				} else if !action.HideOutput || action.OutputFailOnly == !resp.Success {
 					message.Outputs = append(message.Outputs, models.Output{
 						Rule:     rule.Name,
 						Response: resp.Output,

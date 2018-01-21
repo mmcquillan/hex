@@ -117,6 +117,12 @@ Each rule is a seperate json file which consists of some rule options and a seri
 - Default: false
 - Type: bool
 
+### Actions.OutputFailOnly
+- Config: `output_fail_only`
+- Description: Flag to only output action if a failure
+- Default: false
+- Type: bool
+
 ### Actions.RunOnFail
 - Config: `run_on_fail`
 - Description: A flag to let this action run if previous steps have failed
