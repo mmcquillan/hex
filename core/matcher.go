@@ -78,11 +78,10 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 	for key, value := range config.Vars {
 		message.Attributes["hex.var."+key] = value
 	}
-	actionCounter := 0
 	ruleResult := true
 	lastAction := true
 	lastConfig := rule.Actions[0].Config
-	for _, action := range rule.Actions {
+	for actionCounter, action := range rule.Actions {
 		config.Logger.Debug("Matcher - Evaluating Action " + rule.Name + "." + action.Type + " [" + strconv.Itoa(actionCounter) + "] for ID:" + message.Attributes["hex.id"])
 		config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 		if lastAction || action.RunOnFail {
@@ -112,32 +111,42 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 					message.Attributes[attrName+".response"] = strings.TrimSpace(resp.Output)
 				} else if !action.HideOutput {
 					if !action.OutputFailOnly || (action.OutputFailOnly && !resp.Success) {
-						message.Outputs = append(message.Outputs, models.Output{
-							Rule:     rule.Name,
-							Response: resp.Output,
-							Success:  resp.Success,
-							Command:  cmd,
-						})
+						if rule.OutputEachAction {
+							message.Outputs = []models.Output{models.Output{
+								Rule:     rule.Name,
+								Response: resp.Output,
+								Success:  resp.Success,
+								Command:  cmd,
+							}}
+						} else {
+							message.Outputs = append(message.Outputs, models.Output{
+								Rule:     rule.Name,
+								Response: resp.Output,
+								Success:  resp.Success,
+								Command:  cmd,
+							})
+						}
 					}
 				}
 			} else {
 				config.Logger.Error("Matcher - Missing Plugin " + action.Type)
 			}
 		}
-		actionCounter += 1
-	}
-	message.EndTime = models.MessageTimestamp()
-	if !rule.OutputOnChange && (!rule.OutputFailOnly || !ruleResult) {
-		config.Logger.Debug("Matcher - Output ID:" + message.Attributes["hex.id"])
-		config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
-		outputMsgs <- message
-	} else if rule.OutputOnChange && ruleResult != state[rule.Id] {
-		config.Logger.Debug("Matcher - Output Change ID:" + message.Attributes["hex.id"])
-		config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
-		outputMsgs <- message
-	} else {
-		config.Logger.Debug("Matcher - Discarding ID:" + message.Attributes["hex.id"])
-		config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
+		if (!rule.OutputEachAction && actionCounter+1 == len(rule.Actions)) || (rule.OutputEachAction) {
+			message.EndTime = models.MessageTimestamp()
+			if !rule.OutputOnChange && (!rule.OutputFailOnly || !ruleResult) {
+				config.Logger.Debug("Matcher - Output ID:" + message.Attributes["hex.id"])
+				config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
+				outputMsgs <- message
+			} else if rule.OutputOnChange && ruleResult != state[rule.Id] {
+				config.Logger.Debug("Matcher - Output Change ID:" + message.Attributes["hex.id"])
+				config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
+				outputMsgs <- message
+			} else {
+				config.Logger.Debug("Matcher - Discarding ID:" + message.Attributes["hex.id"])
+				config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
+			}
+		}
 	}
 	state[rule.Id] = ruleResult
 }
