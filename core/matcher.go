@@ -75,6 +75,7 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 	message.Attributes["hex.rule.name"] = rule.Name
 	message.Attributes["hex.rule.format"] = strconv.FormatBool(rule.Format)
 	message.Attributes["hex.rule.channel"] = rule.Channel
+	message.Attributes["hex.rule.threaded"] = strconv.FormatBool(rule.Threaded)
 	for key, value := range config.Vars {
 		message.Attributes["hex.var."+key] = value
 	}
@@ -111,7 +112,7 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 					message.Attributes[attrName+".response"] = strings.TrimSpace(resp.Output)
 				} else if !action.HideOutput {
 					if !action.OutputFailOnly || (action.OutputFailOnly && !resp.Success) {
-						if rule.OutputEachAction {
+						if !rule.GroupOutput {
 							message.Outputs = []models.Output{models.Output{
 								Rule:     rule.Name,
 								Response: resp.Output,
@@ -132,7 +133,7 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 				config.Logger.Error("Matcher - Missing Plugin " + action.Type)
 			}
 		}
-		if (!rule.OutputEachAction && actionCounter+1 == len(rule.Actions)) || (rule.OutputEachAction) {
+		if (rule.GroupOutput && actionCounter+1 == len(rule.Actions)) || (!rule.GroupOutput) {
 			message.EndTime = models.MessageTimestamp()
 			if !rule.OutputOnChange && (!rule.OutputFailOnly || !ruleResult) {
 				config.Logger.Debug("Matcher - Output ID:" + message.Attributes["hex.id"])

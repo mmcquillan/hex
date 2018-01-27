@@ -75,9 +75,9 @@ Each rule is a seperate json file which consists of some rule options and a seri
 - Default: false
 - Type: bool
 
-### OutputEachAction
-- Config: `output_each_action`
-- Description: Flag to output each action as they exeucte instead of all at the end
+### GroupOutput
+- Config: `group_output`
+- Description: Flag to output all actions as one message
 - Default: false
 - Type: bool
 

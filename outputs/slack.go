@@ -24,7 +24,7 @@ func (x Slack) Write(message models.Message, config models.Config) {
 	if image == "" {
 		image = ":nut_and_bolt:"
 	}
-	if rule.Threaded && message.Attributes["hex.slack.response"] != "" {
+	if message.Attributes["hex.rule.threaded"] == "true" && message.Attributes["hex.slack.response"] != "" {
 		params.ThreadTimestamp = message.Attributes["hex.slack.response"]
 	}
 	params.IconEmoji = image
