@@ -24,6 +24,9 @@ func (x Slack) Write(message models.Message, config models.Config) {
 	if image == "" {
 		image = ":nut_and_bolt:"
 	}
+	if rule.Threaded && message.Attributes["hex.slack.response"] != "" {
+		params.ThreadTimestamp = message.Attributes["hex.slack.response"]
+	}
 	params.IconEmoji = image
 	for _, output := range message.Outputs {
 		if message.Debug && parse.EitherMember(config.Admins, message.Attributes["hex.user"], message.Attributes["hex.channel"]) {
@@ -69,9 +72,17 @@ func (x Slack) Write(message models.Message, config models.Config) {
 		params.Attachments = append(params.Attachments, attachment)
 	}
 	if message.Attributes["hex.channel"] != "" {
-		api.PostMessage(message.Attributes["hex.channel"], msg, params)
+		_, respTimestamp, err := api.PostMessage(message.Attributes["hex.channel"], msg, params)
+		message.Attributes["hex.slack.response"] = respTimestamp
+		if err != nil {
+			config.Logger.Error("Slack Message Send Error: " + err.Error())
+		}
 	}
 	if message.Attributes["hex.rule.channel"] != "" && message.Attributes["hex.channel"] != message.Attributes["hex.rule.channel"] {
-		api.PostMessage(message.Attributes["hex.rule.channel"], msg, params)
+		_, respTimestamp, err := api.PostMessage(message.Attributes["hex.rule.channel"], msg, params)
+		message.Attributes["hex.slack.response"] = respTimestamp
+		if err != nil {
+			config.Logger.Error("Slack Message Send Error: " + err.Error())
+		}
 	}
 }

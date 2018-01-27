@@ -10,6 +10,7 @@ type Rule struct {
 	ACL              string   `json:"acl"`
 	Channel          string   `json:"channel"`
 	Format           bool     `json:"format"`
+	Threaded         bool     `json:"threaded"`
 	OutputFailOnly   bool     `json:"output_fail_only"`
 	OutputOnChange   bool     `json:"output_on_change"`
 	OutputEachAction bool     `json:"output_each_action"`

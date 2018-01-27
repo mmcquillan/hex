@@ -57,6 +57,12 @@ Each rule is a seperate json file which consists of some rule options and a seri
 - Default: false
 - Type: bool
 
+### Threaded
+- Config: `threaded`
+- Description: Flag to set if the messages for each action should be threaded
+- Default: false
+- Type: bool
+
 ### OutputFailOnly
 - Config: `output_fail_only`
 - Description: Flag to only output if a failure
