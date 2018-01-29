@@ -10,9 +10,8 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/hexbotio/hex/models"
+	"gopkg.in/yaml.v2"
 )
-
-var fileFilter = ".json"
 
 func Rules(rules *map[string]models.Rule, config models.Config) {
 	if config.RulesDir != "" {
@@ -20,7 +19,7 @@ func Rules(rules *map[string]models.Rule, config models.Config) {
 			go watchRules(config, rules)
 			ruleList := []string{}
 			err := filepath.Walk(config.RulesDir, func(path string, f os.FileInfo, err error) error {
-				if !f.IsDir() && strings.HasSuffix(f.Name(), fileFilter) {
+				if !f.IsDir() && isConfig(f.Name()) {
 					ruleList = append(ruleList, path)
 				}
 				return nil
@@ -40,7 +39,7 @@ func Rules(rules *map[string]models.Rule, config models.Config) {
 
 func addRule(ruleFile string, rules map[string]models.Rule, config models.Config) {
 	if _, exists := rules[ruleFile]; !exists {
-		if strings.HasSuffix(ruleFile, fileFilter) {
+		if isConfig(ruleFile) {
 			config.Logger.Info("Loading Rule " + ruleFile)
 			rules[ruleFile] = readRule(ruleFile, config)
 		}
@@ -48,7 +47,7 @@ func addRule(ruleFile string, rules map[string]models.Rule, config models.Config
 }
 
 func reloadRule(ruleFile string, rules map[string]models.Rule, config models.Config) {
-	if strings.HasSuffix(ruleFile, fileFilter) {
+	if isConfig(ruleFile) {
 		config.Logger.Info("Reloading Rule " + ruleFile)
 		rules[ruleFile] = readRule(ruleFile, config)
 	}
@@ -78,10 +77,22 @@ func readRule(ruleFile string, config models.Config) (rule models.Rule) {
 			rule.Active = false
 			return rule
 		}
-		err = json.Unmarshal(file, &rule)
-		if err != nil {
-			config.Logger.Error("Add Rule Unmarshal " + ruleFile + " - " + err.Error())
-			rule.Active = false
+		ruleType := fileType(ruleFile)
+		if ruleType == "json" {
+			err = json.Unmarshal(file, &rule)
+			if err != nil {
+				config.Logger.Error("Add Rule json Unmarshal " + ruleFile + " - " + err.Error())
+				rule.Active = false
+				return rule
+			}
+		} else if ruleType == "yaml" {
+			err = yaml.Unmarshal(file, &rule)
+			if err != nil {
+				config.Logger.Error("Add Rule yaml Unmarshal " + ruleFile + " - " + err.Error())
+				rule.Active = false
+				return rule
+			}
+		} else {
 			return rule
 		}
 		for i := 0; i < len(rule.Actions); i++ {
@@ -132,4 +143,30 @@ func watchRules(config models.Config, rules *map[string]models.Rule) {
 	}
 	<-done
 
+}
+
+func isConfig(file string) bool {
+	if strings.HasSuffix(file, ".json") {
+		return true
+	}
+	if strings.HasSuffix(file, ".yaml") {
+		return true
+	}
+	if strings.HasSuffix(file, ".yml") {
+		return true
+	}
+	return false
+}
+
+func fileType(file string) string {
+	if strings.HasSuffix(file, ".json") {
+		return "json"
+	}
+	if strings.HasSuffix(file, ".yaml") {
+		return "yaml"
+	}
+	if strings.HasSuffix(file, ".yml") {
+		return "yaml"
+	}
+	return ""
 }

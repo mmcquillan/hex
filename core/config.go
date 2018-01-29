@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/hexbotio/hex/models"
+	"gopkg.in/yaml.v2"
 )
 
 // Config func
@@ -51,9 +52,19 @@ func Config(config *models.Config, version string) {
 		if err != nil {
 			log.Fatal("ERROR: Config File Read - ", err)
 		}
-		err = json.Unmarshal(file, &config)
-		if err != nil {
-			log.Fatal("ERROR: Config File Unmarshal - ", err)
+		configType := fileType(os.Args[1])
+		if configType == "json" {
+			err = json.Unmarshal(file, &config)
+			if err != nil {
+				log.Fatal("ERROR: Config File json Unmarshal - ", err)
+			}
+		} else if configType == "yaml" {
+			err = yaml.Unmarshal(file, &config)
+			if err != nil {
+				log.Fatal("ERROR: Config File yaml Unmarshal - ", err)
+			}
+		} else {
+			log.Fatal("ERROR: Config File Unknown Type")
 		}
 	}
 

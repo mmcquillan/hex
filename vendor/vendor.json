@@ -337,6 +337,12 @@
 			"path": "google.golang.org/grpc/transport",
 			"revision": "3f10311ccf076b6b7cba28273df3290d42e60982",
 			"revisionTime": "2017-10-09T23:33:58Z"
+		},
+		{
+			"checksumSHA1": "qOmvuDm+F+2nQQecUZBVkZrTn6Y=",
+			"path": "gopkg.in/yaml.v2",
+			"revision": "d670f9405373e636a5a2765eea47fac0c9bc91a4",
+			"revisionTime": "2018-01-09T11:43:31Z"
 		}
 	],
 	"rootPath": "github.com/hexbotio/hex"
