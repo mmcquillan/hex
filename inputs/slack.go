@@ -68,28 +68,21 @@ func (x Slack) Read(inputMsgs chan<- models.Message, config models.Config) {
 						channel = ev.Channel
 					}
 
-					var match = false
-					var input = ""
-					if useAt && strings.HasPrefix(ev.Text, botName) {
-						match = true
-						input = strings.Replace(html.UnescapeString(ev.Text), botName+" ", "", 1)
+					var input = html.UnescapeString(ev.Text)
+					if useAt {
+						input = strings.Replace(input, botName, config.BotName, -1)
 					}
-					if !useAt && strings.HasPrefix(ev.Text, config.BotName) {
-						match = true
-						input = strings.Replace(html.UnescapeString(ev.Text), config.BotName+" ", "", 1)
-					}
-					if match {
-						input, debug := parse.Flag(input, "--debug")
-						message := models.NewMessage()
-						message.Attributes["hex.service"] = "slack"
-						message.Attributes["hex.channel"] = channel
-						message.Attributes["hex.user"] = x.Users[ev.User]
-						message.Attributes["hex.input"] = input
-						message.Debug = debug
-						config.Logger.Debug("Slack Input - ID:" + message.Attributes["hex.id"])
-						config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
-						inputMsgs <- message
-					}
+					input, debug := parse.Flag(input, "--debug")
+					message := models.NewMessage()
+					message.Attributes["hex.botname"] = config.BotName
+					message.Attributes["hex.service"] = "slack"
+					message.Attributes["hex.channel"] = channel
+					message.Attributes["hex.user"] = x.Users[ev.User]
+					message.Attributes["hex.input"] = input
+					message.Debug = debug
+					config.Logger.Debug("Slack Input - ID:" + message.Attributes["hex.id"])
+					config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
+					inputMsgs <- message
 
 				}
 			}

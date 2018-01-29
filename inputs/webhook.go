@@ -26,6 +26,7 @@ func (x Webhook) Read(inputMsgs chan<- models.Message, config models.Config) {
 		}
 		defer r.Body.Close()
 		message := models.NewMessage()
+		message.Attributes["hex.botname"] = config.BotName
 		message.Attributes["hex.service"] = "webhook"
 		message.Attributes["hex.url"] = r.RequestURI
 		message.Attributes["hex.ipaddress"] = r.RemoteAddr

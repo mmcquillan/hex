@@ -14,10 +14,10 @@ func Help(message *models.Message, rules *map[string]models.Rule, config models.
 
 	// pull internal help
 	help = make([]string, 4)
-	help[0] = "help <filter> - This help"
-	help[1] = "ping - Simple ping response for the bot"
-	help[2] = "rules - dump of loaded rules"
-	help[3] = "version - Compiled version number/sha"
+	help[0] = config.BotName + " help <filter> - This help"
+	help[1] = config.BotName + " ping - Simple ping response for the bot"
+	help[2] = config.BotName + " rules - dump of loaded rules"
+	help[3] = config.BotName + " version - Compiled version number/sha"
 
 	// pull all help from rules
 	for _, rule := range *rules {
@@ -37,7 +37,7 @@ func Help(message *models.Message, rules *map[string]models.Rule, config models.
 	sort.Strings(help)
 	var lasthelp = ""
 	var newhelp = make([]string, 0)
-	var filter = strings.TrimSpace(strings.Replace(message.Attributes["hex.input"], "help", "", 1))
+	var filter = strings.TrimSpace(strings.Replace(message.Attributes["hex.input"], config.BotName+" help", "", 1))
 	newhelp = append(newhelp, helpTitle)
 	for _, h := range help {
 		if strings.Contains(h, filter) || filter == "" {

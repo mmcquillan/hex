@@ -12,7 +12,8 @@ This substitution method is used for constructing commands passed to plugins.
 - `${hex.input.3:4}` - The fourth through fifth word of the input
 - `${hex.input.5|pancakes}` - The sixth word of the input or "pancakes" if not found
 - `${hex.input.json:web.api}` - The json value at `{"web": {"api": "some value"} }`
-- `${hex.user}` - The user who created the Message
+- `${hex.botname}` - The botname set for the system
+- `${hex.user}` - the user who created the message
 - `${hex.channel}` - The originating channel for a slack input
 - `${hex.hostname}` - The hostname for a CLI input
 - `${hex.schedule}` - The schedule for a scheduler input
@@ -25,5 +26,5 @@ This substitution method is used for constructing commands passed to plugins.
 - `${hex.output.0.duration}` - The time in seconds for the first action to execute
 - `${hex.output.0.response}` - The response for the first action if "output_to_var" is true
 - `${hex.output.N.duration}` - The time in seconds for the N'th action to execute
-- `${hex.output.N.duration}` - The response for the N'th action if "output_to_var" is true
+- `${hex.output.N.response}` - The response for the N'th action if "output_to_var" is true
 
