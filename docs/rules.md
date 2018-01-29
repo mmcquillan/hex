@@ -1,7 +1,8 @@
 # Rules
 
-Each rule is a seperate json file which consists of some rule options and a series of actions to execute if the rule matches. A rule will generally be either a match from slack input, a schedule or a web url. Below is a sample rule:
+Each rule is a seperate json file which consists of some rule options and a series of actions to execute if the rule matches. A rule will generally be either a match from slack input, a schedule or a web url.
 
+json:
 ```
 {
   "rule": "Say Hello",
@@ -13,6 +14,16 @@ Each rule is a seperate json file which consists of some rule options and a seri
     }
   ]
 }
+```
+
+yaml:
+```
+---
+rule: "Say Hello"
+match: "hello"
+actions:
+- type: "hex-response"
+  command: "Hello ${hex.user}!"
 ```
 
 ### Rule

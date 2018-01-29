@@ -1,7 +1,8 @@
 # Configuration
 
-Hex can run from environment variables, command line options or a configuration file. If you use a configuration file, use that as a the first argument to execute hex, such as `/usr/local/bin/hex /etc/hex/config.json`. Below is a sample config file:
+Hex can run from environment variables, command line options or a configuration file. If you use a configuration file, use that as a the first argument to execute hex, such as `/usr/local/bin/hex /etc/hex/config.json`.
 
+json config:
 ```
 {
   "slack": true,
@@ -11,6 +12,17 @@ Hex can run from environment variables, command line options or a configuration 
   "rules_dir": "/etc/hex/rules",
   "plugins_dir": "/etc/hex/plugins"
 }
+```
+
+yaml config:
+```
+---
+slack: true
+slack_token: "${SLACK_TOKEN}"
+scheduler: true
+log_file: "/var/log/hex.log"
+rules_dir: "/etc/hex/rules"
+plugins_dir: "/etc/hex/plugins"
 ```
 
 Other config options are lited below:
