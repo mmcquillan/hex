@@ -8,18 +8,18 @@ With Hex's ability to connect to remote systems, you can easily deploy software 
 ```
 {
   "rule": "Deploy Web",
-  "match": "deploy web",
+  "match": "@hex deploy web",
   "url": "/github/hex-web",
   "channel": "#builds",
   "format": true,
   "actions": [
-    { "type": "hex-local", "command": "env", "hide_output": true, "config": { 
+    { "type": "local", "command": "env", "hide_output": true, "config": { 
         "env": "PATH=/bin:/usr/bin",
         "dir": "/var/www/hexbot.io"
       }
     },
-    { "type": "hex-local", "command": "echo Deploying; git pull", "last_config": true },
-    { "type": "hex-response", "command": "Push by: ${hex.input.json:sender.login}", "run_on_fail": true }
+    { "type": "local", "command": "echo Deploying; git pull", "last_config": true },
+    { "type": "response", "command": "Push by: ${hex.input.json:sender.login}", "run_on_fail": true }
   ]
 }
 ```
