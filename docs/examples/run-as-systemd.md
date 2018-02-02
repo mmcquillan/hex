@@ -40,7 +40,7 @@ WantedBy=multi-user.target
 ```
 {
   "rule": "hello",
-  "match": "hello",
+  "match": "@hex hello",
   "actions": [
     { "type": "hex-response", "command": "Hello ${hex.user}!" }
   ]

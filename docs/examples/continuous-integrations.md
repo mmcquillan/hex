@@ -12,22 +12,22 @@ This document covers how Hex performs its continuous integrations for the projec
 ```
 {
   "rule": "Build Hex",
-  "match": "build hex",
+  "match": "@hex build hex",
   "url": "/build/hex",
   "channel": "#builds",
   "format": true,
   "actions": [
-    { "type": "hex-local", "command": "env", "hide_output": true, "config": { 
+    { "type": "local", "command": "env", "hide_output": true, "config": { 
         "env": "GOPATH=/tmp/build/${hex.id}; GOBIN=/tmp/build/${hex.id}/bin; PATH=/bin:/usr/bin:/usr/local/go/bin/",
         "dir": "/tmp/build"
       }
     },
-    { "type": "hex-local", "command": "mkdir -p /tmp/build/${hex.id}", "hide_output": true, "last_config": true },
-    { "type": "hex-local", "command": "echo Pulling; go get github.com/hexbotio/hex", "last_config": true },
-    { "type": "hex-local", "command": "echo Testing; go test github.com/hexbotio/hex/parse", "last_config": true },
-    { "type": "hex-local", "command": "echo Building; go build github.com/hexbotio/hex", "last_config": true },
-    { "type": "hex-local", "command": "rm -rf /tmp/build/${hex.id}", "hide_output": true, "run_on_fail": true },
-    { "type": "hex-response", "command": "Push by: ${hex.input.json:sender.login} ${hex.input.json:head_commit.message}", "run_on_fail": true }
+    { "type": "local", "command": "mkdir -p /tmp/build/${hex.id}", "hide_output": true, "last_config": true },
+    { "type": "local", "command": "echo Pulling; go get github.com/hexbotio/hex", "last_config": true },
+    { "type": "local", "command": "echo Testing; go test github.com/hexbotio/hex/parse", "last_config": true },
+    { "type": "local", "command": "echo Building; go build github.com/hexbotio/hex", "last_config": true },
+    { "type": "local", "command": "rm -rf /tmp/build/${hex.id}", "hide_output": true, "run_on_fail": true },
+    { "type": "response", "command": "Push by: ${hex.input.json:sender.login} ${hex.input.json:head_commit.message}", "run_on_fail": true }
   ]
 }
 ```

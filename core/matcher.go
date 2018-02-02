@@ -12,12 +12,11 @@ import (
 	"github.com/mohae/deepcopy"
 )
 
+var state *State
+
 // Matcher function
 func Matcher(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, plugins *map[string]models.Plugin, rules *map[string]models.Rule, config models.Config) {
-	state := make(map[string]bool)
-	for _, rule := range *rules {
-		state[rule.Id] = true
-	}
+	state = NewState(rules)
 	for {
 		message := <-inputMsgs
 		match := false
@@ -36,7 +35,7 @@ func Matcher(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, 
 						config.Logger.Debug("Matcher - Matched Rule '" + rule.Name + "' with input '" + message.Attributes["hex.input"] + "' on ID:" + message.Attributes["hex.id"])
 						config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 						msg := deepcopy.Copy(message).(models.Message)
-						go runRule(rule, msg, outputMsgs, state, *plugins, config)
+						go runRule(rule, msg, outputMsgs, *plugins, config)
 					}
 				}
 			}
@@ -47,7 +46,7 @@ func Matcher(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, 
 				config.Logger.Debug("Matcher - Matched Rule '" + rule.Name + "' with schedule '" + message.Attributes["hex.schedule"] + "' on ID:" + message.Attributes["hex.id"])
 				config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 				msg := deepcopy.Copy(message).(models.Message)
-				go runRule(rule, msg, outputMsgs, state, *plugins, config)
+				go runRule(rule, msg, outputMsgs, *plugins, config)
 			}
 
 			// match for webhook
@@ -56,7 +55,7 @@ func Matcher(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, 
 				config.Logger.Debug("Matcher - Matched Rule '" + rule.Name + "' with url '" + message.Attributes["hex.url"] + "' on ID:" + message.Attributes["hex.id"])
 				config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 				msg := deepcopy.Copy(message).(models.Message)
-				go runRule(rule, msg, outputMsgs, state, *plugins, config)
+				go runRule(rule, msg, outputMsgs, *plugins, config)
 			}
 
 		}
@@ -68,7 +67,7 @@ func Matcher(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, 
 	}
 }
 
-func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.Message, state map[string]bool, plugins map[string]models.Plugin, config models.Config) {
+func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.Message, plugins map[string]models.Plugin, config models.Config) {
 	config.Logger.Debug("Matcher - Running Rule " + rule.Name + " for ID:" + message.Attributes["hex.id"])
 	config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 	message.Attributes["hex.rule.runid"] = models.MessageID()
@@ -76,6 +75,20 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 	message.Attributes["hex.rule.format"] = strconv.FormatBool(rule.Format)
 	message.Attributes["hex.rule.channel"] = rule.Channel
 	message.Attributes["hex.rule.threaded"] = strconv.FormatBool(rule.Threaded)
+	message.Attributes["hex.rule.lastrun"] = strconv.FormatInt(state.States[rule.Id].LastRun, 10)
+	message.Attributes["hex.rule.runcount"] = strconv.FormatInt(state.States[rule.Id].RunCount, 10)
+	if rule.Lock && state.States[rule.Id].Running {
+		message.Outputs = []models.Output{models.Output{
+			Rule:     rule.Name,
+			Response: "WARNING: " + rule.Name + " is already running",
+			Success:  true,
+			Command:  "",
+		}}
+		message.EndTime = models.MessageTimestamp()
+		outputMsgs <- message
+		return
+	}
+	state.SetRunning(rule.Id, true)
 	for key, value := range config.Vars {
 		message.Attributes["hex.var."+key] = value
 	}
@@ -123,7 +136,7 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 							message.EndTime = models.MessageTimestamp()
 							if !rule.OutputOnChange && (!rule.OutputFailOnly || !ruleResult) {
 								outputMsgs <- message
-							} else if rule.OutputOnChange && ruleResult != state[rule.Id] {
+							} else if rule.OutputOnChange && ruleResult != state.States[rule.Id].Success {
 								outputMsgs <- message
 							}
 						} else {
@@ -145,11 +158,12 @@ func runRule(rule models.Rule, message models.Message, outputMsgs chan<- models.
 		message.EndTime = models.MessageTimestamp()
 		if !rule.OutputOnChange && (!rule.OutputFailOnly || !ruleResult) {
 			outputMsgs <- message
-		} else if rule.OutputOnChange && ruleResult != state[rule.Id] {
+		} else if rule.OutputOnChange && ruleResult != state.States[rule.Id].Success {
 			outputMsgs <- message
 		}
 	}
 	config.Logger.Debug("Matcher - Output ID:" + message.Attributes["hex.id"])
 	config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
-	state[rule.Id] = ruleResult
+	state.SetSuccess(rule.Id, ruleResult)
+	state.SetRunning(rule.Id, false)
 }

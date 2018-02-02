@@ -14,6 +14,7 @@ type Rule struct {
 	OutputFailOnly bool     `json:"output_fail_only" yaml:"output_fail_only"`
 	OutputOnChange bool     `json:"output_on_change" yaml:"output_on_change"`
 	GroupOutput    bool     `json:"group_output" yaml:"group_output"`
+	Lock           bool     `json:"lock" yaml:"lock"`
 	Help           string   `json:"help" yaml:"help"`
 	Hide           bool     `json:"hide" yaml:"hide"`
 	Active         bool     `json:"active" yaml:"active"`
