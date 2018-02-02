@@ -92,6 +92,12 @@ actions:
 - Default: false
 - Type: bool
 
+### Lock
+- Config: `lock`
+- Description: Flag to lock running to one at a time
+- Default: false
+- Type: bool
+
 ### Help
 - Config: `help`
 - Description: Custom help to display for the rule
