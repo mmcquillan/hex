@@ -23,6 +23,7 @@ func Config(config *models.Config, version string) {
 	config.ACL = "*"
 	config.PluginsDir = ""
 	config.RulesDir = ""
+	config.RulesGitUrl = ""
 	config.LogFile = ""
 	config.Debug = false
 	config.Trace = false
@@ -77,6 +78,9 @@ func Config(config *models.Config, version string) {
 	}
 	if os.Getenv("HEX_RULES_DIR") != "" {
 		config.RulesDir = os.Getenv("HEX_RULES_DIR")
+	}
+	if os.Getenv("HEX_RULES_GIT_URL") != "" {
+		config.RulesGitUrl = os.Getenv("HEX_RULES_GIT_URL")
 	}
 	if os.Getenv("HEX_PLUGINS_DIR") != "" {
 		config.PluginsDir = os.Getenv("HEX_PLUGINS_DIR")
@@ -138,6 +142,7 @@ func Config(config *models.Config, version string) {
 	Admins := flag.String("admins", config.Admins, "Admins (comma delimited)")
 	ACL := flag.String("acl", config.ACL, "ACL (comma delimited)")
 	RulesDir := flag.String("rules-dir", config.RulesDir, "Rules Directory")
+	RulesGitUrl := flag.String("rules-git-url", config.RulesGitUrl, "Rules Git URL")
 	PluginsDir := flag.String("plugins-dir", config.PluginsDir, "Plugins Directory")
 	LogFile := flag.String("log-file", config.LogFile, "Log File")
 	Debug := flag.Bool("debug", config.Debug, "Debug [false]")
@@ -161,6 +166,7 @@ func Config(config *models.Config, version string) {
 	config.Admins = *Admins
 	config.ACL = *ACL
 	config.RulesDir = *RulesDir
+	config.RulesGitUrl = *RulesGitUrl
 	config.PluginsDir = *PluginsDir
 	config.LogFile = *LogFile
 	config.Debug = *Debug

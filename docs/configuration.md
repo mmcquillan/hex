@@ -59,6 +59,14 @@ Other config options are lited below:
 - CLI Param:  `-rules-dir`
 - Conf File: `rules_dir`
 
+### Rules Git URL
+- Description: The git url for the rules to be auto downloaded
+- Default:
+- Type: string
+- Env Variable: `HEX_RULES_GIT_URL`
+- CLI Param:  `-rules-git-url`
+- Conf File: `rules_git_url`
+
 ### Log File
 - Description: The logfile for the hexbot (empty is stdout)
 - Default: 

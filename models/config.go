@@ -12,6 +12,7 @@ type Config struct {
 	ACL          string            `json:"acl" yaml:"acl"`
 	PluginsDir   string            `json:"plugins_dir" yaml:"plugins_dir"`
 	RulesDir     string            `json:"rules_dir" yaml:"rules_dir"`
+	RulesGitUrl  string            `json:"rules_git_url" yaml:"rules_git_url"`
 	LogFile      string            `json:"log_file" yaml:"log_file"`
 	Debug        bool              `json:"debug" yaml:"debug"`
 	Trace        bool              `json:"trace" yaml:"trace"`

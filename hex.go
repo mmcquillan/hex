@@ -22,6 +22,7 @@ func main() {
 	// initialize app
 	core.Config(&config, version)
 	core.Logging(&config)
+	core.Pull(config)
 	core.Rules(&rules, config)
 	core.Plugins(&plugins, rules, config)
 	core.Handler(&plugins, config)
