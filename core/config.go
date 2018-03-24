@@ -70,10 +70,10 @@ func Config(config *models.Config, version string) {
 
 	// environment
 	if os.Getenv("HEX_ADMINS") != "" {
-		config.RulesDir = os.Getenv("HEX_ADMINS")
+		config.Admins = os.Getenv("HEX_ADMINS")
 	}
 	if os.Getenv("HEX_ACL") != "" {
-		config.RulesDir = os.Getenv("HEX_ACL")
+		config.ACL = os.Getenv("HEX_ACL")
 	}
 	if os.Getenv("HEX_RULES_DIR") != "" {
 		config.RulesDir = os.Getenv("HEX_RULES_DIR")
