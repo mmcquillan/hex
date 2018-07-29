@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hexbotio/hex/models"
+	"github.com/mmcquillan/hex/models"
 )
 
 type Auditing struct {

@@ -1,6 +1,6 @@
 FROM golang:1.9.1
-MAINTAINER HexBot.io
+MAINTAINER Matt McQuillan
 ENV GOBIN=/go/bin
-RUN go get -d github.com/hexbotio/hex
-RUN go install github.com/hexbotio/hex
+RUN go get -d github.com/mmcquillan/hex
+RUN go install github.com/mmcquillan/hex
 ENTRYPOINT /go/bin/hex

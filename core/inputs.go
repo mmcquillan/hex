@@ -3,8 +3,8 @@ package core
 import (
 	"strconv"
 
-	"github.com/hexbotio/hex/inputs"
-	"github.com/hexbotio/hex/models"
+	"github.com/mmcquillan/hex/inputs"
+	"github.com/mmcquillan/hex/models"
 )
 
 func Inputs(inputMsgs chan<- models.Message, rules *map[string]models.Rule, config models.Config) {

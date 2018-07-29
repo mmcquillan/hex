@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/hexbotio/hex/models"
+	"github.com/mmcquillan/hex/models"
 	"gopkg.in/yaml.v2"
 )
 

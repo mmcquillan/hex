@@ -13,8 +13,8 @@ import (
 	"strings"
 
 	"github.com/hashicorp/go-plugin"
-	"github.com/hexbotio/hex-plugin"
-	"github.com/hexbotio/hex/models"
+	"github.com/mmcquillan/hex-plugin"
+	"github.com/mmcquillan/hex/models"
 )
 
 func Plugins(plugins *map[string]models.Plugin, rules map[string]models.Rule, config models.Config) {

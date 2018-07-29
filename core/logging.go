@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/hashicorp/go-hclog"
-	"github.com/hexbotio/hex/models"
+	"github.com/mmcquillan/hex/models"
 )
 
 func Logging(config *models.Config) {
@@ -39,5 +39,4 @@ func Logging(config *models.Config) {
 	config.Logger = hclog.New(&logOptions)
 	config.Logger.Info(". . .")
 	config.Logger.Info("Starting HexBot " + config.Version)
-	config.Logger.Info("http://hexbot.io")
 }

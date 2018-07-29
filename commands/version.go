@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hexbotio/hex/models"
+	"github.com/mmcquillan/hex/models"
 )
 
 func Version(message *models.Message, config models.Config) {

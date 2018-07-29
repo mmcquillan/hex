@@ -23,9 +23,9 @@ This document covers how Hex performs its continuous integrations for the projec
       }
     },
     { "type": "local", "command": "mkdir -p /tmp/build/${hex.id}", "hide_output": true, "last_config": true },
-    { "type": "local", "command": "echo Pulling; go get github.com/hexbotio/hex", "last_config": true },
-    { "type": "local", "command": "echo Testing; go test github.com/hexbotio/hex/parse", "last_config": true },
-    { "type": "local", "command": "echo Building; go build github.com/hexbotio/hex", "last_config": true },
+    { "type": "local", "command": "echo Pulling; go get github.com/mmcquillan/hex", "last_config": true },
+    { "type": "local", "command": "echo Testing; go test github.com/mmcquillan/hex/parse", "last_config": true },
+    { "type": "local", "command": "echo Building; go build github.com/mmcquillan/hex", "last_config": true },
     { "type": "local", "command": "rm -rf /tmp/build/${hex.id}", "hide_output": true, "run_on_fail": true },
     { "type": "response", "command": "Push by: ${hex.input.json:sender.login} ${hex.input.json:head_commit.message}", "run_on_fail": true }
   ]

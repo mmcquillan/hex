@@ -4,7 +4,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/hexbotio/hex/models"
+	"github.com/mmcquillan/hex/models"
 )
 
 func Handler(plugins *map[string]models.Plugin, config models.Config) {

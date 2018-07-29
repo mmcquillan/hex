@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/hexbotio/hex/models"
+	"github.com/mmcquillan/hex/models"
 	"github.com/robfig/cron"
 )
 

@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/hashicorp/go-plugin"
-	"github.com/hexbotio/hex-plugin"
+	"github.com/mmcquillan/hex-plugin"
 )
 
 // Rule Struct

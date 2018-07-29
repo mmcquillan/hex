@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/hexbotio/hex/models"
-	"github.com/hexbotio/hex/outputs"
+	"github.com/mmcquillan/hex/models"
+	"github.com/mmcquillan/hex/outputs"
 )
 
 func Outputs(outputMsgs <-chan models.Message, plugins *map[string]models.Plugin, config models.Config) {

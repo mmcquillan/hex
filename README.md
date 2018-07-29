@@ -22,6 +22,3 @@ An automation focused bot for doing your sysadmin dirty work.
 - [Develop](docs/develop.md)
 
 
-### Follow Us
-
-https://twitter.com/hexbotio
