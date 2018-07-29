@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/hashicorp/go-hclog"
-	"github.com/hexbotio/hex/models"
+	"github.com/mmcquillan/hex/models"
 )
 
 func Logging(config *models.Config) {

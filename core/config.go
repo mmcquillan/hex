@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hexbotio/hex/models"
+	"github.com/mmcquillan/hex/models"
 	"gopkg.in/yaml.v2"
 )
 

@@ -3,8 +3,8 @@ package main
 import (
 	"sync"
 
-	"github.com/hexbotio/hex/core"
-	"github.com/hexbotio/hex/models"
+	"github.com/mmcquillan/hex/core"
+	"github.com/mmcquillan/hex/models"
 )
 
 var version string

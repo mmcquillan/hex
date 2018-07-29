@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/hexbotio/hex/models"
+	"github.com/mmcquillan/hex/models"
 )
 
 // State struct to control all things state

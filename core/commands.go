@@ -1,9 +1,9 @@
 package core
 
 import (
-	"github.com/hexbotio/hex/commands"
-	"github.com/hexbotio/hex/models"
-	"github.com/hexbotio/hex/parse"
+	"github.com/mmcquillan/hex/commands"
+	"github.com/mmcquillan/hex/models"
+	"github.com/mmcquillan/hex/parse"
 	"github.com/mohae/deepcopy"
 )
 

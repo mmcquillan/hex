@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/hexbotio/hex/models"
+	"github.com/mmcquillan/hex/models"
 )
 
 func Ping(message *models.Message) {

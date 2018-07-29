@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
-	"github.com/hexbotio/hex/models"
-	"github.com/hexbotio/hex/parse"
+	"github.com/mmcquillan/hex/models"
+	"github.com/mmcquillan/hex/parse"
 )
 
 type Command struct {

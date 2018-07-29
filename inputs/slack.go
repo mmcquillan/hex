@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hexbotio/hex/models"
-	"github.com/hexbotio/hex/parse"
+	"github.com/mmcquillan/hex/models"
+	"github.com/mmcquillan/hex/parse"
 	"github.com/nlopes/slack"
 )
 

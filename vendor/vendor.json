@@ -69,22 +69,16 @@
 			"revisionTime": "2017-10-05T15:17:51Z"
 		},
 		{
-			"checksumSHA1": "R6me0jVmcT/OPo80Fe0qo5fRwHc=",
+			"checksumSHA1": "lbG9uwM7qJlTIBg+8mjCC88sCPc=",
 			"path": "github.com/hashicorp/go-plugin",
-			"revision": "3e6d191694b5a3a2b99755f31b47fa209e4bcd09",
-			"revisionTime": "2017-08-28T02:45:49Z"
+			"revision": "e8d22c780116115ae5624720c9af0c97afe4f551",
+			"revisionTime": "2018-03-31T00:25:53Z"
 		},
 		{
 			"checksumSHA1": "ZhK6IO2XN81Y+3RAjTcVm1Ic7oU=",
 			"path": "github.com/hashicorp/yamux",
 			"revision": "f5742cb6b85602e7fa834e9d5d91a7d7fa850824",
 			"revisionTime": "2017-10-05T17:02:12Z"
-		},
-		{
-			"checksumSHA1": "ngFli0A8LIyVznznCq2oMIF5L4w=",
-			"path": "github.com/hexbotio/hex-plugin",
-			"revision": "09fe178dec9c50ef1b8a026d3880cc7af8e1c009",
-			"revisionTime": "2017-10-11T23:59:52Z"
 		},
 		{
 			"checksumSHA1": "cTDA66oZUy18cIzJsU1diKq+9CE=",
@@ -115,6 +109,12 @@
 			"path": "github.com/nlopes/slack",
 			"revision": "280245264a9d8c496e95ead447421d37cd95f93a",
 			"revisionTime": "2018-01-19T00:24:06Z"
+		},
+		{
+			"checksumSHA1": "nf3UoPNBIut7BL9nWE8Fw2X2j+Q=",
+			"path": "github.com/oklog/run",
+			"revision": "6934b124db28979da51d3470dadfa34d73d72652",
+			"revisionTime": "2018-03-08T00:51:04Z"
 		},
 		{
 			"checksumSHA1": "LuFv4/jlrmFNnDb/5SCSEPAM9vU=",
@@ -179,12 +179,6 @@
 		{
 			"checksumSHA1": "u/r66lwYfgg682u5hZG7/E7+VCY=",
 			"path": "golang.org/x/net/trace",
-			"revision": "a04bdaca5b32abe1c069418fb7088ae607de5bd0",
-			"revisionTime": "2017-10-03T05:09:24Z"
-		},
-		{
-			"checksumSHA1": "7EZyXN0EmZLgGxZxK01IJua4c8o=",
-			"path": "golang.org/x/net/websocket",
 			"revision": "a04bdaca5b32abe1c069418fb7088ae607de5bd0",
 			"revisionTime": "2017-10-03T05:09:24Z"
 		},
@@ -345,5 +339,5 @@
 			"revisionTime": "2018-01-09T11:43:31Z"
 		}
 	],
-	"rootPath": "github.com/hexbotio/hex"
+	"rootPath": "github.com/mmcquillan/hex"
 }

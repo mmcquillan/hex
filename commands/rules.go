@@ -3,7 +3,7 @@ package commands
 import (
 	"fmt"
 
-	"github.com/hexbotio/hex/models"
+	"github.com/mmcquillan/hex/models"
 )
 
 func Rules(message *models.Message, rules *map[string]models.Rule, config models.Config) {
