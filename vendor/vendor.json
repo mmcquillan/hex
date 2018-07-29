@@ -63,18 +63,6 @@
 			"revisionTime": "2018-01-25T18:51:21Z"
 		},
 		{
-			"checksumSHA1": "AA0aYmdg4pb5gPCUSXg8iPzxLag=",
-			"path": "github.com/hashicorp/go-hclog",
-			"revision": "ca137eb4b4389c9bc6f1a6d887f056bf16c00510",
-			"revisionTime": "2017-10-05T15:17:51Z"
-		},
-		{
-			"checksumSHA1": "lbG9uwM7qJlTIBg+8mjCC88sCPc=",
-			"path": "github.com/hashicorp/go-plugin",
-			"revision": "e8d22c780116115ae5624720c9af0c97afe4f551",
-			"revisionTime": "2018-03-31T00:25:53Z"
-		},
-		{
 			"checksumSHA1": "ZhK6IO2XN81Y+3RAjTcVm1Ic7oU=",
 			"path": "github.com/hashicorp/yamux",
 			"revision": "f5742cb6b85602e7fa834e9d5d91a7d7fa850824",

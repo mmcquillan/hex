@@ -39,5 +39,4 @@ func Logging(config *models.Config) {
 	config.Logger = hclog.New(&logOptions)
 	config.Logger.Info(". . .")
 	config.Logger.Info("Starting HexBot " + config.Version)
-	config.Logger.Info("http://hexbot.io")
 }
