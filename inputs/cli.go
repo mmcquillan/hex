@@ -20,11 +20,10 @@ func (x Cli) Read(inputMsgs chan<- models.Message, config models.Config) {
 	hostname, _ := os.Hostname()
 	user, _ := user.Current()
 	fmt.Print("Starting in cli mode...\n")
-	fmt.Print("\n", config.BotName, "> ")
+	fmt.Print("\n> ")
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		req := scanner.Text()
-		fmt.Print("\n", config.BotName, "> ")
 		input, debug := parse.Flag(req, "--debug")
 		if strings.TrimSpace(input) != "" {
 			message := models.NewMessage()
@@ -37,6 +36,8 @@ func (x Cli) Read(inputMsgs chan<- models.Message, config models.Config) {
 			config.Logger.Debug("Cli Input - ID:" + message.Attributes["hex.id"])
 			config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 			inputMsgs <- message
+		} else {
+			fmt.Print("\n> ")
 		}
 	}
 }

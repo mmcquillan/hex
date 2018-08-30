@@ -14,7 +14,7 @@ type Cli struct {
 }
 
 func (x Cli) Write(message models.Message, config models.Config) {
-	fmt.Print("\n\n")
+	fmt.Print("\n")
 	for _, output := range message.Outputs {
 		if message.Debug && parse.EitherMember(config.Admins, message.Attributes["hex.user"], message.Attributes["hex.channel"]) {
 			output.Response = output.Response + "\n\n[ Debug: " + output.Command + " ]"
@@ -46,5 +46,5 @@ func (x Cli) Write(message models.Message, config models.Config) {
 			}
 		}
 	}
-	fmt.Print("\n", config.BotName, "> ")
+	fmt.Print("\n> ")
 }
