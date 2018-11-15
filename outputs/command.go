@@ -24,10 +24,12 @@ func (x Command) Write(message models.Message, config models.Config) {
 			} else {
 				color.Set(color.FgRed)
 			}
-			fmt.Println(output.Response, "\n")
+			fmt.Println(output.Response)
+			fmt.Println("")
 			color.Unset()
 		} else {
-			fmt.Println(output.Response, "\n")
+			fmt.Println(output.Response)
+			fmt.Println("")
 		}
 	}
 	if message.Debug {

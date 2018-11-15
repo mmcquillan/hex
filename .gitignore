@@ -26,3 +26,4 @@ _testmain.go
 .vagrant
 test*.yaml
 test*.json
+out/

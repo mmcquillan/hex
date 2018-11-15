@@ -16,12 +16,20 @@ var state *State
 
 // Matcher function
 func Matcher(inputMsgs <-chan models.Message, outputMsgs chan<- models.Message, plugins *map[string]models.Plugin, rules *map[string]models.Rule, config models.Config) {
+
+	// initialize state
 	state = NewState(rules)
+
+	// main listen loop
 	for {
 		message := <-inputMsgs
 		match := false
 		config.Logger.Debug("Matcher - Eval of Message ID:" + message.Attributes["hex.id"])
 		config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
+
+		// somehwere in here we decorate with globals
+		message.Attributes["hex.version"] = config.Version
+
 		if parse.EitherMember(config.ACL, message.Attributes["hex.user"], message.Attributes["hex.channel"]) {
 			Commands(message, outputMsgs, rules, config)
 		}

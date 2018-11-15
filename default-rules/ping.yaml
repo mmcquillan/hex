@@ -1,0 +1,5 @@
+rule: "${hex.botname} ping"
+match: "ping"
+actions:
+- type: "response"
+  command: "pong!"
