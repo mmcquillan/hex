@@ -9,6 +9,7 @@ import (
 	"github.com/mmcquillan/hex/models"
 )
 
+// Auditing struct
 type Auditing struct {
 	AuditFile *os.File
 }
