@@ -2,31 +2,38 @@ package core
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 
+	"github.com/hashicorp/go-hclog"
 	"github.com/mmcquillan/hex/models"
+	"github.com/mmcquillan/hex/parse"
+	"github.com/mmcquillan/matcher"
 	"gopkg.in/yaml.v2"
 )
 
 // Config func
-func Config(config *models.Config, version string) {
+func Config(version string) (config models.Config) {
 
-	// start with defaults
+	// set version default
+	if version == "" {
+		version = "unknown"
+	}
+
+	// defaults
+	config.Logger = hclog.New(nil)
 	config.Version = version
 	config.Admins = ""
-	config.ACL = "*"
+	config.UserACL = "*"
+	config.ChannelACL = "*"
 	config.PluginsDir = ""
 	config.RulesDir = ""
 	config.LogFile = ""
-	config.Debug = false
-	config.Trace = false
-	config.Quiet = false
+	config.LogLevel = "info"
 	config.BotName = "@hex"
 	config.CLI = false
 	config.Auditing = false
@@ -40,154 +47,104 @@ func Config(config *models.Config, version string) {
 	config.WebhookPort = 8000
 	config.Command = ""
 
-	// version and exit
-	if len(os.Args) > 1 && os.Args[1] == "version" {
-		fmt.Print("HexBot " + config.Version + "\n")
-		os.Exit(0)
-	}
-
-	// evaluate for config file
-	if len(os.Args) > 1 && FileExists(os.Args[1]) {
-		file, err := ioutil.ReadFile(os.Args[1])
+	// saved
+	_, _, values := matcher.Matcher("<bin> [config] [--]", strings.Join(os.Args, " "))
+	if values["config"] != "" {
+		fileName := values["config"]
+		file, err := ioutil.ReadFile(fileName)
 		if err != nil {
-			log.Fatal("ERROR: Config File Read - ", err)
+			config.Logger.Error("ERROR: Config File Read - " + err.Error())
+			os.Exit(1)
 		}
-		configType := fileType(os.Args[1])
-		if configType == "json" {
-			err = json.Unmarshal(file, &config)
+		subFile := parse.SubstituteEnv(string(file[:]))
+		if strings.HasSuffix(fileName, ".json") {
+			err = json.Unmarshal([]byte(subFile), &config)
 			if err != nil {
-				log.Fatal("ERROR: Config File json Unmarshal - ", err)
+				config.Logger.Error("ERROR: Config File json Unmarshal - " + err.Error())
+				os.Exit(1)
 			}
-		} else if configType == "yaml" {
-			err = yaml.Unmarshal(file, &config)
+		} else if strings.HasSuffix(fileName, ".yaml") || strings.HasSuffix(fileName, ".yml") {
+			err = yaml.Unmarshal([]byte(subFile), &config)
 			if err != nil {
-				log.Fatal("ERROR: Config File yaml Unmarshal - ", err)
+				config.Logger.Error("ERROR: Config File yaml Unmarshal - " + err.Error())
+				os.Exit(1)
 			}
 		} else {
-			log.Fatal("ERROR: Config File Unknown Type")
+			config.Logger.Error("ERROR: Config File Unknown Type")
+			os.Exit(1)
 		}
 	}
 
-	// environment
-	if os.Getenv("HEX_ADMINS") != "" {
-		config.Admins = os.Getenv("HEX_ADMINS")
-	}
-	if os.Getenv("HEX_ACL") != "" {
-		config.ACL = os.Getenv("HEX_ACL")
-	}
-	if os.Getenv("HEX_RULES_DIR") != "" {
-		config.RulesDir = os.Getenv("HEX_RULES_DIR")
-	}
-	if os.Getenv("HEX_PLUGINS_DIR") != "" {
-		config.PluginsDir = os.Getenv("HEX_PLUGINS_DIR")
-	}
-	if os.Getenv("HEX_LOG_FILE") != "" {
-		config.LogFile = os.Getenv("HEX_LOG_FILE")
-	}
-	if strings.ToUpper(os.Getenv("HEX_DEBUG")) == "TRUE" {
-		config.Debug = true
-	}
-	if strings.ToUpper(os.Getenv("HEX_TRACE")) == "TRUE" {
-		config.Trace = true
-	}
-	if strings.ToUpper(os.Getenv("HEX_QUIET")) == "TRUE" {
-		config.Quiet = true
-	}
-	if os.Getenv("HEX_BOT_NAME") != "" {
-		config.BotName = os.Getenv("HEX_BOT_NAME")
-	}
-	if strings.ToUpper(os.Getenv("HEX_CLI")) == "TRUE" {
-		config.CLI = true
-	}
-	if strings.ToUpper(os.Getenv("HEX_AUDITING")) == "TRUE" {
-		config.Auditing = true
-	}
-	if os.Getenv("HEX_AUDITING_FILE") != "" {
-		config.AuditingFile = os.Getenv("HEX_AUDITING_FILE")
-	}
-	if strings.ToUpper(os.Getenv("HEX_SLACK")) == "TRUE" {
-		config.Slack = true
-	}
-	if os.Getenv("HEX_SLACK_TOKEN") != "" {
-		config.SlackToken = os.Getenv("HEX_SLACK_TOKEN")
-	}
-	if os.Getenv("HEX_SLACK_ICON") != "" {
-		config.SlackIcon = os.Getenv("HEX_SLACK_ICON")
-	}
-	if strings.ToUpper(os.Getenv("HEX_SLACK_DEBUG")) == "TRUE" {
-		config.SlackDebug = true
-	}
-	if strings.ToUpper(os.Getenv("HEX_SCHEDULER")) == "TRUE" {
-		config.Scheduler = true
-	}
-	if strings.ToUpper(os.Getenv("HEX_WEBHOOK")) == "TRUE" {
-		config.Webhook = true
-	}
-	if os.Getenv("HEX_WEBHOOK_PORT") != "" {
-		port, err := strconv.Atoi(os.Getenv("HEX_WEBHOOK_PORT"))
-		if err != nil {
-			log.Fatal("ERROR: Webhook Port is not a Number")
+	// reflect on things
+	obj := reflect.TypeOf(config)
+
+	// env vars
+	envVarPrefix := "HEX_"
+	for i := 0; i < obj.NumField(); i++ {
+		f := obj.Field(i)
+		if f.Tag.Get("json") != "" {
+			env := strings.ToUpper(envVarPrefix + f.Tag.Get("json"))
+			v := reflect.ValueOf(&config).Elem().FieldByName(f.Name)
+			if v.CanSet() && os.Getenv(env) != "" {
+				switch fmt.Sprintf("%v", f.Type) {
+				case "string":
+					v.SetString(os.Getenv(env))
+				case "int":
+					if val, err := strconv.ParseInt(os.Getenv(env), 10, 32); err == nil {
+						v.SetInt(val)
+					}
+				case "bool":
+					if val, err := strconv.ParseBool(os.Getenv(env)); err == nil {
+						v.SetBool(val)
+					}
+				}
+			}
 		}
-		config.WebhookPort = port
-	}
-	if os.Getenv("HEX_COMMAND") != "" {
-		config.Command = os.Getenv("HEX_COMMAND")
 	}
 
 	// flags
-	Admins := flag.String("admins", config.Admins, "Admins (comma delimited)")
-	ACL := flag.String("acl", config.ACL, "ACL (comma delimited)")
-	RulesDir := flag.String("rules-dir", config.RulesDir, "Rules Directory")
-	PluginsDir := flag.String("plugins-dir", config.PluginsDir, "Plugins Directory")
-	LogFile := flag.String("log-file", config.LogFile, "Log File")
-	Debug := flag.Bool("debug", config.Debug, "Debug [false]")
-	Quiet := flag.Bool("quiet", config.Quiet, "Quiet [false]")
-	Trace := flag.Bool("trace", config.Trace, "Trace [false]")
-	BotName := flag.String("bot-name", config.BotName, "Bot Name [hex]")
-	CLI := flag.Bool("cli", config.CLI, "CLI [false]")
-	Auditing := flag.Bool("auditing", config.Auditing, "Audting [false]")
-	AuditingFile := flag.String("auditing-file", config.AuditingFile, "Auditing File")
-	Slack := flag.Bool("slack", config.Slack, "Slack [false]")
-	SlackToken := flag.String("slack-token", config.SlackToken, "Slack Token")
-	SlackIcon := flag.String("slack-icon", config.SlackIcon, "Slack Icon [:nut_and_bolt:]")
-	SlackDebug := flag.Bool("slack-debug", config.SlackDebug, "Slack Debug [false]")
-	Scheduler := flag.Bool("scheduler", config.Scheduler, "Scheduler [false]")
-	Webhook := flag.Bool("webhook", config.Webhook, "Webhook [false]")
-	WebhookPort := flag.Int("webhook-port", config.WebhookPort, "Webhook Port [8000]")
-	Command := flag.String("command", config.Command, "Command to Execute")
-	flag.Parse()
+	for i := 0; i < obj.NumField(); i++ {
+		f := obj.Field(i)
+		if f.Tag.Get("json") != "" {
+			flag := strings.Replace(f.Tag.Get("json"), "_", "-", -1)
+			v := reflect.ValueOf(&config).Elem().FieldByName(f.Name)
+			if v.CanSet() && values[flag] != "" {
+				switch fmt.Sprintf("%v", f.Type) {
+				case "string":
+					v.SetString(values[flag])
+				case "int":
+					if val, err := strconv.ParseInt(values[flag], 10, 32); err == nil {
+						v.SetInt(val)
+					}
+				case "bool":
+					if val, err := strconv.ParseBool(values[flag]); err == nil {
+						v.SetBool(val)
+					}
+				}
+			}
+		}
+	}
 
-	// set flags
-	config.Admins = *Admins
-	config.ACL = *ACL
-	config.RulesDir = *RulesDir
-	config.PluginsDir = *PluginsDir
-	config.LogFile = *LogFile
-	config.Debug = *Debug
-	config.Quiet = *Quiet
-	config.Trace = *Trace
-	config.BotName = *BotName
-	config.CLI = *CLI
-	config.Auditing = *Auditing
-	config.AuditingFile = *AuditingFile
-	config.Slack = *Slack
-	config.SlackToken = *SlackToken
-	config.SlackIcon = *SlackIcon
-	config.SlackDebug = *SlackDebug
-	config.Scheduler = *Scheduler
-	config.Webhook = *Webhook
-	config.WebhookPort = *WebhookPort
-	config.Command = *Command
-
-	// a few basic rules
-	if config.ACL == "" {
-		log.Println("WARNING: Setting a blank ACL will result in nothing happening.")
+	// validate
+	if config.UserACL == "" {
+		config.Logger.Warn("WARNING: Setting a blank User ACL will result in nothing happening.")
+	}
+	if config.ChannelACL == "" {
+		config.Logger.Warn("WARNING: Setting a blank Channel ACL will result in nothing happening.")
+	}
+	if !parse.Member("ERROR,INFO,DEBUG,TRACE", strings.ToUpper(config.LogLevel)) {
+		config.Logger.Error("ERROR: Log Level should be error, info, debug or trace.")
+		os.Exit(1)
 	}
 	if config.Slack && config.SlackToken == "" {
-		log.Fatal("ERROR: Slack is enabled, but no Slack Token is specified.")
+		config.Logger.Error("ERROR: Slack is enabled, but no Slack Token is specified.")
+		os.Exit(1)
 	}
 	if config.Auditing && config.AuditingFile == "" {
-		log.Fatal("ERROR: Auditing is enabled, but no Auditing File is specified.")
+		config.Logger.Error("ERROR: Auditing is enabled, but no Auditing File is specified.")
+		os.Exit(1)
 	}
+
+	return config
 
 }

@@ -1,0 +1,4 @@
+match: "${hex.botname} whoami"
+actions:
+- type: "response"
+  command: "${hex.user}"

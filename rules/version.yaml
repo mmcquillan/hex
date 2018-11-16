@@ -1,0 +1,4 @@
+match: "${hex.botname} version"
+actions:
+- type: "response"
+  command: "${hex.version}"

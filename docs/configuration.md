@@ -1,6 +1,17 @@
 # Configuration
 
-Hex can run from environment variables, command line options or a configuration file. If you use a configuration file, use that as a the first argument to execute hex, such as `/usr/local/bin/hex /etc/hex/config.json`.
+Hex can run from environment variables, command line options or a configuration file. If you use a configuration file, use that as a the first argument to execute hex, such as `/usr/local/bin/hex /etc/hex/config.yaml`.
+
+yaml config:
+```
+---
+slack: true
+slack_token: "${SLACK_TOKEN}"
+scheduler: true
+log_file: "/var/log/hex.log"
+rules_dir: "/etc/hex/rules"
+plugins_dir: "/etc/hex/plugins"
+```
 
 json config:
 ```
@@ -14,16 +25,6 @@ json config:
 }
 ```
 
-yaml config:
-```
----
-slack: true
-slack_token: "${SLACK_TOKEN}"
-scheduler: true
-log_file: "/var/log/hex.log"
-rules_dir: "/etc/hex/rules"
-plugins_dir: "/etc/hex/plugins"
-```
 
 Other config options are lited below:
 
@@ -32,23 +33,31 @@ Other config options are lited below:
 - Default:
 - Type: string
 - Env Variable: `HEX_ADMINS`
-- CLI Param:  `-admins`
+- CLI Param:  `--admins`
 - Conf File: `admins`
 
-### ACL
-- Description: Comma delimited list of users and channels allowed to execute any rule
+### UserACL
+- Description: Comma delimited list of users allowed to execute any rule
 - Default: *
 - Type: string
-- Env Variable: `HEX_ACL`
-- CLI Param: `-acl`
-- Conf File: `acl`
+- Env Variable: `HEX_USER_ACL`
+- CLI Param: `--user-acl`
+- Conf File: `user_acl`
+
+### ChannelACL
+- Description: Comma delimited list of channels allowed to execute any rule
+- Default: *
+- Type: string
+- Env Variable: `HEX_CHANNEL_ACL`
+- CLI Param: `--channel-acl`
+- Conf File: `channel_acl`
 
 ### Plugins Directory
 - Description: The location of the hex plugins
 - Default:
 - Type: string
 - Env Variable: `HEX_PLUGINS_DIR`
-- CLI Param:  `-plugins-dir`
+- CLI Param:  `--plugins-dir`
 - Conf File: `plugins_dir`
 
 ### Rules Directory
@@ -56,7 +65,7 @@ Other config options are lited below:
 - Default:
 - Type: string
 - Env Variable: `HEX_RULES_DIR`
-- CLI Param:  `-rules-dir`
+- CLI Param:  `--rules-dir`
 - Conf File: `rules_dir`
 
 ### Log File
@@ -64,39 +73,23 @@ Other config options are lited below:
 - Default: 
 - Type: string
 - Env Variable: `HEX_LOG_FILE`
-- CLI Param:  `-log-file`
+- CLI Param:  `--log-file`
 - Conf File: `log_file`
 
-### Debug
-- Description: Flag to enable debug for logs
-- Default: `false`
-- Type: bool
-- Env Variable: `HEX_DEBUG`
-- CLI Param:  `-debug`
-- Conf File: `debug`
-
-### Trace
-- Description: Flag to enable trace for logs (WARNING: this is very verbose and can contain sensitve data)
-- Default: `false`
-- Type: bool
-- Env Variable: `HEX_TRACE`
-- CLI Param:  `-trace`
-- Conf File: `trace`
-
-### Quiet
-- Description: Flag to only log errors out (note, debug takes precedence over this)
-- Default: `false`
-- Type: bool
-- Env Variable: `HEX_QUIET`
-- CLI Param:  `-quiet`
-- Conf File: `quiet`
+### Log Level
+- Description: The log level to write out (error, info, debug, trace)
+- Default: `info`
+- Type: string
+- Env Variable: `HEX_LOG_LEVEL`
+- CLI Param:  `--log-level`
+- Conf File: `log_level`
 
 ### Bot Name
 - Description: Bot Name in Slack
 - Default: `@hex`
 - Type: string
 - Env Variable: `HEX_BOT_NAME`
-- CLI Param:  `-bot-name`
+- CLI Param:  `--bot-name`
 - Conf File: `bot_name`
 
 ### Command Line Interface
@@ -104,7 +97,7 @@ Other config options are lited below:
 - Default: `false`
 - Type: bool
 - Env Variable: `HEX_CLI`
-- CLI Param:  `-cli`
+- CLI Param:  `--cli`
 - Conf File: `cli`
 
 ### Auditing
@@ -112,7 +105,7 @@ Other config options are lited below:
 - Default: `false`
 - Type: bool
 - Env Variable: `HEX_AUDITING`
-- CLI Param:  `-auditing`
+- CLI Param:  `--auditing`
 - Conf File: `auditing`
 
 ### Auditing File
@@ -120,7 +113,7 @@ Other config options are lited below:
 - Default:
 - Type: string
 - Env Variable: `HEX_AUDITING_FILE`
-- CLI Param:  `-auditing-file`
+- CLI Param:  `--auditing-file`
 - Conf File: `auditing_file`
 
 ### Slack
@@ -128,7 +121,7 @@ Other config options are lited below:
 - Default: `false`
 - Type: bool
 - Env Variable: `HEX_SLACK`
-- CLI Param:  `-slack`
+- CLI Param:  `--slack`
 - Conf File: `slack`
 
 ### Slack Token
@@ -136,7 +129,7 @@ Other config options are lited below:
 - Default: 
 - Type: string
 - Env Variable: `HEX_SLACK_TOKEN`
-- CLI Param:  `-slack-token`
+- CLI Param:  `--slack-token`
 - Conf File: `slack_token`
 
 ### Slack Icon
@@ -144,7 +137,7 @@ Other config options are lited below:
 - Default: `:nut_and_bolt:`
 - Type: string
 - Env Variable: `HEX_SLACK_ICON`
-- CLI Param:  `-slack-icon`
+- CLI Param:  `--slack-icon`
 - Conf File: `slack_icon`
 
 ### Slack Debug
@@ -152,7 +145,7 @@ Other config options are lited below:
 - Default: `false`
 - Type: bool
 - Env Variable: `HEX_SLACK_DEBUG`
-- CLI Param:  `-slack-debug`
+- CLI Param:  `--slack-debug`
 - Conf File: `slack_debug`
 
 ### Scheduler
@@ -160,7 +153,7 @@ Other config options are lited below:
 - Default: `false`
 - Type: bool
 - Env Variable: `HEX_SCHEDULER`
-- CLI Param:  `-scheduler`
+- CLI Param:  `--scheduler`
 - Conf File: `scheduler`
 
 ### Webhook
@@ -168,7 +161,7 @@ Other config options are lited below:
 - Default: `false`
 - Type: bool
 - Env Variable: `HEX_WEBHOOK`
-- CLI Param:  `-webhook`
+- CLI Param:  `--webhook`
 - Conf File: `webhook`
 
 ### Webhook Port
@@ -176,7 +169,7 @@ Other config options are lited below:
 - Default: `8000`
 - Type: int
 - Env Variable: `HEX_WEBHOOK_PORT`
-- CLI Param:  `-webhook-port`
+- CLI Param:  `--webhook-port`
 - Conf File: `webhook_port`
 
 ### Command
@@ -184,7 +177,7 @@ Other config options are lited below:
 - Default:
 - Type: string
 - Env Variable: `HEX_COMMAND`
-- CLI Param:  `-command`
+- CLI Param:  `--command`
 - Conf File: `command`
 
 ### Vars

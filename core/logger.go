@@ -3,27 +3,30 @@ package core
 import (
 	"log"
 	"os"
+	"strings"
 
 	"github.com/hashicorp/go-hclog"
 	"github.com/mmcquillan/hex/models"
 )
 
-func Logging(config *models.Config) {
+// Logger function
+func Logger(config *models.Config) {
 	logOptions := hclog.LoggerOptions{
-		Name:  "hex",
+		Name:  config.BotName,
 		Level: hclog.Info,
 	}
-	if config.Quiet {
+	logLevel := strings.ToUpper(config.LogLevel)
+	if logLevel == "ERROR" {
 		logOptions.Level = hclog.Error
 	}
-	if config.Debug {
+	if logLevel == "DEBUG" {
 		logOptions.Level = hclog.Debug
 	}
-	if config.Trace {
+	if logLevel == "TRACE" {
 		logOptions.Level = hclog.Trace
 	}
 	if config.LogFile != "" {
-		if !FileExists(config.LogFile) {
+		if _, err := os.Stat(config.LogFile); os.IsNotExist(err) {
 			nf, err := os.Create(config.LogFile)
 			if err != nil {
 				log.Fatal("ERROR: Cannot create log file at "+config.LogFile, err)
@@ -37,6 +40,6 @@ func Logging(config *models.Config) {
 		logOptions.Output = f
 	}
 	config.Logger = hclog.New(&logOptions)
-	config.Logger.Info(". . .")
-	config.Logger.Info("Starting HexBot " + config.Version)
+	config.Logger.Info("Starting Hex (" + config.Version + ")")
+	config.Logger.Info("Initializing Logger")
 }

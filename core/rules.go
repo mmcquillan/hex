@@ -98,6 +98,9 @@ func readRule(ruleFile string, config models.Config) (rule models.Rule) {
 		for i := 0; i < len(rule.Actions); i++ {
 			rule.Actions[i].Type = ResolvePluginName(rule.Actions[i].Type)
 		}
+		if rule.Name == "" {
+			rule.Name = rule.Match
+		}
 		// no need to sub action.config as this happens at matcher time
 	}
 	rule.Id = ruleFile

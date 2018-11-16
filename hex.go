@@ -20,11 +20,11 @@ func main() {
 	var outputMsgs = make(chan models.Message, 1)
 
 	// initialize app
-	core.Config(&config, version)
-	core.Logging(&config)
+	config = core.Config(version)
+	core.Logger(&config)
+	core.Handler(&plugins, config)
 	core.Rules(&rules, config)
 	core.Plugins(&plugins, rules, config)
-	core.Handler(&plugins, config)
 
 	// run application
 	wg.Add(3)

@@ -14,4 +14,4 @@ go install github.com/mmcquillan/hex-twilio
 go install github.com/mmcquillan/hex-validate
 go install github.com/mmcquillan/hex-winrm
 mkdir out/rules
-cp ./default-rules/* ./out/rules/
+cp ./rules/* ./out/rules/

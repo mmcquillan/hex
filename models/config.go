@@ -9,13 +9,12 @@ type Config struct {
 	Version      string
 	Logger       hclog.Logger
 	Admins       string            `json:"admins" yaml:"admins"`
-	ACL          string            `json:"acl" yaml:"acl"`
+	UserACL      string            `json:"user_acl" yaml:"user_acl"`
+	ChannelACL   string            `json:"channel_acl" yaml:"channel_acl"`
 	PluginsDir   string            `json:"plugins_dir" yaml:"plugins_dir"`
 	RulesDir     string            `json:"rules_dir" yaml:"rules_dir"`
 	LogFile      string            `json:"log_file" yaml:"log_file"`
-	Debug        bool              `json:"debug" yaml:"debug"`
-	Trace        bool              `json:"trace" yaml:"trace"`
-	Quiet        bool              `json:"quiet" yaml:"quiet"`
+	LogLevel     string            `json:"log_level" yaml:"log_level"`
 	BotName      string            `json:"bot_name" yaml:"bot_name"`
 	CLI          bool              `json:"cli" yaml:"cli"`
 	Auditing     bool              `json:"auditing" yaml:"auditing"`
