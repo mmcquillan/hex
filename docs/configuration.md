@@ -109,7 +109,7 @@ Other config options are lited below:
 - Conf File: `auditing`
 
 ### Auditing File
-- Description: The location of the auditing log file
+- Description: The location of the auditing log file (empty is stdout)
 - Default:
 - Type: string
 - Env Variable: `HEX_AUDITING_FILE`

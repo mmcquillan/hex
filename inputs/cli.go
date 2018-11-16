@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/mmcquillan/hex/models"
-	"github.com/mmcquillan/hex/parse"
 )
 
 // Cli struct
@@ -24,15 +23,13 @@ func (x Cli) Read(inputMsgs chan<- models.Message, config models.Config) {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		req := scanner.Text()
-		input, debug := parse.Flag(req, "--debug")
-		if strings.TrimSpace(input) != "" {
+		if strings.TrimSpace(req) != "" {
 			message := models.NewMessage()
 			message.Attributes["hex.botname"] = config.BotName
 			message.Attributes["hex.service"] = "cli"
 			message.Attributes["hex.hostname"] = hostname
 			message.Attributes["hex.user"] = user.Username
-			message.Attributes["hex.input"] = input
-			message.Debug = debug
+			message.Attributes["hex.input"] = req
 			config.Logger.Debug("Cli Input - ID:" + message.Attributes["hex.id"])
 			config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 			inputMsgs <- message

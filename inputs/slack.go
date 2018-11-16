@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/mmcquillan/hex/models"
-	"github.com/mmcquillan/hex/parse"
 	"github.com/nlopes/slack"
 )
 
@@ -72,14 +71,12 @@ func (x Slack) Read(inputMsgs chan<- models.Message, config models.Config) {
 					if useAt {
 						input = strings.Replace(input, botName, config.BotName, -1)
 					}
-					input, debug := parse.Flag(input, "--debug")
 					message := models.NewMessage()
 					message.Attributes["hex.botname"] = config.BotName
 					message.Attributes["hex.service"] = "slack"
 					message.Attributes["hex.channel"] = channel
 					message.Attributes["hex.user"] = x.Users[ev.User]
 					message.Attributes["hex.input"] = input
-					message.Debug = debug
 					config.Logger.Debug("Slack Input - ID:" + message.Attributes["hex.id"])
 					config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 					inputMsgs <- message

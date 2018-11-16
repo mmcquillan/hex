@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/mmcquillan/hex/models"
-	"github.com/mmcquillan/hex/parse"
 )
 
 // Command struct
@@ -18,14 +17,12 @@ type Command struct {
 func (x Command) Read(inputMsgs chan<- models.Message, config models.Config) {
 	hostname, _ := os.Hostname()
 	user, _ := user.Current()
-	input, debug := parse.Flag(config.Command, "--debug")
-	if strings.TrimSpace(input) != "" {
+	if strings.TrimSpace(config.Command) != "" {
 		message := models.NewMessage()
 		message.Attributes["hex.service"] = "command"
 		message.Attributes["hex.hostname"] = hostname
 		message.Attributes["hex.user"] = user.Username
-		message.Attributes["hex.input"] = input
-		message.Debug = debug
+		message.Attributes["hex.input"] = config.Command
 		config.Logger.Debug("Command Input - ID:" + message.Attributes["hex.id"])
 		config.Logger.Trace(fmt.Sprintf("Message: %+v", message))
 		inputMsgs <- message

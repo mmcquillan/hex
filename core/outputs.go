@@ -1,7 +1,6 @@
 package core
 
 import (
-	"log"
 	"os"
 
 	"github.com/mmcquillan/hex/models"
@@ -38,14 +37,6 @@ func Outputs(outputMsgs <-chan models.Message, plugins *map[string]models.Plugin
 		}
 
 		if config.Auditing {
-			if !FileExists(config.AuditingFile) {
-				nf, err := os.Create(config.AuditingFile)
-				if err != nil {
-					log.Fatal("ERROR: Cannot create Auditing File at "+config.AuditingFile, err)
-				}
-				nf.Close()
-				config.Logger.Info("Created Auditing File " + config.AuditingFile)
-			}
 			auditing.Write(message, config)
 		}
 

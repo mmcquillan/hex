@@ -140,10 +140,6 @@ func Config(version string) (config models.Config) {
 		config.Logger.Error("ERROR: Slack is enabled, but no Slack Token is specified.")
 		os.Exit(1)
 	}
-	if config.Auditing && config.AuditingFile == "" {
-		config.Logger.Error("ERROR: Auditing is enabled, but no Auditing File is specified.")
-		os.Exit(1)
-	}
 
 	return config
 
