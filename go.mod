@@ -11,7 +11,14 @@ require (
 	github.com/hashicorp/go-plugin v1.1.0
 	github.com/lusis/go-slackbot v0.0.0-20180109053408-401027ccfef5 // indirect
 	github.com/lusis/slack-test v0.0.0-20190426140909-c40012f20018 // indirect
+	github.com/masterzen/winrm v0.0.0-20190308153735-1d17eaf15943 // indirect
+	github.com/mmcquillan/hex-local v0.0.0-20180726095434-dbc86b5795fe // indirect
 	github.com/mmcquillan/hex-plugin v0.0.0-20180726094947-03c0d997680c
+	github.com/mmcquillan/hex-response v0.0.0-20180726095254-d07a0d16b630 // indirect
+	github.com/mmcquillan/hex-ssh v0.0.0-20180726095352-0149d3208712 // indirect
+	github.com/mmcquillan/hex-twilio v0.0.0-20180726095714-ea9e477b8a7b // indirect
+	github.com/mmcquillan/hex-validate v0.0.0-20180726095629-07cf894fad99 // indirect
+	github.com/mmcquillan/hex-winrm v0.0.0-20180726095524-f6ed4b327f77 // indirect
 	github.com/mmcquillan/matcher v0.0.0-20190530201230-593f78813455
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
